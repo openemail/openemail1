@@ -1,4 +1,4 @@
-# openemail - Open source mail server in dockers
+# openemail - open source mail server in dockers
 
 ## Information and documentation
 
