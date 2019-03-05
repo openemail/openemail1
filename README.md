@@ -1,10 +1,7 @@
-# mailcow: dockerized - 🐮 + 🐋 = 💕
+# openemail - Open source mail server in dockers
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JWBSYHF4SMC68)
+## Information and documentation
 
-**mailcow Bitcoin donations:** 1E5rgzgA1sS3QH7r1ToWxRC3GEavfsGMrx
+Please see [the official documentation](https://docs.openemail.io/) for instructions.
 
-Please see [the official documentation](https://mailcow.github.io/mailcow-dockerized-docs/) for instructions.
-
-**Important**: mailcow makes use of various open-source software. Please assure you agree with their license before using mailcow.
-Any part of mailcow itself is released under **GNU General Public License, Version 3**.
+**Important**: openemail makes use of various open-source software. Please assure you agree with their license before using openemail. Any part of openemail itself is released under **GNU General Public License, Version 3**.
