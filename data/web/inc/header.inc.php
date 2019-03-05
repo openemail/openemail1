@@ -100,7 +100,7 @@
           }
           if ($_SESSION['mailcow_cc_role'] == 'admin') {
           ?>
-          <li><a href data-toggle="modal" data-container="sogo-mailcow" data-target="#RestartContainer"><span class="glyphicon glyphicon-refresh"></span> <?= $lang['header']['restart_sogo']; ?></a></li>
+          <li><a href data-toggle="modal" data-container="sogo-openemail" data-target="#RestartContainer"><span class="glyphicon glyphicon-refresh"></span> <?= $lang['header']['restart_sogo']; ?></a></li>
           <?php
           }
           ?>
