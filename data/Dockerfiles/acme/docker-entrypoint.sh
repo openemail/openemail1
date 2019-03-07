@@ -236,14 +236,14 @@ while true; do
   IPV6=$(get_ipv6)
   log_f "OK" no_date
 
-  # Hard-fail on CAA errors for MAILCOW_HOSTNAME
-  MH_PARENT_DOMAIN=$(echo ${MAILCOW_HOSTNAME} | cut -d. -f2-)
+  # Hard-fail on CAA errors for OPENEMAIL_HOSTNAME
+  MH_PARENT_DOMAIN=$(echo ${OPENEMAIL_HOSTNAME} | cut -d. -f2-)
   MH_CAAS=( $(dig CAA ${MH_PARENT_DOMAIN} +short | sed -n 's/\d issue "\(.*\)"/\1/p') )
   if [[ ! -z ${MH_CAAS} ]]; then
     if [[ ${MH_CAAS[@]} =~ "letsencrypt.org" ]]; then
       echo "Validated CAA for parent domain ${MH_PARENT_DOMAIN}"
     else
-      echo "Skipping ACME validation: Lets Encrypt disallowed for ${MAILCOW_HOSTNAME} by CAA record, retrying in 1h..."
+      echo "Skipping ACME validation: Lets Encrypt disallowed for ${OPENEMAIL_HOSTNAME} by CAA record, retrying in 1h..."
       sleep 1h
       exec $(readlink -f "$0")
     fi
@@ -257,7 +257,7 @@ while true; do
 
   for SQL_DOMAIN in "${SQL_DOMAIN_ARR[@]}"; do
     for SUBDOMAIN in "${ADDITIONAL_WC_ARR[@]}"; do
-      if [[  "${SUBDOMAIN}.${SQL_DOMAIN}" != "${MAILCOW_HOSTNAME}" ]]; then
+      if [[  "${SUBDOMAIN}.${SQL_DOMAIN}" != "${OPENEMAIL_HOSTNAME}" ]]; then
         A_SUBDOMAIN=$(dig A ${SUBDOMAIN}.${SQL_DOMAIN} +short | tail -n 1)
         AAAA_SUBDOMAIN=$(dig AAAA ${SUBDOMAIN}.${SQL_DOMAIN} +short | tail -n 1)
         # Check if CNAME without v6 enabled target
@@ -295,38 +295,38 @@ while true; do
     done
   done
 
-  A_MAILCOW_HOSTNAME=$(dig A ${MAILCOW_HOSTNAME} +short | tail -n 1)
-  AAAA_MAILCOW_HOSTNAME=$(dig AAAA ${MAILCOW_HOSTNAME} +short | tail -n 1)
+  A_OPENEMAIL_HOSTNAME=$(dig A ${OPENEMAIL_HOSTNAME} +short | tail -n 1)
+  AAAA_OPENEMAIL_HOSTNAME=$(dig AAAA ${OPENEMAIL_HOSTNAME} +short | tail -n 1)
   # Check if CNAME without v6 enabled target
-  if [[ ! -z ${AAAA_MAILCOW_HOSTNAME} ]] && [[ -z $(echo ${AAAA_MAILCOW_HOSTNAME} | grep "^\([0-9a-fA-F]\{0,4\}:\)\{1,7\}[0-9a-fA-F]\{0,4\}$") ]]; then
-    AAAA_MAILCOW_HOSTNAME=
+  if [[ ! -z ${AAAA_OPENEMAIL_HOSTNAME} ]] && [[ -z $(echo ${AAAA_OPENEMAIL_HOSTNAME} | grep "^\([0-9a-fA-F]\{0,4\}:\)\{1,7\}[0-9a-fA-F]\{0,4\}$") ]]; then
+    AAAA_OPENEMAIL_HOSTNAME=
   fi
-  if [[ ! -z ${AAAA_MAILCOW_HOSTNAME} ]]; then
-    log_f "Found AAAA record for ${MAILCOW_HOSTNAME}: ${AAAA_MAILCOW_HOSTNAME} - skipping A record check"
-    if [[ $(expand ${IPV6:-"0000:0000:0000:0000:0000:0000:0000:0000"}) == $(expand ${AAAA_MAILCOW_HOSTNAME}) ]] || [[ ${SKIP_IP_CHECK} == "y" ]]; then
-      if verify_challenge_path "${MAILCOW_HOSTNAME}" 6; then
-        log_f "Confirmed AAAA record ${AAAA_MAILCOW_HOSTNAME}"
-        VALIDATED_MAILCOW_HOSTNAME=${MAILCOW_HOSTNAME}
+  if [[ ! -z ${AAAA_OPENEMAIL_HOSTNAME} ]]; then
+    log_f "Found AAAA record for ${OPENEMAIL_HOSTNAME}: ${AAAA_OPENEMAIL_HOSTNAME} - skipping A record check"
+    if [[ $(expand ${IPV6:-"0000:0000:0000:0000:0000:0000:0000:0000"}) == $(expand ${AAAA_OPENEMAIL_HOSTNAME}) ]] || [[ ${SKIP_IP_CHECK} == "y" ]]; then
+      if verify_challenge_path "${OPENEMAIL_HOSTNAME}" 6; then
+        log_f "Confirmed AAAA record ${AAAA_OPENEMAIL_HOSTNAME}"
+        VALIDATED_OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
       else
-        log_f "Confirmed AAAA record ${A_MAILCOW_HOSTNAME}, but HTTP validation failed"
+        log_f "Confirmed AAAA record ${A_OPENEMAIL_HOSTNAME}, but HTTP validation failed"
       fi
     else
-      log_f "Cannot match your IP ${IPV6:-NO_IPV6_LINK} against hostname ${MAILCOW_HOSTNAME} ($(expand ${AAAA_MAILCOW_HOSTNAME}))"
+      log_f "Cannot match your IP ${IPV6:-NO_IPV6_LINK} against hostname ${OPENEMAIL_HOSTNAME} ($(expand ${AAAA_OPENEMAIL_HOSTNAME}))"
     fi
-  elif [[ ! -z ${A_MAILCOW_HOSTNAME} ]]; then
-    log_f "Found A record for ${MAILCOW_HOSTNAME}: ${A_MAILCOW_HOSTNAME}"
-    if [[ ${IPV4:-ERR} == ${A_MAILCOW_HOSTNAME} ]] || [[ ${SKIP_IP_CHECK} == "y" ]]; then
-      if verify_challenge_path "${MAILCOW_HOSTNAME}" 4; then
-        log_f "Confirmed A record ${A_MAILCOW_HOSTNAME}"
-        VALIDATED_MAILCOW_HOSTNAME=${MAILCOW_HOSTNAME}
+  elif [[ ! -z ${A_OPENEMAIL_HOSTNAME} ]]; then
+    log_f "Found A record for ${OPENEMAIL_HOSTNAME}: ${A_OPENEMAIL_HOSTNAME}"
+    if [[ ${IPV4:-ERR} == ${A_OPENEMAIL_HOSTNAME} ]] || [[ ${SKIP_IP_CHECK} == "y" ]]; then
+      if verify_challenge_path "${OPENEMAIL_HOSTNAME}" 4; then
+        log_f "Confirmed A record ${A_OPENEMAIL_HOSTNAME}"
+        VALIDATED_OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
       else
-        log_f "Confirmed A record ${A_MAILCOW_HOSTNAME}, but HTTP validation failed"
+        log_f "Confirmed A record ${A_OPENEMAIL_HOSTNAME}, but HTTP validation failed"
       fi
     else
-      log_f "Cannot match your IP ${IPV4} against hostname ${MAILCOW_HOSTNAME} (${A_MAILCOW_HOSTNAME})"
+      log_f "Cannot match your IP ${IPV4} against hostname ${OPENEMAIL_HOSTNAME} (${A_OPENEMAIL_HOSTNAME})"
     fi
   else
-    log_f "No A or AAAA record found for hostname ${MAILCOW_HOSTNAME}"
+    log_f "No A or AAAA record found for hostname ${OPENEMAIL_HOSTNAME}"
   fi
 
   for SAN in "${ADDITIONAL_SAN_ARR[@]}"; do
@@ -341,7 +341,7 @@ while true; do
         continue
       fi
     fi
-    if [[ ${SAN} == ${MAILCOW_HOSTNAME} ]]; then
+    if [[ ${SAN} == ${OPENEMAIL_HOSTNAME} ]]; then
       continue
     fi
     A_SAN=$(dig A ${SAN} +short | tail -n 1)
@@ -380,7 +380,7 @@ while true; do
   done
 
   # Unique elements
-  ALL_VALIDATED=(${VALIDATED_MAILCOW_HOSTNAME} $(echo ${VALIDATED_CONFIG_DOMAINS[*]} ${ADDITIONAL_VALIDATED_SAN[*]} | xargs -n1 | sort -u | xargs))
+  ALL_VALIDATED=(${VALIDATED_OPENEMAIL_HOSTNAME} $(echo ${VALIDATED_CONFIG_DOMAINS[*]} ${ADDITIONAL_VALIDATED_SAN[*]} | xargs -n1 | sort -u | xargs))
   if [[ -z ${ALL_VALIDATED[*]} ]]; then
     log_f "Cannot validate hostnames, skipping Let's Encrypt for 1 hour."
     log_f "Use SKIP_LETS_ENCRYPT=y in mailcow.conf to skip it permanently."

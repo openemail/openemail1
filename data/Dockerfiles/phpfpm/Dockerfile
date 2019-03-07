@@ -1,5 +1,6 @@
 FROM php:7.3-fpm-alpine3.8
-LABEL maintainer "Andre Peters <andre.peters@servercow.de>"
+LABEL maintainer "Chinthaka Desahpriya <chinthaka@cybergate.lk>"
+
 
 ENV APCU_PECL 5.1.16
 ENV IMAGICK_PECL 3.4.3

@@ -936,7 +936,7 @@ $tfa_data = get_tfa();
           <div class="form-group">
             <label class="control-label col-sm-2" for="mass_from"><?=$lang['admin']['from'];?>:</label>
             <div class="col-sm-10">
-              <input type="email" class="form-control" name="mass_from" value="noreply@<?=getenv('MAILCOW_HOSTNAME');;?>" required>
+              <input type="email" class="form-control" name="mass_from" value="noreply@<?=getenv('OPENEMAIL_HOSTNAME');;?>" required>
             </div>
           </div>
           <div class="form-group">

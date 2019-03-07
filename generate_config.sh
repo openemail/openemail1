@@ -11,11 +11,11 @@ if cp --help 2>&1 | grep -q -i "busybox"; then
   exit 1
 fi
 
-if [ -f mailcow.conf ]; then
+if [ -f openemail.conf ]; then
   read -r -p "A config file exists and will be overwritten, are you sure you want to contine? [y/N] " response
   case $response in
     [yY][eE][sS]|[yY])
-      mv mailcow.conf mailcow.conf_backup
+      mv openemail.conf openemail.conf_backup
       ;;
     *)
       exit 1
@@ -24,12 +24,12 @@ if [ -f mailcow.conf ]; then
 fi
 
 echo "Press enter to confirm the detected value '[value]' where applicable or enter a custom value."
-while [ -z "${MAILCOW_HOSTNAME}" ]; do
-  read -p "Hostname (FQDN): " -e MAILCOW_HOSTNAME
-  DOTS=${MAILCOW_HOSTNAME//[^.]};
-  if [ ${#DOTS} -lt 2 ] && [ ! -z ${MAILCOW_HOSTNAME} ]; then
-    echo "${MAILCOW_HOSTNAME} is not a FQDN"
-    MAILCOW_HOSTNAME=
+while [ -z "${OPENEMAIL_HOSTNAME}" ]; do
+  read -p "Hostname (FQDN): " -e OPENEMAIL_HOSTNAME
+  DOTS=${OPENEMAIL_HOSTNAME//[^.]};
+  if [ ${#DOTS} -lt 2 ] && [ ! -z ${OPENEMAIL_HOSTNAME} ]; then
+    echo "${OPENEMAIL_HOSTNAME} is not a FQDN"
+    OPENEMAIL_HOSTNAME=
   fi
 done
 
@@ -39,12 +39,12 @@ elif [ -a /etc/localtime ]; then
   DETECTED_TZ=$(readlink /etc/localtime|sed -n 's|^.*zoneinfo/||p')
 fi
 
-while [ -z "${MAILCOW_TZ}" ]; do
+while [ -z "${OPENEMAIL_TZ}" ]; do
   if [ -z "${DETECTED_TZ}" ]; then
-    read -p "Timezone: " -e MAILCOW_TZ
+    read -p "Timezone: " -e OPENEMAIL_TZ
   else
-    read -p "Timezone [${DETECTED_TZ}]: " -e MAILCOW_TZ
-    [ -z "${MAILCOW_TZ}" ] && MAILCOW_TZ=${DETECTED_TZ}
+    read -p "Timezone [${DETECTED_TZ}]: " -e OPENEMAIL_TZ
+    [ -z "${OPENEMAIL_TZ}" ] && OPENEMAIL_TZ=${DETECTED_TZ}
   fi
 done
 
@@ -52,7 +52,7 @@ MEM_TOTAL=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 
 if [ ${MEM_TOTAL} -le "2621440" ]; then
   echo "Installed memory is <= 2.5 GiB. It is recommended to disable ClamAV to prevent out-of-memory situations."
-  echo "ClamAV can be re-enabled by setting SKIP_CLAMD=n in mailcow.conf."
+  echo "ClamAV can be re-enabled by setting SKIP_CLAMD=n in openemail.conf."
   read -r -p  "Do you want to disable ClamAV now? [Y/n] " response
   case $response in
     [nN][oO]|[nN])
@@ -71,8 +71,8 @@ if [ ${MEM_TOTAL} -le "2097152" ]; then
   SKIP_SOLR=y
 elif [ ${MEM_TOTAL} -le "3670016" ]; then
   echo "Installed memory is <= 3.5 GiB. It is recommended to disable Solr to prevent out-of-memory situations."
-  echo "Solr is a prone to run OOM and should be monitored. The default Solr heap size is 1024 MiB and should be set in mailcow.conf according to your expected load."
-  echo "Solr can be re-enabled by setting SKIP_SOLR=n in mailcow.conf but will refuse to start with less than 2 GB total memory."
+  echo "Solr is a prone to run OOM and should be monitored. The default Solr heap size is 1024 MiB and should be set in openemail.conf according to your expected load."
+  echo "Solr can be re-enabled by setting SKIP_SOLR=n in openemail.conf but will refuse to start with less than 2 GB total memory."
   read -r -p  "Do you want to disable Solr now? [Y/n] " response
   case $response in
     [nN][oO]|[nN])
@@ -88,7 +88,7 @@ fi
 
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
-cat << EOF > mailcow.conf
+cat << EOF > openemail.conf
 # ------------------------------
 # mailcow web ui configuration
 # ------------------------------
@@ -96,7 +96,7 @@ cat << EOF > mailcow.conf
 # Default admin user is "admin"
 # Default password is "moohoo"
 
-MAILCOW_HOSTNAME=${MAILCOW_HOSTNAME}
+OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
 
 # ------------------------------
 # SQL database configuration
@@ -142,11 +142,11 @@ SQL_PORT=127.0.0.1:13306
 
 # Your timezone
 
-TZ=${MAILCOW_TZ}
+TZ=${OPENEMAIL_TZ}
 
 # Fixed project name
 
-COMPOSE_PROJECT_NAME=mailcowdockerized
+COMPOSE_PROJECT_NAME=openemail
 
 # Set this to "allow" to enable the anyone pseudo user. Disabled by default.
 # When enabled, ACL can be created, that apply to "All authenticated users"
@@ -200,7 +200,7 @@ SOLR_HEAP=1024
 
 USE_WATCHDOG=n
 
-# Send notifications by mail (no DKIM signature, sent from watchdog@MAILCOW_HOSTNAME)
+# Send notifications by mail (no DKIM signature, sent from watchdog@OPENEMAIL_HOSTNAME)
 # Can by multiple rcpts, NO quotation marks
 
 #WATCHDOG_NOTIFY_EMAIL=a@example.com,b@example.com,c@example.com
@@ -239,3 +239,9 @@ mkdir -p data/assets/ssl
 
 # copy but don't overwrite existing certificate
 cp -n data/assets/ssl-example/*.pem data/assets/ssl/
+
+rm -f /opt/openemail/.env
+rm -f /opt/openemail/mailcow.conf
+
+ln /opt/openemail/openemail.conf /opt/openemail/.env
+ln /opt/openemail/openemail.conf /opt/openemail/mailcow.conf

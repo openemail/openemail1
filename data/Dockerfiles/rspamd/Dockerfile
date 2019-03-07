@@ -1,5 +1,6 @@
 FROM ubuntu:bionic
-LABEL maintainer "Andre Peters <andre.peters@servercow.de>"
+LABEL maintainer "Chinthaka Desahpriya <chinthaka@cybergate.lk>"
+
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL C

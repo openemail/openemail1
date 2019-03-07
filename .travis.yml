@@ -2,7 +2,7 @@ sudo: required
 services:
 - docker
 script:
-- echo 'Europe/Berlin' | MAILCOW_HOSTNAME=build.mailcow ./generate_config.sh
+- echo 'Europe/Berlin' | OPENEMAIL_HOSTNAME=build.mailcow ./generate_config.sh
 - docker-compose pull --ignore-pull-failures --parallel
 - docker-compose build
 - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD

@@ -102,9 +102,9 @@ done
 
 [[ ! -f mailcow.conf ]] && { echo "mailcow.conf is missing"; exit 1;}
 source mailcow.conf
-DOTS=${MAILCOW_HOSTNAME//[^.]};
+DOTS=${OPENEMAIL_HOSTNAME//[^.]};
 if [ ${#DOTS} -lt 2 ]; then
-  echo "MAILCOW_HOSTNAME (${MAILCOW_HOSTNAME}) is not a FQDN!"
+  echo "OPENEMAIL_HOSTNAME (${OPENEMAIL_HOSTNAME}) is not a FQDN!"
   echo "Please change it to a FQDN and run docker-compose down followed by docker-compose up -d"
   exit 1
 fi

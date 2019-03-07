@@ -61,9 +61,9 @@ function mail_error() {
       --subject="Watchdog: ${1} hit the error rate limit" \
       --body-plain="${BODY}" \
       --to=${rcpt} \
-      --from="watchdog@${MAILCOW_HOSTNAME}" \
+      --from="watchdog@${OPENEMAIL_HOSTNAME}" \
       --server="${RCPT_MX}" \
-      --hello-host=${MAILCOW_HOSTNAME} \
+      --hello-host=${OPENEMAIL_HOSTNAME} \
       ${ATTACH}
     log_msg "Sent notification email to ${rcpt}"
   done

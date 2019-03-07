@@ -1,4 +1,6 @@
 FROM solr:7-alpine
+LABEL maintainer "Chinthaka Desahpriya <chinthaka@cybergate.lk>"
+
 USER root
 COPY docker-entrypoint.sh /
 

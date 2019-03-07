@@ -1,5 +1,5 @@
 FROM alpine:3.9
-LABEL maintainer "Andre Peters <andre.peters@servercow.de>"
+LABEL maintainer "Chinthaka Desahpriya <chinthaka@cybergate.lk>"
 
 RUN apk add -U --no-cache python2 python-dev py-pip gcc musl-dev tzdata openssl-dev libffi-dev \
   && pip2 install --upgrade pip \
