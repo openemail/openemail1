@@ -905,15 +905,15 @@ $tfa_data = get_tfa();
           <form class="form" data-id="uitexts" role="form" method="post">
             <div class="form-group">
               <label for="title_name"><?=$lang['admin']['title_name'];?>:</label>
-              <input type="text" class="form-control" name="title_name" placeholder="mailcow UI" value="<?=$ui_texts['title_name'];?>">
+              <input type="text" class="form-control" name="title_name" placeholder="openemail UI" value="<?=$ui_texts['title_name'];?>">
             </div>
             <div class="form-group">
               <label for="main_name"><?=$lang['admin']['main_name'];?>:</label>
-              <input type="text" class="form-control" name="main_name" placeholder="mailcow UI" value="<?=$ui_texts['main_name'];?>">
+              <input type="text" class="form-control" name="main_name" placeholder="openemail UI" value="<?=$ui_texts['main_name'];?>">
             </div>
             <div class="form-group">
               <label for="apps_name"><?=$lang['admin']['apps_name'];?>:</label>
-              <input type="text" class="form-control" name="apps_name" placeholder="mailcow Apps" value="<?=$ui_texts['apps_name'];?>">
+              <input type="text" class="form-control" name="apps_name" placeholder="openemail Apps" value="<?=$ui_texts['apps_name'];?>">
             </div>
             <div class="form-group">
               <label for="help_text"><?=$lang['admin']['help_text'];?>:</label>
