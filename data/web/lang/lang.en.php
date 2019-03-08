@@ -251,7 +251,7 @@ $lang['user']['edit'] = 'Edit';
 $lang['user']['remove'] = 'Remove';
 $lang['user']['create_syncjob'] = 'Create new sync job';
 
-$lang['start']['mailcow_apps_detail'] = 'Use a mailcow app to access your mails, calendar, contacts and more.';
+$lang['start']['mailcow_apps_detail'] = 'Use a openemail app to access your mails, calendar, contacts and more.';
 $lang['start']['mailcow_panel_detail'] = '<b>Domain administrators</b> create, modify or delete mailboxes and aliases, change domains and read further information about their assigned domains.<br>
 <b>Mailbox users</b> are able to create time-limited aliases (spam aliases), change their password and spam filter settings.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Please use your full email address and the PLAIN authentication mechanism.<br>
@@ -361,7 +361,7 @@ $lang['edit']['active'] = 'Active';
 $lang['edit']['gal'] = 'Global Address List';
 $lang['edit']['gal_info'] = 'The GAL contains all objects of a domain and cannot be edited by any user. <b>Restart SOGo to apply changes.</b>';
 $lang['edit']['force_pw_update'] = 'Force password update at next login';
-$lang['edit']['force_pw_update_info'] = 'This user will only be able to login to mailcow UI.';
+$lang['edit']['force_pw_update_info'] = 'This user will only be able to login to openemail UI.';
 $lang['edit']['sogo_access'] = 'Grant access to SOGo';
 $lang['edit']['sogo_access_info'] = 'Grant or permit access to SOGo. This setting does neither affect access to all other services nor does it delete or change a users existing SOGo profile.';
 $lang['edit']['target_domain'] = 'Target domain';
@@ -472,7 +472,7 @@ $lang['add']['relay_all'] = 'Relay all recipients';
 $lang['add']['relay_domain'] = 'Relay this domain';
 $lang['add']['relay_all_info'] = '<small>If you choose <b>not</b> to relay all recipients, you will need to add a ("blind") mailbox for every single recipient that should be relayed.</small>';
 $lang['add']['alias_address'] = 'Alias address/es';
-$lang['add']['alias_address_info'] = '<small>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>mailcow domains only</b>.</small>';
+$lang['add']['alias_address_info'] = '<small>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>openemail domains only</b>.</small>';
 $lang['add']['alias_domain_info'] = '<small>Valid domain names only (comma-separated).</small>';
 $lang['add']['target_address'] = 'Goto addresses';
 $lang['add']['target_address_info'] = '<small>Full email address/es (comma-separated).</small>';
@@ -516,7 +516,7 @@ $lang['tfa']['set_tfa'] = "Set two-factor authentication method";
 $lang['tfa']['yubi_otp'] = "Yubico OTP authentication";
 $lang['tfa']['key_id'] = "An identifier for your YubiKey";
 $lang['tfa']['key_id_totp'] = "An identifier for your key";
-$lang['tfa']['api_register'] = 'mailcow uses the Yubico Cloud API. Please get an API key for your key <a href="https://upgrade.yubico.com/getapikey/" target="_blank">here</a>';
+$lang['tfa']['api_register'] = 'openemail uses the Yubico Cloud API. Please get an API key for your key <a href="https://upgrade.yubico.com/getapikey/" target="_blank">here</a>';
 $lang['tfa']['u2f'] = "U2F authentication";
 $lang['tfa']['none'] = "Deactivate";
 $lang['tfa']['delete_tfa'] = "Disable TFA";
@@ -557,7 +557,7 @@ $lang['admin']['f2b_list_info'] = 'A blacklisted host or network will always out
 $lang['admin']['search_domain_da'] = 'Search domains';
 $lang['admin']['r_inactive'] = 'Inactive restrictions';
 $lang['admin']['r_active'] = 'Active restrictions';
-$lang['admin']['r_info'] = 'Greyed out/disabled elements on the list of active restrictions are not known as valid restrictions to mailcow and cannot be moved. Unknown restrictions will be set in order of appearance anyway. <br>You can add new elements in <code>inc/vars.local.inc.php</code> to be able to toggle them.';
+$lang['admin']['r_info'] = 'Greyed out/disabled elements on the list of active restrictions are not known as valid restrictions to openemail and cannot be moved. Unknown restrictions will be set in order of appearance anyway. <br>You can add new elements in <code>inc/vars.local.inc.php</code> to be able to toggle them.';
 $lang['admin']['dkim_key_length'] = 'DKIM key length (bits)';
 $lang['admin']['dkim_key_valid'] = 'Key valid';
 $lang['admin']['dkim_key_unused'] = 'Key unused';
@@ -627,7 +627,7 @@ $lang['admin']['refresh'] = 'Refresh';
 $lang['admin']['to_top'] = 'Back to top';
 $lang['admin']['in_use_by'] = 'In use by';
 $lang['admin']['forwarding_hosts'] = 'Forwarding Hosts';
-$lang['admin']['forwarding_hosts_hint'] = 'Incoming messages are unconditionally accepted from any hosts listed here. These hosts are then not checked against DNSBLs or subjected to greylisting. Spam received from them is never rejected, but optionally it can be filed into the Junk folder. The most common use for this is to specify mail servers on which you have set up a rule that forwards incoming emails to your mailcow server.';
+$lang['admin']['forwarding_hosts_hint'] = 'Incoming messages are unconditionally accepted from any hosts listed here. These hosts are then not checked against DNSBLs or subjected to greylisting. Spam received from them is never rejected, but optionally it can be filed into the Junk folder. The most common use for this is to specify mail servers on which you have set up a rule that forwards incoming emails to your openemail server.';
 $lang['admin']['forwarding_hosts_add_hint'] = 'You can either specify IPv4/IPv6 addresses, networks in CIDR notation, host names (which will be resolved to IP addresses), or domain names (which will be resolved to IP addresses by querying SPF records or, in their absence, MX records).';
 $lang['admin']['relayhosts_hint'] = 'Define sender-dependent transports to be able to select them in a domains configuration dialog.<br>
   The transport service is always "smtp:". A users individual outbound TLS policy setting is taken into account.';
@@ -693,9 +693,9 @@ $lang['admin']['quota_notification_subject'] = "Notification email subject";
 $lang['admin']['quota_notification_html'] = "Notification email template:<br><small>Leave empty to restore default template.</small>";
 $lang['admin']['ui_texts'] = "UI labels and texts";
 $lang['admin']['help_text'] = "Override help text below login mask (HTML allowed)";
-$lang['admin']['title_name'] = '"mailcow UI" website title';
-$lang['admin']['main_name'] = '"mailcow UI" name';
-$lang['admin']['apps_name'] = '"mailcow Apps" name';
+$lang['admin']['title_name'] = '"openemail UI" website title';
+$lang['admin']['main_name'] = '"openemail UI" name';
+$lang['admin']['apps_name'] = '"openemail Apps" name';
 
 $lang['admin']['customize'] = "Customize";
 $lang['admin']['change_logo'] = "Change logo";
@@ -768,7 +768,7 @@ $lang['debug']['system_containers'] = 'System & Containers';
 $lang['debug']['solr_status'] = 'Solr status';
 $lang['debug']['solr_dead'] = 'Solr is starting, disabled or died.';
 $lang['debug']['logs'] = 'Logs';
-$lang['debug']['log_info'] = '<p>mailcow <b>in-memory logs</b> are collected in Redis lists and trimmed to LOG_LINES (%d) every minute to reduce hammering.
+$lang['debug']['log_info'] = '<p>openemail <b>in-memory logs</b> are collected in Redis lists and trimmed to LOG_LINES (%d) every minute to reduce hammering.
   <br>In-memory logs are not meant to be persistent. All applications that log in-memory, also log to the Docker daemon and therefore to the default logging driver.
   <br>The in-memory log type should be used for debugging minor issues with containers.</p>
   <p><b>External logs</b> are collected via API of the given application.</p>
