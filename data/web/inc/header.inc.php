@@ -44,7 +44,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/"><img alt="mailcow-logo" src="<?=($main_logo = customize('get', 'main_logo')) ? $main_logo : '/img/cow_mailcow.svg';?>"></a>
+        <a class="navbar-brand" href="/"><img alt="openemail-logo" src="<?=($main_logo = customize('get', 'main_logo')) ? $main_logo : '/img/openemail-logo.png';?>"></a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
