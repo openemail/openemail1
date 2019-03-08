@@ -491,13 +491,13 @@ function check_login($user, $pass) {
 	}
 	if (!isset($_SESSION['ldelay'])) {
 		$_SESSION['ldelay'] = "0";
-    $redis->publish("F2B_CHANNEL", "mailcow UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
-    error_log("mailcow UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+    $redis->publish("F2B_CHANNEL", "openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+    error_log("openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
 	}
 	elseif (!isset($_SESSION['mailcow_cc_username'])) {
 		$_SESSION['ldelay'] = $_SESSION['ldelay']+0.5;
-    $redis->publish("F2B_CHANNEL", "mailcow UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
-		error_log("mailcow UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+    $redis->publish("F2B_CHANNEL", "openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+		error_log("openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
 	}
   $_SESSION['return'][] =  array(
     'type' => 'danger',
