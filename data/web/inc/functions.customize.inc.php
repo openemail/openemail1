@@ -197,9 +197,9 @@ function customize($_action, $_item, $_data = null) {
         break;
         case 'ui_texts':
           try {
-            $data['title_name'] = ($title_name = $redis->get('TITLE_NAME')) ? $title_name : 'mailcow UI';
-            $data['main_name'] = ($main_name = $redis->get('MAIN_NAME')) ? $main_name : 'mailcow UI';
-            $data['apps_name'] = ($apps_name = $redis->get('APPS_NAME')) ? $apps_name : 'mailcow Apps';
+            $data['title_name'] = ($title_name = $redis->get('TITLE_NAME')) ? $title_name : 'openemail UI';
+            $data['main_name'] = ($main_name = $redis->get('MAIN_NAME')) ? $main_name : 'openemail UI';
+            $data['apps_name'] = ($apps_name = $redis->get('APPS_NAME')) ? $apps_name : 'openemail Apps';
             $data['help_text'] = ($help_text = $redis->get('HELP_TEXT')) ? $help_text : false;
             return $data;
           }
