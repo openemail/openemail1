@@ -31,7 +31,7 @@ else {
         <li role="presentation"><span class="dropdown-desc"><?=$lang['debug']['external_logs'];?></span></li>
         <li role="presentation"><a href="#tab-rspamd-history" aria-controls="tab-rspamd-history" role="tab" data-toggle="tab">Rspamd</a></li>
         <li role="presentation"><span class="dropdown-desc"><?=$lang['debug']['static_logs'];?></span></li>
-        <li role="presentation"><a href="#tab-ui" aria-controls="tab-ui" role="tab" data-toggle="tab">mailcow UI</a></li>
+        <li role="presentation"><a href="#tab-ui" aria-controls="tab-ui" role="tab" data-toggle="tab">openemail UI</a></li>
       </ul>
     </li>
   </ul>
@@ -42,7 +42,7 @@ else {
         <div class="debug-log-info"><?=sprintf($lang['debug']['log_info'], getenv('LOG_LINES') + 1);?></div>
         <?php
           $exec_fields = array('cmd' => 'system', 'task' => 'df', 'dir' => '/var/vmail');
-          $vmail_df = explode(',', json_decode(docker('post', 'dovecot-mailcow', 'exec', $exec_fields), true));
+          $vmail_df = explode(',', json_decode(docker('post', 'dovecot-openemail', 'exec', $exec_fields), true));
         ?>
         <div role="tabpanel" class="tab-pane active" id="tab-containers">
           <div class="panel panel-default">
