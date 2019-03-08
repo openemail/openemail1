@@ -51,8 +51,8 @@ if (!empty($_SERVER['HTTP_X_API_KEY'])) {
       $_SESSION['mailcow_cc_api'] = true;
     }
     else {
-      $redis->publish("F2B_CHANNEL", "mailcow UI: Invalid password for API_USER by " . $_SERVER['REMOTE_ADDR']);
-      error_log("mailcow UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+      $redis->publish("F2B_CHANNEL", "openemail UI: Invalid password for API_USER by " . $_SERVER['REMOTE_ADDR']);
+      error_log("openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
       echo json_encode(array(
         'type' => 'error',
         'msg' => 'api access denied for ip ' . $_SERVER['REMOTE_ADDR']
@@ -62,8 +62,8 @@ if (!empty($_SERVER['HTTP_X_API_KEY'])) {
     }
   }
   else {
-    $redis->publish("F2B_CHANNEL", "mailcow UI: Invalid password for API_USER by " . $_SERVER['REMOTE_ADDR']);
-    error_log("mailcow UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+    $redis->publish("F2B_CHANNEL", "openemail UI: Invalid password for API_USER by " . $_SERVER['REMOTE_ADDR']);
+    error_log("openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
     echo json_encode(array(
       'type' => 'error',
       'msg' => 'authentication failed'
