@@ -114,7 +114,7 @@ $lang['user']['tls_policy'] = 'Regras de Encryptação';
 $lang['user']['tls_enforce_in'] = 'Forçar TLS na entrada';
 $lang['user']['tls_enforce_out'] = 'Forçar TLS na saída';
 $lang['user']['no_record'] = 'Nenhum registro';
-$lang['start']['mailcow_apps_detail'] = 'Use um mailcow app para acessar seus emails, calendário, contatos e outras informações.';
+$lang['start']['mailcow_apps_detail'] = 'Use um openemail app para acessar seus emails, calendário, contatos e outras informações.';
 $lang['start']['mailcow_panel_detail'] = '<b>Administradores:</b> podem criar, alterar ou apagar contas e apelidos , alterar domínios e outras informações de seus domínios atribuídos.<br>
 	<b>Usuários:</b> podem criar apelidos por tempo determinado , alterar senha e configuração do nível do filtro de spam.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Utilize o endereço de email completo com o método de autentucação PLAIN.<br>
@@ -216,7 +216,7 @@ $lang['login']['trash_login'] = "Tentativas de entrada";
 $lang['admin']['search_domain_da'] = 'Selecione o(s) domínio(s)';
 $lang['admin']['r_inactive'] = 'Restrictions Inativos';
 $lang['admin']['r_active'] = 'Restrictions Ativos';
-$lang['admin']['r_info'] = 'Greyed out/disabled elements on the list of active restrictions are not known as valid restrictions to mailcow and cannot be moved. Unknown restrictions will be set in order of appearance anyway. <br>You can add new elements in <code>inc/vars.local.inc.php</code> to be able to toggle them.';
+$lang['admin']['r_info'] = 'Greyed out/disabled elements on the list of active restrictions are not known as valid restrictions to openemail and cannot be moved. Unknown restrictions will be set in order of appearance anyway. <br>You can add new elements in <code>inc/vars.local.inc.php</code> to be able to toggle them.';
 $lang['admin']['dkim_key_length'] = 'Tamanho do registro DKIM (bits)';
 $lang['admin']['save'] = 'Salvar';
 $lang['admin']['dkim_add_key'] = 'Adicionar registro ARC/DKIM';
