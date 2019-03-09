@@ -8,7 +8,7 @@ $lang['footer']['loading'] = "Attendere...";
 $lang['header']['restart_sogo'] = 'Riavvia SOGo';
 $lang['footer']['restart_sogo'] = 'Riavvia SOGo';
 $lang['footer']['restart_now'] = 'Riavvia adesso';
-$lang['footer']['restart_sogo_info'] = 'Some tasks, e.g. adding a domain, require you to restart SOGo to catch changes made in the mailcow UI.<br /><br /><b>Important:</b> A graceful restart may take a while to complete, please wait for it to finish.';
+$lang['footer']['restart_sogo_info'] = 'Some tasks, e.g. adding a domain, require you to restart SOGo to catch changes made in the openemail UI.<br /><br /><b>Important:</b> A graceful restart may take a while to complete, please wait for it to finish.';
 
 $lang['footer']['confirm_delete'] = 'Conferma eliminazione';
 $lang['footer']['delete_these_items'] = 'Sicuro di voler eliminare gli oggetti selezionati?';
@@ -160,7 +160,7 @@ $lang['user']['edit'] = 'Modifica';
 $lang['user']['remove'] = 'Elimina';
 $lang['user']['create_syncjob'] = 'Crea un azione di sync';
 
-$lang['start']['mailcow_apps_detail'] = 'Usa l\'app mailcow per accedere alla posta, calendari, contatti ed altro.';
+$lang['start']['mailcow_apps_detail'] = 'Usa l\'app openemail per accedere alla posta, calendari, contatti ed altro.';
 $lang['start']['mailcow_panel_detail'] = '<b>Amministratori di dominio</b> crea, modifica o cancella caselle e alias, cambia i domini e informazioni relative ai domini associati.<br />
 	<b>Utenti di caselle</b> possono creare degli alias temporanei (spam aliases), cambiare la loro password e le impostazioni relative ai filtri spam.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Please use your full email address and the PLAIN authentication mechanism.<br />
@@ -279,7 +279,7 @@ $lang['add']['relay_all'] = 'Trasmettere a tutti i destinatari';
 $lang['add']['relay_domain'] = 'Trasmetti questo dominio';
 $lang['add']['relay_all_info'] = '<small>Se si sceglie di <b>non</b> inviare tutti i destinatari, è necessario aggiungere una cassetta postale ("blind") per ogni singolo destinatario a cui deve essere inoltrato.</small>';
 $lang['add']['alias_address'] = 'Indirizzo alias/es:';
-$lang['add']['alias_address_info'] = '<small>Indirizzo e-mail completo/es @example.com, per catturare tutti i messaggi di un dominio (separati da virgola). <b>solo domini mailcow</b>.</small>';
+$lang['add']['alias_address_info'] = '<small>Indirizzo e-mail completo/es @example.com, per catturare tutti i messaggi di un dominio (separati da virgola). <b>solo domini openemail</b>.</small>';
 $lang['add']['alias_domain_info'] = '<small>Solo nomi di dominio validi (cseparati da virgola).</small>';
 $lang['add']['target_address'] = 'Inoltra all\'indirizzo:';
 $lang['add']['target_address_info'] = '<small>Indirizzo e-mail completo/es (separati da virgole).</small>';
@@ -304,7 +304,7 @@ $lang['tfa']['set_tfa'] = "Imposta il metodo di autenticazione a due fattori";
 $lang['tfa']['yubi_otp'] = "Autenticazione Yubico OTP";
 $lang['tfa']['key_id'] = "Identificatore per il tuo YubiKey";
 $lang['tfa']['key_id_totp'] = "Identificatore per la tua chiave";
-$lang['tfa']['api_register'] = 'mailcow usa le Api Yubico Cloud. Richiedi una Chiave API <a href="https://upgrade.yubico.com/getapikey/" target="_blank">qui</a>';
+$lang['tfa']['api_register'] = 'openemail usa le Api Yubico Cloud. Richiedi una Chiave API <a href="https://upgrade.yubico.com/getapikey/" target="_blank">qui</a>';
 $lang['tfa']['u2f'] = "Autenticazione U2F";
 $lang['tfa']['totp'] = "Autenticazione TOTP";
 $lang['tfa']['none'] = "Disattiva";
@@ -351,7 +351,7 @@ $lang['admin']['no_record'] = 'Nessun risultato';
 $lang['admin']['filter_table'] = 'Tabella filtro';
 $lang['admin']['empty'] = 'Nessun risultato';
 $lang['admin']['forwarding_hosts'] = 'Inoltro degli host';
-$lang['admin']['forwarding_hosts_hint'] = 'I messaggi in entrata sono accettati in maniera incondizionata da tutti gli host elencati qui. Questi host sono quindi non controllati contro DNSBL o sottoposti a greylisting. Spam ricevuti da loro non viene mai rifiutata e sempre archiviata nella cartella Junk. L\'utilizzo più comune per questo è quello di specificare i server di posta elettronica su cui è stata impostata una regola che inoltra le email in arrivo al server mailcow.';
+$lang['admin']['forwarding_hosts_hint'] = 'I messaggi in entrata sono accettati in maniera incondizionata da tutti gli host elencati qui. Questi host sono quindi non controllati contro DNSBL o sottoposti a greylisting. Spam ricevuti da loro non viene mai rifiutata e sempre archiviata nella cartella Junk. L\'utilizzo più comune per questo è quello di specificare i server di posta elettronica su cui è stata impostata una regola che inoltra le email in arrivo al server openemail.';
 $lang['admin']['forwarding_hosts_add_hint'] = 'È possibile specificare indirizzi IPv4 / IPv6, reti nella notazione CIDR, nomi host (che verranno risolti in indirizzi IP) o nomi di dominio (che verranno risolti agli indirizzi IP richiamando i record SPF o, in assenza, i record MX) .';
 $lang['edit']['host'] = 'Host';
 $lang['edit']['source'] = 'Sorgente';
