@@ -33,7 +33,7 @@ if ($https_port === FALSE) {
 // Other settings =>
 $autodiscover_config = array(
   // General autodiscover service type: "activesync" or "imap"
-  // emClient uses autodiscover, but does not support ActiveSync. mailcow excludes emClient from ActiveSync.
+  // emClient uses autodiscover, but does not support ActiveSync. openemail excludes emClient from ActiveSync.
   'autodiscoverType' => 'activesync',
   // If autodiscoverType => activesync, also use ActiveSync (EAS) for Outlook desktop clients (>= Outlook 2013 on Windows)
   // Outlook for Mac does not support ActiveSync
@@ -118,7 +118,7 @@ $LOG_PAGINATION_SIZE = 30;
 $SESSION_LIFETIME = 3600;
 
 // Label for OTP devices
-$OTP_LABEL = "mailcow UI";
+$OTP_LABEL = "openemail UI";
 
 // Default "to" address in relay test tool
 $RELAY_TO = "null@hosted.mailcow.de";
@@ -138,10 +138,10 @@ $MAILBOX_DEFAULT_ATTRIBUTES['tls_enforce_in'] = false;
 // Force outgoing TLS for new mailboxes by default
 $MAILBOX_DEFAULT_ATTRIBUTES['tls_enforce_out'] = false;
 
-// Force password change on next login (only allows login to mailcow UI)
+// Force password change on next login (only allows login to openemail UI)
 $MAILBOX_DEFAULT_ATTRIBUTES['force_pw_update'] = false;
 
-// Force password change on next login (only allows login to mailcow UI)
+// Force password change on next login (only allows login to openemail UI)
 $MAILBOX_DEFAULT_ATTRIBUTES['sogo_access'] = true;
 
 // Send notification when quarantine is not empty (never, hourly, daily, weekly)
