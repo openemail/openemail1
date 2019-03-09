@@ -1311,7 +1311,7 @@ function get_logs($application, $lines = false) {
     }
   }
   // Redis
-  if ($application == "dovecot-mailcow") {
+  if ($application == "dovecot-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('DOVECOT_MAILLOG', $from - 1, $to - 1);
     }
@@ -1325,7 +1325,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "postfix-mailcow") {
+  if ($application == "postfix-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('POSTFIX_MAILLOG', $from - 1, $to - 1);
     }
@@ -1339,7 +1339,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "sogo-mailcow") {
+  if ($application == "sogo-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('SOGO_LOG', $from - 1, $to - 1);
     }
@@ -1353,7 +1353,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "watchdog-mailcow") {
+  if ($application == "watchdog-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('WATCHDOG_LOG', $from - 1, $to - 1);
     }
@@ -1367,7 +1367,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "acme-mailcow") {
+  if ($application == "acme-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('ACME_LOG', $from - 1, $to - 1);
     }
@@ -1395,7 +1395,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "api-mailcow") {
+  if ($application == "api-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('API_LOG', $from - 1, $to - 1);
     }
@@ -1409,7 +1409,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "netfilter-mailcow") {
+  if ($application == "netfilter-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('NETFILTER_LOG', $from - 1, $to - 1);
     }
@@ -1423,7 +1423,7 @@ function get_logs($application, $lines = false) {
       return $data_array;
     }
   }
-  if ($application == "autodiscover-mailcow") {
+  if ($application == "autodiscover-openemail") {
     if (isset($from) && isset($to)) {
       $data = $redis->lRange('AUTODISCOVER_LOG', $from - 1, $to - 1);
     }
