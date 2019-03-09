@@ -569,7 +569,7 @@ $tfa_data = get_tfa();
           </div>
           <div class="btn-group">
             <button class="btn btn-default" data-action="edit_selected" data-item="self" data-id="f2b" data-api-url='edit/fail2ban' data-api-attr='{}' href="#"><span class="glyphicon glyphicon-check"></span> <?=$lang['admin']['save'];?></button>
-            <a href="#" role="button" class="btn btn-default" data-toggle="modal" data-container="netfilter-mailcow" data-target="#RestartContainer"><span class="glyphicon glyphicon-refresh"></span> <?= $lang['header']['restart_netfilter']; ?></a>
+            <a href="#" role="button" class="btn btn-default" data-toggle="modal" data-container="netfilter-openemail" data-target="#RestartContainer"><span class="glyphicon glyphicon-refresh"></span> <?= $lang['header']['restart_netfilter']; ?></a>
           </div>
         </form>
         <hr>
@@ -841,7 +841,7 @@ $tfa_data = get_tfa();
         <div class="row">
           <div class="col-sm-3">
             <div class="thumbnail">
-              <img class="img-thumbnail" src="<?=$main_logo;?>" alt="mailcow logo">
+              <img class="img-thumbnail" src="<?=$main_logo;?>" alt="openemail logo">
               <div class="caption">
                 <span class="label label-info"><?=$specs['geometry']['width'];?>x<?=$specs['geometry']['height'];?> px</span>
                 <span class="label label-info"><?=$specs['mimetype'];?></span>
