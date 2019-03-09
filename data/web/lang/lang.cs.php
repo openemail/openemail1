@@ -1,6 +1,6 @@
 <?php
 /*
- * Czech language file for mailcow
+ * Czech language file for openemail
  *
  * Author: radek@fastlinux.eu (www.fastlinux.eu)
  *
@@ -254,7 +254,7 @@ $lang['user']['edit'] = 'Upravit';
 $lang['user']['remove'] = 'Smazat';
 $lang['user']['create_syncjob'] = 'Vytvořit novou synchronizační úlohu';
 
-$lang['start']['mailcow_apps_detail'] = 'Použijte mailcow aplikace pro přístup k vašim e-mailům, kalendáři, kontaktům a dalším funkcím.';
+$lang['start']['mailcow_apps_detail'] = 'Použijte openemail aplikace pro přístup k vašim e-mailům, kalendáři, kontaktům a dalším funkcím.';
 $lang['start']['mailcow_panel_detail'] = '<b>Administrátoři domén</b> mohou vytvářet, upravovat nebo mazat mailboxy a aliasy. Dále mohou upravovat parametry domény a zobrazovat další informace o jejich přidělených doménách.<br>
 <b>Uživatelé</b> mohou vytvářet časově omezené aliasy (spam aliases), měnit jejich heslo a nastavovat spam filtr.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Použijte prosím vaší celou e-mailovou adresu a způsob ověřování PLAIN.<br>
@@ -449,7 +449,7 @@ $lang['add']['relay_all'] = 'Přesměrování provozy (Relay) pro všechny pří
 $lang['add']['relay_domain'] = 'Přesměrování provozu domény';
 $lang['add']['relay_all_info'] = '<small>Pokud se rozhodnete <b>nepřesměrovat</b> provoz pro všechny příjemce, bude nutné přidat prázdnou ("blind") poštovní schránku pro každého příjemce, který se má přesměrovávat.</small>';
 $lang['add']['alias_address'] = 'Adresa/y aliasů';
-$lang['add']['alias_address_info'] = '<small>Kompletní email adresa/y nebo @example.com pro zachycení všech zpráv pro doménu (oddělené čárkami). <b>pouze mailcow domény</b>.</small>';
+$lang['add']['alias_address_info'] = '<small>Kompletní email adresa/y nebo @example.com pro zachycení všech zpráv pro doménu (oddělené čárkami). <b>pouze openemail domény</b>.</small>';
 $lang['add']['alias_domain_info'] = '<small>Platné názvy domén (oddělené čárkami).</small>';
 $lang['add']['target_address'] = 'Cílové adresy';
 $lang['add']['target_address_info'] = '<small>Kompletní email adresa/y (oddělené čárkami).</small>';
@@ -492,7 +492,7 @@ $lang['tfa']['set_tfa'] = "Nastavení způsobu dvoufaktorového ověřování";
 $lang['tfa']['yubi_otp'] = "Yubico OTP ověřování";
 $lang['tfa']['key_id'] = "Identifikátor vašeho YubiKey";
 $lang['tfa']['key_id_totp'] = "Identifikátor vašeho klíče";
-$lang['tfa']['api_register'] = 'mailcow používá Yubico Cloud API. Prosím získejte API klíč pro vaše Yubico <a href="https://upgrade.yubico.com/getapikey/" target="_blank">ZDE</a>';
+$lang['tfa']['api_register'] = 'openemail používá Yubico Cloud API. Prosím získejte API klíč pro vaše Yubico <a href="https://upgrade.yubico.com/getapikey/" target="_blank">ZDE</a>';
 $lang['tfa']['u2f'] = "U2F ověřování";
 $lang['tfa']['none'] = "Deaktivovat";
 $lang['tfa']['delete_tfa'] = "Zakázat TFA";
@@ -533,7 +533,7 @@ $lang['admin']['f2b_list_info'] = 'Sít nebo klienti na blacklistu budou mít v�
 $lang['admin']['search_domain_da'] = 'Hledat domény';
 $lang['admin']['r_inactive'] = 'Neaktivní restrikce';
 $lang['admin']['r_active'] = 'Aktivní restrikce';
-$lang['admin']['r_info'] = 'Šedé/zakázané položky v seznamu aktivních omezení nejsou mailcow systému známy jako platná a nelze je přesouvat. Neznámá omezení budou stejně seřazena dle času jejich výskytu. <br>Pro nastavení lze přidat nové záznamy do <code>inc/vars.local.inc.php</code>.';
+$lang['admin']['r_info'] = 'Šedé/zakázané položky v seznamu aktivních omezení nejsou openemail systému známy jako platná a nelze je přesouvat. Neznámá omezení budou stejně seřazena dle času jejich výskytu. <br>Pro nastavení lze přidat nové záznamy do <code>inc/vars.local.inc.php</code>.';
 $lang['admin']['dkim_key_length'] = 'Délka DKIM klíče (bits)';
 $lang['admin']['dkim_key_valid'] = 'Klíč je platný';
 $lang['admin']['dkim_key_unused'] = 'Klíč nepoužitý';
@@ -659,9 +659,9 @@ $lang['admin']['quarantine_release_format_att'] = "Jako příloha";
 
 $lang['admin']['ui_texts'] = "Úpravy UI textů";
 $lang['admin']['help_text'] = "Přetíží text nápovědy pod přihlašovacím formulářem (HTML povoleno)";
-$lang['admin']['title_name'] = 'Název webu ("mailcow UI" title)';
-$lang['admin']['main_name'] = 'Popis přihlašovacího formuláře ("mailcow UI")';
-$lang['admin']['apps_name'] = 'Popis sekce aplikací ("mailcow Apps")';
+$lang['admin']['title_name'] = 'Název webu ("openemail UI" title)';
+$lang['admin']['main_name'] = 'Popis přihlašovacího formuláře ("openemail UI")';
+$lang['admin']['apps_name'] = 'Popis sekce aplikací ("openemail Apps")';
 
 $lang['admin']['customize'] = "Přizpůsobení";
 $lang['admin']['change_logo'] = "Změna loga";
