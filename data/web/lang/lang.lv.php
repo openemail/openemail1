@@ -174,7 +174,7 @@ $lang['user']['edit'] = 'Labot';
 $lang['user']['remove'] = 'Noņemt';
 $lang['user']['create_syncjob'] = 'Izveidot jaunu sinhronizācijas darbu';
 
-$lang['start']['mailcow_apps_detail'] = 'Izmantojiet lietotni mailcow, lai piekļūtu savam pastam, kalendāram, kontaktiem un citām lietām.';
+$lang['start']['mailcow_apps_detail'] = 'Izmantojiet lietotni openemail, lai piekļūtu savam pastam, kalendāram, kontaktiem un citām lietām.';
 $lang['start']['mailcow_panel_detail'] = '<b>Domēna administrators</b> izveidot, mainīt vai dzēst pastkastes un aliases, mainīt domēnus un lasīt papildu informāciju par saviem piešķirtajiem domēniem.<br>
   <b>Pastkastes lietotāji</b> var izveidot ierobežotus laika ierobežojumus (surogātpasta aliases), mainīt paroli un surogātpasta filtru iestatījumus.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Lūdzu, izmantojiet pilnu e-pasta adresi un PLAIN autentifikācijas mehānismu.<br>
@@ -250,7 +250,7 @@ $lang['edit']['title'] = 'Labot priekšmetu';
 $lang['edit']['target_address'] = 'Iet uz adresi/ēm <small>(komatu atdalītas)</small>';
 $lang['edit']['active'] = 'Aktīvs';
 $lang['edit']['force_pw_update'] = 'Piespiedu paroles atjaunošana pie nākošās pieslēgšanās';
-$lang['edit']['force_pw_update_info'] = 'Šis lietotājs varēs pieslēgties tikai mailcow lietotāja saskarnē.';
+$lang['edit']['force_pw_update_info'] = 'Šis lietotājs varēs pieslēgties tikai openemail lietotāja saskarnē.';
 $lang['edit']['target_domain'] = 'Mērķa domēns';
 $lang['edit']['password'] = 'Parole';
 $lang['edit']['password_repeat'] = 'Apstiprinājuma parole (atkārtot)';
@@ -306,7 +306,7 @@ $lang['add']['relay_all'] = 'Pārsūtīt visus saņēmējus';
 $lang['add']['relay_domain'] = 'Pārsūtīt šo domēnu';
 $lang['add']['relay_all_info'] = '<small>Ja izvēlies <b>nepārsūtīt</b> visus saņēmējus, tad Tev būs nepieciešams pievienot ("tukšu") pastkasti katram saņēmējam, kas būtu jāpārsūta.</small>';
 $lang['add']['alias_address'] = 'Alias addrese/s';
-$lang['add']['alias_address_info'] = '<small>Pilna epasta addrese/s vai @piemērs.com, lai notvertu visas domēna ziņas (komatu atdalītas). <b>tikai mailcow domēni</b>.</small>';
+$lang['add']['alias_address_info'] = '<small>Pilna epasta addrese/s vai @piemērs.com, lai notvertu visas domēna ziņas (komatu atdalītas). <b>tikai openemail domēni</b>.</small>';
 $lang['add']['alias_domain_info'] = '<small>Tikai derīgi domēna vārdi (komatu atdalīti).</small>';
 $lang['add']['target_address'] = 'Iet uz adresēm';
 $lang['add']['target_address_info'] = '<small>Pilna epasta addrese/s (comma-separated).</small>';
@@ -348,7 +348,7 @@ $lang['tfa']['set_tfa'] = "Uzstādīt difi faktoru autentifik;acijas metodi";
 $lang['tfa']['yubi_otp'] = "Yubico OTP autentifikators";
 $lang['tfa']['key_id'] = "Jūsu YubiKey identifikators";
 $lang['tfa']['key_id_totp'] = "Identifikators Jūsu atslēgai";
-$lang['tfa']['api_register'] = 'mailcow izmanto Yubico Cloud API. Lūdzu iegūstiet API atslēgu priekš Jūsu atslēgas<a href="https://upgrade.yubico.com/getapikey/" target="_blank">here</a>';
+$lang['tfa']['api_register'] = 'openemail izmanto Yubico Cloud API. Lūdzu iegūstiet API atslēgu priekš Jūsu atslēgas<a href="https://upgrade.yubico.com/getapikey/" target="_blank">here</a>';
 $lang['tfa']['u2f'] = "U2F autentifikācija";
 $lang['tfa']['none'] = "Deaktivizēt";
 $lang['tfa']['delete_tfa'] = "Atspējot TFA";
@@ -376,7 +376,7 @@ $lang['admin']['f2b_whitelist'] = 'Baltā saraksta tīkls/hosts';
 $lang['admin']['search_domain_da'] = 'Meklēt domēnus';
 $lang['admin']['r_inactive'] = 'Neaktīvie ierobežojumi';
 $lang['admin']['r_active'] = 'Aktīvie ierobežojumi';
-$lang['admin']['r_info'] = ' Pelēki/atslēgti elementi aktīvo ierobežojumu sarakstā nav zināmi kā mailcow spēkā esoši ierobežojumi un tos nevar pārvietot. Jebkurā gadījumā nezināmi ierobežojumi tiks sakārtoti pēc pievienošanas. <br>Jūs varat pievienot jaunus elementus <code>inc/vars.local.inc.php</code>, lai varētu tos pārslēgt.';
+$lang['admin']['r_info'] = ' Pelēki/atslēgti elementi aktīvo ierobežojumu sarakstā nav zināmi kā openemail spēkā esoši ierobežojumi un tos nevar pārvietot. Jebkurā gadījumā nezināmi ierobežojumi tiks sakārtoti pēc pievienošanas. <br>Jūs varat pievienot jaunus elementus <code>inc/vars.local.inc.php</code>, lai varētu tos pārslēgt.';
 $lang['admin']['dkim_key_length'] = 'DKIM atslēgas garums (bits)';
 $lang['admin']['dkim_key_valid'] = 'Atslēga derīga';
 $lang['admin']['dkim_key_unused'] = 'Neizmantota atslēga';
@@ -410,7 +410,7 @@ $lang['admin']['refresh'] = 'Atsvaidzināt';
 $lang['admin']['to_top'] = 'Atpakaļ uz sākumu';
 $lang['admin']['in_use_by'] = 'Tiek lietots ar';
 $lang['admin']['forwarding_hosts'] = 'Hostu pārsūtīšana';
-$lang['admin']['forwarding_hosts_hint'] = 'Ienākošie ziņojumi ir bez nosacījumiem pieņemti no visiem šeit norādītajiem hostiem. Pēc tam šie hosti netiek pārbaudīti pret DNSBL vai  pakļauti Greylistei. No tiem saņemtās mēstules nekad netiek noraidītas, bet pēc izvēles tās var pārvietot mapē Nevēlamais. Visbiežāk to izmanto, lai precizētu pasta serverus, kuros ir iestatīts noteikums, kas pārsūta ienākošos e-pasta ziņojumus uz jūsu mailcow serveri.';
+$lang['admin']['forwarding_hosts_hint'] = 'Ienākošie ziņojumi ir bez nosacījumiem pieņemti no visiem šeit norādītajiem hostiem. Pēc tam šie hosti netiek pārbaudīti pret DNSBL vai  pakļauti Greylistei. No tiem saņemtās mēstules nekad netiek noraidītas, bet pēc izvēles tās var pārvietot mapē Nevēlamais. Visbiežāk to izmanto, lai precizētu pasta serverus, kuros ir iestatīts noteikums, kas pārsūta ienākošos e-pasta ziņojumus uz jūsu openemail serveri.';
 $lang['admin']['forwarding_hosts_add_hint'] = 'Jūs varat norādīt  IPv4/IPv6 addreses, tīklu iekš CIDR apzīmējuma, hosta nosaukumu (kas tiks atrisinātas IP  adresēs), vai domēna vārdos (kas tiks atrisināts IP adresēs vaicājot SPF ierakstus vai, ja tādu nav, MX ierakstus).';
 $lang['admin']['relayhosts_hint'] = 'Definējiet  relejhostus šeit, lai tos varētu izvēlēties domēna konfigurācijas logā.';
 $lang['admin']['add_relayhost_add_hint'] = 'Lūdzu, ņemiet vērā, ka relejhostu autentifikācijas dati tiks saglabāti kā vienkāršs teksts.';
@@ -445,9 +445,9 @@ $lang['admin']['quarantine_exclude_domains'] = "Izslēgt domēnus un alias-domē
 
 $lang['admin']['ui_texts'] = "UI etiķetes un teksti";
 $lang['admin']['help_text'] = "Ignorēt palīdzības tekstu zem pieteikšanās maskas (HTML ir atļauta)";
-$lang['admin']['title_name'] = '"mailcow UI" mājas lapas nosaukums';
-$lang['admin']['main_name'] = '"mailcow UI" nosaukums';
-$lang['admin']['apps_name'] = '"mailcow Apps" nosaukums';
+$lang['admin']['title_name'] = '"openemail UI" mājas lapas nosaukums';
+$lang['admin']['main_name'] = '"openemail UI" nosaukums';
+$lang['admin']['apps_name'] = '"openemail Apps" nosaukums';
 
 $lang['admin']['customize'] = "Pielāgot";
 $lang['admin']['change_logo'] = "Nomainīt logo";
