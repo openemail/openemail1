@@ -247,7 +247,7 @@ $lang['user']['edit'] = 'Bearbeiten';
 $lang['user']['remove'] = 'Entfernen';
 $lang['user']['create_syncjob'] = 'Neuen Sync-Job erstellen';
 
-$lang['start']['mailcow_apps_detail'] = 'Verwenden Sie mailcow Apps, um E-Mails abzurufen, Kalender und Kontakte zu verwalten und vieles mehr.';
+$lang['start']['mailcow_apps_detail'] = 'Verwenden Sie openemail Apps, um E-Mails abzurufen, Kalender und Kontakte zu verwalten und vieles mehr.';
 $lang['start']['mailcow_panel_detail'] = '<b>Domain-Administratoren</b> erstellen, verändern oder löschen Mailboxen, verwalten die Domäne und sehen sonstige Einstellungen ein.<br>
 	Als <b>Mailbox-Benutzer</b> erstellen Sie hier zeitlich limitierte Aliasse, ändern das Verhalten des Spamfilters, setzen ein neues Passwort und vieles mehr.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Bitte verwenden Sie Ihre vollständige E-Mail-Adresse sowie das PLAIN-Authentifizierungsverfahren.<br>
@@ -348,7 +348,7 @@ $lang['edit']['active'] = 'Aktiv';
 $lang['edit']['gal'] = 'Globales Adressbuch';
 $lang['edit']['gal_info'] = 'Das Globale Adressbuch enthält alle Objekte einer Domain und kann durch keinen Benutzer editiert werden. <b>Zum Anwenden einer Änderung muss SOGo neugestartet werden.</b>';
 $lang['edit']['force_pw_update'] = 'Erzwinge Passwortänderung bei nächstem Login';
-$lang['edit']['force_pw_update_info'] = 'Dem Benutzer wird lediglich der Zugang zur mailcow UI ermöglicht.';
+$lang['edit']['force_pw_update_info'] = 'Dem Benutzer wird lediglich der Zugang zur openemail UI ermöglicht.';
 $lang['edit']['sogo_access'] = 'SOGo Zugriffsrecht';
 $lang['edit']['sogo_access_info'] = 'Zugriff auf SOGo erlauben oder verbieten. Diese Einstellung hat weder Einfluss auf den Zugang sonstiger Dienste noch entfernt sie ein vorhandenes SOGo Benutzerprofil.';
 $lang['edit']['target_domain'] = 'Ziel-Domain:';
@@ -501,7 +501,7 @@ $lang['tfa']['set_tfa'] = "Konfiguriere Zwei-Faktor-Authentifizierungsmethode";
 $lang['tfa']['yubi_otp'] = "Yubico OTP Authentifizierung";
 $lang['tfa']['key_id'] = "Ein Name für diesen YubiKey";
 $lang['tfa']['key_id_totp'] = "Ein eindeutiger Name";
-$lang['tfa']['api_register'] = 'mailcow verwendet die Yubico Cloud API. Ein API-Key für den Yubico Stick kann <a href="https://upgrade.yubico.com/getapikey/" target="_blank">hier</a> bezogen werden.';
+$lang['tfa']['api_register'] = 'openemail verwendet die Yubico Cloud API. Ein API-Key für den Yubico Stick kann <a href="https://upgrade.yubico.com/getapikey/" target="_blank">hier</a> bezogen werden.';
 $lang['tfa']['u2f'] = "U2F Authentifizierung";
 $lang['tfa']['totp'] = "TOTP Authentifizierung";
 $lang['tfa']['none'] = "Deaktiviert";
@@ -535,7 +535,7 @@ $lang['admin']['f2b_netban_ipv6'] = 'Netzbereich für IPv6-Bans (8-128)';
 $lang['admin']['f2b_whitelist'] = 'Whitelist für Netzwerke und Hosts';
 $lang['admin']['r_inactive'] = 'Inaktive Restriktionen';
 $lang['admin']['r_active'] = 'Aktive Restriktionen';
-$lang['admin']['r_info'] = 'Ausgegraute/deaktivierte Elemente sind mailcow nicht bekannt und können nicht in die Liste inaktiver Elemente verschoben werden. Unbekannte Restriktionen werden trotzdem in Reihenfolge der Erscheinung gesetzt.<br>Sie können ein Element in der Datei <code>inc/vars.local.inc.php</code> als bekannt hinzufügen, um es zu bewegen.';
+$lang['admin']['r_info'] = 'Ausgegraute/deaktivierte Elemente sind openemail nicht bekannt und können nicht in die Liste inaktiver Elemente verschoben werden. Unbekannte Restriktionen werden trotzdem in Reihenfolge der Erscheinung gesetzt.<br>Sie können ein Element in der Datei <code>inc/vars.local.inc.php</code> als bekannt hinzufügen, um es zu bewegen.';
 $lang['admin']['save'] = 'Änderungen speichern';
 $lang['admin']['dkim_add_key'] = 'ARC/DKIM-Key hinzufügen';
 $lang['admin']['dkim_keys'] = 'ARC/DKIM-Keys';
@@ -603,7 +603,7 @@ $lang['admin']['in_use_by'] = 'Verwendet von';
 $lang['admin']['rate_name'] = 'Rate name';
 $lang['admin']['message'] = 'Nachricht';
 $lang['admin']['forwarding_hosts'] = 'Weiterleitungs-Hosts';
-$lang['admin']['forwarding_hosts_hint'] = 'Eingehende Nachrichten werden von den hier gelisteten Hosts bedingungslos akzeptiert. Diese Hosts werden dann nicht mit DNSBLs abgeglichen oder Greylisting unterworfen. Von ihnen empfangener Spam wird nie abgelehnt, optional kann er aber in den Spam-Ordner einsortiert werden. Die übliche Verwendung für diese Funktion ist, um Mailserver anzugeben, auf denen eine Weiterleitung zu Ihrem mailcow-Server eingerichtet wurde.';
+$lang['admin']['forwarding_hosts_hint'] = 'Eingehende Nachrichten werden von den hier gelisteten Hosts bedingungslos akzeptiert. Diese Hosts werden dann nicht mit DNSBLs abgeglichen oder Greylisting unterworfen. Von ihnen empfangener Spam wird nie abgelehnt, optional kann er aber in den Spam-Ordner einsortiert werden. Die übliche Verwendung für diese Funktion ist, um Mailserver anzugeben, auf denen eine Weiterleitung zu Ihrem openemail-Server eingerichtet wurde.';
 $lang['admin']['forwarding_hosts_add_hint'] = 'Sie können entweder IPv4/IPv6-Adressen, Netzwerke in CIDR-Notation, Hostnamen (die zu IP-Adressen aufgelöst werden), oder Domainnamen (die zu IP-Adressen aufgelöst werden, indem ihr SPF-Record abgefragt wird oder, in dessen Abwesenheit, ihre MX-Records) angeben.';
 $lang['admin']['relayhosts_hint'] = 'Erstellen Sie senderabhängige Transporte, um diese im Einstellungsdialog einer Domain auszuwählen.<br>
   Der Transporttyp lautet immer "smtp:". Benutzereinstellungen bezüglich Verschlüsselungsrichtlinie werden beim Transport berücksichtigt.';
@@ -679,9 +679,9 @@ $lang['mailbox']['disable_x'] = "Deaktiviere";
 
 $lang['admin']['ui_texts'] = "UI Label und Texte";
 $lang['admin']['help_text'] = "Hilfstext unter Login-Maske (HTML zulässig)";
-$lang['admin']['title_name'] = '"mailcow UI" Webseiten Titel';
-$lang['admin']['main_name'] = '"mailcow UI" Name';
-$lang['admin']['apps_name'] = '"mailcow Apps" Name';
+$lang['admin']['title_name'] = '"openemail UI" Webseiten Titel';
+$lang['admin']['main_name'] = '"openemail UI" Name';
+$lang['admin']['apps_name'] = '"openemail Apps" Name';
 
 $lang['admin']['customize'] = "UI Anpassung";
 $lang['admin']['change_logo'] = "Logo ändern";
@@ -742,7 +742,7 @@ $lang['warning']['fuzzy_learn_error'] = "Fuzzy Lernfehler: %s";
 $lang['danger']['spam_learn_error'] = "Spam Lernfehler: %s";
 $lang['success']['qlearn_spam'] = "Nachricht ID %s wurde als Spam gelernt und gelöscht";
 
-$lang['debug']['log_info'] = '<p>mailcow <b>in-memory Logs</b> werden in Redis Listen gespeichert, die maximale Anzahl der Einträge pro Anwendung richtet sich nach LOG_LINES (%d).
+$lang['debug']['log_info'] = '<p>openemail <b>in-memory Logs</b> werden in Redis Listen gespeichert, die maximale Anzahl der Einträge pro Anwendung richtet sich nach LOG_LINES (%d).
   <br>In-memory Logs sind vergänglich und nicht zur ständigen Aufbewahrung bestimmt. Alle Anwendungen, die in-memory protokollieren, schreiben ebenso in den Docker Daemon.
   <br>Das in-memory Protokoll versteht sich als schnelle Übersicht zum Debugging eines Containers, für komplexere Protokolle sollte der Docker Daemon konsultiert werden.</p>
   <p><b>Externe Logs</b> werden via API externer Applikationen bezogen.</p>
