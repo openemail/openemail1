@@ -7,7 +7,7 @@ $lang['footer']['loading'] = "Espere Por Favor...";
 $lang['header']['restart_sogo'] = 'Reiniciar SOGo';
 $lang['footer']['restart_sogo'] = 'Reiniciar SOGo';
 $lang['footer']['restart_now'] = 'Reiniciar ahora';
-$lang['footer']['restart_sogo_info'] = 'Algunas tareas, por ejemplo agregar un dominio, requieren que reinicies SOGo para detectar cambios hechos en la UI de mailcow.<br><br><b>Importante:</b> Un reinicio sencillo puede tardar un poco en completarse, por favor espere a que termine.';
+$lang['footer']['restart_sogo_info'] = 'Algunas tareas, por ejemplo agregar un dominio, requieren que reinicies SOGo para detectar cambios hechos en la UI de openemail.<br><br><b>Importante:</b> Un reinicio sencillo puede tardar un poco en completarse, por favor espere a que termine.';
 $lang['danger']['dkim_domain_or_sel_invalid'] = "Dominio DKIM ó selector inválido";
 $lang['success']['dkim_removed'] = "Registro DKIM removido";
 $lang['success']['dkim_added'] = "Registro DKIM guardado";
@@ -127,7 +127,7 @@ $lang['user']['tag_help_explain'] = 'En subcarpeta: una nueva subcarpeta llamada
 En asunto: los nombres de las etiquetas serán añadidos al asunto de los correos, ejemplo: "[Facebook] Mis Noticias".';
 $lang['user']['tag_help_example'] = 'Ejemplo de una dirección email etiquetada: mi<b>+Facebook</b>@ejemplo.org';
 
-$lang['start']['mailcow_apps_detail'] = 'Utiliza una aplicación de mailcow para acceder a tus correos, calendario, contactos y más.';
+$lang['start']['mailcow_apps_detail'] = 'Utiliza una aplicación de openemail para acceder a tus correos, calendario, contactos y más.';
 $lang['start']['mailcow_panel_detail'] = '<b>Administradores del dominio</b> crean, modifican o eliminan buzones y alias, cambia dominios y lee información más detallada sobre sus dominios asignados<br>
 	<b>Usuarios de buzón</b> son capaces de crear alias de tiempo limitado (spam alias), cambiar su contraseña y la configuración del filtro de spam.';
 $lang['start']['imap_smtp_server_auth_info'] = 'Por favor utiliza tu dirección de correo completa y el mecanismo de autenticación PLANO.<br>
@@ -208,7 +208,7 @@ $lang['add']['relay_all'] = 'Retransmitir todos los recipientes';
 $lang['add']['relay_domain'] = 'Retransmitir este dominio';
 $lang['add']['relay_all_info'] = '<small>Si eliges <b>no</b> retransmitir a todos los recipientes, necesitas agregar un buzón "blind"("ciego") por cada recipiente que debe ser retransmitido.</small>';
 $lang['add']['alias_address'] = 'Dirección/es alias:';
-$lang['add']['alias_address_info'] = '<small>Dirección/es de correo completa/s ó @ejemplo.com, para atrapar todos los mensajes para un dominio (separado por coma). <b>Dominios mailcow solamente</b>.</small>';
+$lang['add']['alias_address_info'] = '<small>Dirección/es de correo completa/s ó @ejemplo.com, para atrapar todos los mensajes para un dominio (separado por coma). <b>Dominios openemail solamente</b>.</small>';
 $lang['add']['alias_domain_info'] = '<small>Nombres de dominio válidos solamente (separado por coma).</small>';
 $lang['add']['target_address'] = 'Direcciones goto:';
 $lang['add']['target_address_info'] = '<small>Dirección/es de correo completa/s (separado por coma).</small>';
@@ -237,7 +237,7 @@ $lang['login']['trash_login'] = "Inicio de sesión basura";
 $lang['admin']['search_domain_da'] = 'Buscar dominios';
 $lang['admin']['r_inactive'] = 'Restricciones inactivas';
 $lang['admin']['r_active'] = 'Restricciones activas';
-$lang['admin']['r_info'] = 'Elementos en gris/deshabilitados en la lista de restricciones activas no son reconocidas como restricciones válidas para mailcow y no pueden ser movidas. Restricciones desconocidas serán establecidas en el orden de aparicion de todas maneras. <br>Puedes agregar nuevos elementos en <code>inc/vars.local.inc.php</code> para ser capaz de habilitarlas.';
+$lang['admin']['r_info'] = 'Elementos en gris/deshabilitados en la lista de restricciones activas no son reconocidas como restricciones válidas para openemail y no pueden ser movidas. Restricciones desconocidas serán establecidas en el orden de aparicion de todas maneras. <br>Puedes agregar nuevos elementos en <code>inc/vars.local.inc.php</code> para ser capaz de habilitarlas.';
 $lang['admin']['dkim_key_length'] = 'Longitud de la llave DKIM (bits)';
 $lang['admin']['dkim_add_key'] = 'Agregar registro ARC/DKIM';
 $lang['admin']['dkim_keys'] = 'Registros ARC/DKIM';
