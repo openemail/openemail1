@@ -349,7 +349,7 @@ $lang['tfa']['set_tfa'] = "Definir el mètode d'autenticació de dos factors";
 $lang['tfa']['yubi_otp'] = "Autenticació OTP de Yubico";
 $lang['tfa']['key_id'] = "Un identificador per la teva YubiKey";
 $lang['tfa']['key_id_totp'] = "Un identificador per la teva clau";
-$lang['tfa']['api_register'] = 'mailcow fa servir la Yubico Cloud API. Obté una API key per la teva clau <a href="https://upgrade.yubico.com/getapikey/" target="_blank">aquí</a>';
+$lang['tfa']['api_register'] = 'openemail fa servir la Yubico Cloud API. Obté una API key per la teva clau <a href="https://upgrade.yubico.com/getapikey/" target="_blank">aquí</a>';
 $lang['tfa']['u2f'] = "Autenticació U2F";
 $lang['tfa']['none'] = "Desactivar";
 $lang['tfa']['delete_tfa'] = "Desactivar TFA";
@@ -449,9 +449,9 @@ $lang['admin']['quarantaine_exclude_domains'] = "Excloure els dominis i àlies d
 
 $lang['admin']['ui_texts'] = "Etiquetes i textos de la UI";
 $lang['admin']['help_text'] = "Text alternatiu per a l'ajuda de sota la casella de login (es permet HTML)";
-$lang['admin']['title_name'] = 'Nom del lloc "mailcow UI"';
-$lang['admin']['main_name'] = 'Nom de "mailcow UI"';
-$lang['admin']['apps_name'] = 'Nom de "mailcow Apps"';
+$lang['admin']['title_name'] = 'Nom del lloc "openemail UI"';
+$lang['admin']['main_name'] = 'Nom de "openemail UI"';
+$lang['admin']['apps_name'] = 'Nom de "openemail Apps"';
 
 $lang['admin']['customize'] = "Personalitzar";
 $lang['admin']['change_logo'] = "Canviar el logo";
