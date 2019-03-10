@@ -259,7 +259,7 @@ services:
         openemail-network:
           aliases:
             - memcached
-            - memcached-maailcow
+            - memcached-mailcow
 
     nginx-openemail:
       depends_on:
@@ -462,7 +462,7 @@ networks:
         - subnet: ${IPV6_NETWORK:-fd4d:6169:6c63:6f77::/64}
 
 volumes:
-  # Storage for email files
+  # Storage for email files 
   vmail-vol-1:
   # Storage for attachments (deduplicated)
   vmail-attachments-vol-1:
