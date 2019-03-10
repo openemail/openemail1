@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Thanks to https://github.com/mailcow/mailcow-dockerized/
+
 set -o pipefail
 exec 5>&1
 
@@ -383,7 +386,7 @@ while true; do
   ALL_VALIDATED=(${VALIDATED_OPENEMAIL_HOSTNAME} $(echo ${VALIDATED_CONFIG_DOMAINS[*]} ${ADDITIONAL_VALIDATED_SAN[*]} | xargs -n1 | sort -u | xargs))
   if [[ -z ${ALL_VALIDATED[*]} ]]; then
     log_f "Cannot validate hostnames, skipping Let's Encrypt for 1 hour."
-    log_f "Use SKIP_LETS_ENCRYPT=y in mailcow.conf to skip it permanently."
+    log_f "Use SKIP_LETS_ENCRYPT=y in openemail.conf to skip it permanently."
     sleep 1h
     exec $(readlink -f "$0")
   fi
