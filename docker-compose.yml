@@ -12,7 +12,7 @@ services:
       restart: always
       tty: true
       networks:
-        mailcow-network:
+        openemail-network:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.254
           aliases:
             - unbound
@@ -36,7 +36,7 @@ services:
       ports:
         - "${SQL_PORT:-127.0.0.1:13306}:3306"
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - mysql
             - mysql-mailcow
@@ -51,7 +51,7 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.249
           aliases:
             - redis
@@ -69,7 +69,7 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - clamd
             - clamd-mailcow
@@ -93,7 +93,7 @@ services:
         - ${IPV4_NETWORK:-172.22.1}.254
       hostname: rspamd
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - rspamd
             - rspamd-mailcow
@@ -133,13 +133,13 @@ services:
         - SMTP_PORT=${SMTP_PORT:-25}
         - API_KEY=${API_KEY:-invalid}
         - API_ALLOW_FROM=${API_ALLOW_FROM:-invalid}
-        - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-openemail-dockerized}
+        - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-openemail-1.0}
         - SKIP_SOLR=${SKIP_SOLR:-y}
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - phpfpm
             - php-fpm-mailcow
@@ -164,7 +164,7 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
           aliases:
             - sogo
@@ -213,7 +213,7 @@ services:
         - ${IPV4_NETWORK:-172.22.1}.254
       hostname: ${OPENEMAIL_HOSTNAME}
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - dovecot
             - dovecot-mailcow
@@ -245,7 +245,7 @@ services:
         - ${IPV4_NETWORK:-172.22.1}.254
       hostname: ${OPENEMAIL_HOSTNAME}
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - postfix
             - postfix-dovecot
@@ -256,7 +256,7 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - memcached
             - memcached-maailcow
@@ -299,7 +299,7 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - nginx
             - nginx-mailcow
@@ -329,7 +329,7 @@ services:
         - mysql-socket-vol-1:/var/run/mysqld/
       restart: always
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - acme
             - acme-mailcow
@@ -386,7 +386,7 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - watchdog
             - watchdog-mailcow
@@ -402,7 +402,7 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock:ro
         - ./data/conf/rspamd/override.d/worker-controller-password.inc:/access.inc:rw
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - dockerapi
             - dockerapi-mailcow
@@ -420,7 +420,7 @@ services:
         - SOLR_HEAP=${SOLR_HEAP:-1024}
         - SKIP_SOLR=${SKIP_SOLR:-y}
       networks:
-        mailcow-network:
+        openemail-network:
           aliases:
             - solr
             - solr-mailcow
@@ -452,7 +452,7 @@ services:
         - /lib/modules:/lib/modules:ro
 
 networks:
-  mailcow-network:
+  openemail-network:
     driver: bridge
     enable_ipv6: true
     ipam:
