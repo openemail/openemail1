@@ -8,15 +8,15 @@ while ! mysqladmin status --socket=/var/run/mysqld/mysqld.sock -u${DBUSER} -p${D
   sleep 2
 done
 
-until [[ $(redis-cli -h redis-mailcow PING) == "PONG" ]]; do
+until [[ $(redis-cli -h redis-openemail PING) == "PONG" ]]; do
   echo "Waiting for Redis..."
   sleep 2
 done
 
 # Set a default release format
 
-if [[ -z $(redis-cli --raw -h redis-mailcow GET Q_RELEASE_FORMAT) ]]; then
-  redis-cli --raw -h redis-mailcow SET Q_RELEASE_FORMAT raw
+if [[ -z $(redis-cli --raw -h redis-openemail GET Q_RELEASE_FORMAT) ]]; then
+  redis-cli --raw -h redis-openemail SET Q_RELEASE_FORMAT raw
 fi
 
 # Check of mysql_upgrade
@@ -25,7 +25,7 @@ CONTAINER_ID=
 # Todo: Better check if upgrade failed
 # This can happen due to a broken sogo_view
 [ -s /mysql_upgrade_loop ] && SQL_LOOP_C=$(cat /mysql_upgrade_loop)
-CONTAINER_ID=$(curl --silent --insecure https://dockerapi/containers/json | jq -r ".[] | {name: .Config.Labels[\"com.docker.compose.service\"], id: .Id}" | jq -rc "select( .name | tostring | contains(\"mysql-mailcow\")) | .id")
+CONTAINER_ID=$(curl --silent --insecure https://dockerapi/containers/json | jq -r ".[] | {name: .Config.Labels[\"com.docker.compose.service\"], id: .Id}" | jq -rc "select( .name | tostring | contains(\"mysql-openemail\")) | .id")
 if [[ ! -z "${CONTAINER_ID}" ]] && [[ "${CONTAINER_ID}" =~ [^a-zA-Z0-9] ]]; then
   SQL_UPGRADE_RETURN=$(curl --silent --insecure -XPOST https://dockerapi/containers/${CONTAINER_ID}/exec -d '{"cmd":"system", "task":"mysql_upgrade"}' --silent -H 'Content-type: application/json' | jq -r .type)
   if [[ ${SQL_UPGRADE_RETURN} == 'warning' ]]; then
@@ -35,7 +35,7 @@ if [[ ! -z "${CONTAINER_ID}" ]] && [[ "${CONTAINER_ID}" =~ [^a-zA-Z0-9] ]]; then
       exit 1
     else
       rm /mysql_upgrade_loop
-      echo "MySQL was not applied previously, skipping. Restart php-fpm-mailcow to retry or run mysql_upgrade manually."
+      echo "MySQL was not applied previously, skipping. Restart php-fpm-openemail to retry or run mysql_upgrade manually."
       while ! mysqladmin status --socket=/var/run/mysqld/mysqld.sock -u${DBUSER} -p${DBPASS} --silent; do
         echo "Waiting for SQL to return..."
         sleep 2
@@ -50,7 +50,7 @@ php -c /usr/local/etc/php -f /web/inc/init_db.inc.php
 
 # Migrate domain map
 declare -a DOMAIN_ARR
-redis-cli -h redis-mailcow DEL DOMAIN_MAP
+redis-cli -h redis-openemail DEL DOMAIN_MAP
 while read line
 do
   DOMAIN_ARR+=("$line")
@@ -62,7 +62,7 @@ done < <(mysql --socket=/var/run/mysqld/mysqld.sock -u ${DBUSER} -p${DBPASS} ${D
 
 if [[ ! -z ${DOMAIN_ARR} ]]; then
 for domain in "${DOMAIN_ARR[@]}"; do
-  redis-cli -h redis-mailcow HSET DOMAIN_MAP ${domain} 1
+  redis-cli -h redis-openemail HSET DOMAIN_MAP ${domain} 1
 done
 fi
 
