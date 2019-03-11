@@ -95,7 +95,7 @@ function sys_mail($_data) {
       )
     );
     $mail->isSMTP();
-    $mail->Host = 'dovecot-mailcow';
+    $mail->Host = 'dovecot-openemail';
     $mail->SMTPAuth = false;
     $mail->Port = 24;
     $mail->setFrom($mass_from);
