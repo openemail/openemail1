@@ -49,9 +49,9 @@ mkdir -p ${ACME_BASE}/acme
 reload_configurations(){
   # Reading container IDs
   # Wrapping as array to ensure trimmed content when calling $NGINX etc.
-  local NGINX=($(curl --silent --insecure https://dockerapi/containers/json | jq -r '.[] | {name: .Config.Labels["com.docker.compose.service"], id: .Id}' | jq -rc 'select( .name | tostring | contains("nginx-mailcow")) | .id' | tr "\n" " "))
-  local DOVECOT=($(curl --silent --insecure https://dockerapi/containers/json | jq -r '.[] | {name: .Config.Labels["com.docker.compose.service"], id: .Id}' | jq -rc 'select( .name | tostring | contains("dovecot-mailcow")) | .id' | tr "\n" " "))
-  local POSTFIX=($(curl --silent --insecure https://dockerapi/containers/json | jq -r '.[] | {name: .Config.Labels["com.docker.compose.service"], id: .Id}' | jq -rc 'select( .name | tostring | contains("postfix-mailcow")) | .id' | tr "\n" " "))
+  local NGINX=($(curl --silent --insecure https://dockerapi/containers/json | jq -r '.[] | {name: .Config.Labels["com.docker.compose.service"], id: .Id}' | jq -rc 'select( .name | tostring | contains("nginx-openemail")) | .id' | tr "\n" " "))
+  local DOVECOT=($(curl --silent --insecure https://dockerapi/containers/json | jq -r '.[] | {name: .Config.Labels["com.docker.compose.service"], id: .Id}' | jq -rc 'select( .name | tostring | contains("dovecot-openemail")) | .id' | tr "\n" " "))
+  local POSTFIX=($(curl --silent --insecure https://dockerapi/containers/json | jq -r '.[] | {name: .Config.Labels["com.docker.compose.service"], id: .Id}' | jq -rc 'select( .name | tostring | contains("postfix-openemail")) | .id' | tr "\n" " "))
   # Reloading
   echo "Reloading Nginx..."
   NGINX_RELOAD_RET=$(curl -X POST --insecure https://dockerapi/containers/${NGINX}/exec -d '{"cmd":"reload", "task":"nginx"}' --silent -H 'Content-type: application/json' | jq -r .type)
@@ -185,7 +185,7 @@ log_f "Initializing, please wait... "
 
 while true; do
 
-  # Re-using previous acme-mailcow account and domain keys
+  # Re-using previous acme-openemail account and domain keys
   if [[ ! -f ${ACME_BASE}/acme/key.pem ]]; then
     log_f "Generating missing domain private key..."
     openssl genrsa 4096 > ${ACME_BASE}/acme/key.pem
