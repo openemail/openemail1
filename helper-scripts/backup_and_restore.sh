@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ ! -z ${MAILCOW_BACKUP_LOCATION} ]]; then
-  BACKUP_LOCATION="${MAILCOW_BACKUP_LOCATION}"
+if [[ ! -z ${OPENEMAIL_BACKUP_LOCATION} ]]; then
+  BACKUP_LOCATION="${OPENEMAIL_BACKUP_LOCATION}"
 fi
 
 if [[ ! ${1} =~ (backup|restore) ]]; then
@@ -50,44 +50,44 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 COMPOSE_FILE=${SCRIPT_DIR}/../docker-compose.yml
 echo "Using ${BACKUP_LOCATION} as backup/restore location."
 echo
-source ${SCRIPT_DIR}/../mailcow.conf
+source ${SCRIPT_DIR}/../openemail.conf
 CMPS_PRJ=$(echo $COMPOSE_PROJECT_NAME | tr -cd "[A-Za-z-_]")
 
 function backup() {
   DATE=$(date +"%Y-%m-%d-%H-%M-%S")
-  mkdir -p "${BACKUP_LOCATION}/mailcow-${DATE}"
-  chmod 755 "${BACKUP_LOCATION}/mailcow-${DATE}"
-  cp "${SCRIPT_DIR}/../mailcow.conf" "${BACKUP_LOCATION}/mailcow-${DATE}"
+  mkdir -p "${BACKUP_LOCATION}/openemail-${DATE}"
+  chmod 755 "${BACKUP_LOCATION}/openemail-${DATE}"
+  cp "${SCRIPT_DIR}/../openemail.conf" "${BACKUP_LOCATION}/openemail-${DATE}"
   while (( "$#" )); do
     case "$1" in
     vmail|all)
       docker run --rm \
-        -v ${BACKUP_LOCATION}/mailcow-${DATE}:/backup \
+        -v ${BACKUP_LOCATION}/openemail-${DATE}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_vmail-vol-1):/vmail:ro \
         debian:stretch-slim /bin/tar --warning='no-file-ignored' --use-compress-program="gzip --rsyncable -v --best" -Pcvpf /backup/backup_vmail.tar.gz /vmail
       ;;&
     crypt|all)
       docker run --rm \
-        -v ${BACKUP_LOCATION}/mailcow-${DATE}:/backup \
+        -v ${BACKUP_LOCATION}/openemail-${DATE}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_crypt-vol-1):/crypt:ro \
         debian:stretch-slim /bin/tar --warning='no-file-ignored' --use-compress-program="gzip --rsyncable -v --best" -Pcvpf /backup/backup_crypt.tar.gz /crypt
       ;;&
     redis|all)
-      docker exec $(docker ps -qf name=redis-mailcow) redis-cli save
+      docker exec $(docker ps -qf name=redis-openemail) redis-cli save
       docker run --rm \
-        -v ${BACKUP_LOCATION}/mailcow-${DATE}:/backup \
+        -v ${BACKUP_LOCATION}/openemail-${DATE}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_redis-vol-1):/redis:ro \
         debian:stretch-slim /bin/tar --warning='no-file-ignored' --use-compress-program="gzip --rsyncable -v --best" -Pcvpf /backup/backup_redis.tar.gz /redis
       ;;&
     rspamd|all)
       docker run --rm \
-        -v ${BACKUP_LOCATION}/mailcow-${DATE}:/backup \
+        -v ${BACKUP_LOCATION}/openemail-${DATE}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_rspamd-vol-1):/rspamd:ro \
         debian:stretch-slim /bin/tar --warning='no-file-ignored' --use-compress-program="gzip --rsyncable -v --best" -Pcvpf /backup/backup_rspamd.tar.gz /rspamd
       ;;&
     postfix|all)
       docker run --rm \
-        -v ${BACKUP_LOCATION}/mailcow-${DATE}:/backup \
+        -v ${BACKUP_LOCATION}/openemail-${DATE}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_postfix-vol-1):/postfix:ro \
         debian:stretch-slim /bin/tar --warning='no-file-ignored' --use-compress-program="gzip --rsyncable -v --best" -Pcvpf /backup/backup_postfix.tar.gz /postfix
       ;;&
@@ -97,7 +97,7 @@ function backup() {
         --network $(docker network ls -qf name=${CMPS_PRJ}_) \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_mysql-vol-1):/var/lib/mysql/:ro \
         --entrypoint= \
-        -v ${BACKUP_LOCATION}/mailcow-${DATE}:/backup \
+        -v ${BACKUP_LOCATION}/openemail-${DATE}:/backup \
         ${SQLIMAGE} /bin/sh -c "mysqldump -hmysql -uroot -p${DBROOT} --all-databases | gzip > /backup/backup_mysql.gz"
       ;;
     esac
@@ -106,65 +106,65 @@ function backup() {
 }
 
 function restore() {
-  docker stop $(docker ps -qf name=watchdog-mailcow)
+  docker stop $(docker ps -qf name=watchdog-openemail)
   RESTORE_LOCATION="${1}"
   shift
   while (( "$#" )); do
     case "$1" in
     vmail)
-      docker stop $(docker ps -qf name=dovecot-mailcow)
+      docker stop $(docker ps -qf name=dovecot-openemail)
       docker run -it --rm \
         -v ${RESTORE_LOCATION}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_vmail-vol-1):/vmail \
         debian:stretch-slim /bin/tar -Pxvzf /backup/backup_vmail.tar.gz
-      docker start $(docker ps -aqf name=dovecot-mailcow)
+      docker start $(docker ps -aqf name=dovecot-openemail)
       echo
       echo "In most cases it is not required to run a full resync, you can run the command printed below at any time after testing wether the restore process broke a mailbox:"
       echo
-      echo "docker exec $(docker ps -qf name=dovecot-mailcow) doveadm force-resync -A '*'"
+      echo "docker exec $(docker ps -qf name=dovecot-openemail) doveadm force-resync -A '*'"
       echo
       read -p "Force a resync now? [y|N] " FORCE_RESYNC
       if [[ ${FORCE_RESYNC,,} =~ ^(yes|y)$ ]]; then
-        docker exec $(docker ps -qf name=dovecot-mailcow) doveadm force-resync -A '*'
+        docker exec $(docker ps -qf name=dovecot-openemail) doveadm force-resync -A '*'
       else
         echo "OK, skipped."
       fi
       ;;
     redis)
-      docker stop $(docker ps -qf name=redis-mailcow)
+      docker stop $(docker ps -qf name=redis-openemail)
       docker run -it --rm \
         -v ${RESTORE_LOCATION}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_redis-vol-1):/redis \
         debian:stretch-slim /bin/tar -Pxvzf /backup/backup_redis.tar.gz
-      docker start $(docker ps -aqf name=redis-mailcow)
+      docker start $(docker ps -aqf name=redis-openemail)
       ;;
     crypt)
-      docker stop $(docker ps -qf name=dovecot-mailcow)
+      docker stop $(docker ps -qf name=dovecot-openemail)
       docker run -it --rm \
         -v ${RESTORE_LOCATION}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_crypt-vol-1):/crypt \
         debian:stretch-slim /bin/tar -Pxvzf /backup/backup_crypt.tar.gz
-      docker start $(docker ps -aqf name=dovecot-mailcow)
+      docker start $(docker ps -aqf name=dovecot-openemail)
       ;;
     rspamd)
-      docker stop $(docker ps -qf name=rspamd-mailcow)
+      docker stop $(docker ps -qf name=rspamd-openemail)
       docker run -it --rm \
         -v ${RESTORE_LOCATION}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_rspamd-vol-1):/rspamd \
         debian:stretch-slim /bin/tar -Pxvzf /backup/backup_rspamd.tar.gz
-      docker start $(docker ps -aqf name=rspamd-mailcow)
+      docker start $(docker ps -aqf name=rspamd-openemail)
       ;;
     postfix)
-      docker stop $(docker ps -qf name=postfix-mailcow)
+      docker stop $(docker ps -qf name=postfix-openemail)
       docker run -it --rm \
         -v ${RESTORE_LOCATION}:/backup \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_postfix-vol-1):/postfix \
         debian:stretch-slim /bin/tar -Pxvzf /backup/backup_postfix.tar.gz
-      docker start $(docker ps -aqf name=postfix-mailcow)
+      docker start $(docker ps -aqf name=postfix-openemail)
       ;;
     mysql)
       SQLIMAGE=$(grep -iEo '(mysql|mariadb)\:.+' ${COMPOSE_FILE})
-      docker stop $(docker ps -qf name=mysql-mailcow)
+      docker stop $(docker ps -qf name=mysql-openemail)
       docker run \
         -it --rm \
         -v $(docker volume ls -qf name=${CMPS_PRJ}_mysql-vol-1):/var/lib/mysql/ \
@@ -176,12 +176,12 @@ function restore() {
         echo Restoring... && \
         gunzip < backup/backup_mysql.gz | mysql -uroot && \
         mysql -uroot -e SHUTDOWN;"
-      docker start $(docker ps -aqf name=mysql-mailcow)
+      docker start $(docker ps -aqf name=mysql-openemail)
       ;;
     esac
     shift
   done
-  docker start $(docker ps -aqf name=watchdog-mailcow)
+  docker start $(docker ps -aqf name=watchdog-openemail)
 }
 
 if [[ ${1} == "backup" ]]; then
@@ -189,11 +189,11 @@ if [[ ${1} == "backup" ]]; then
 elif [[ ${1} == "restore" ]]; then
   i=1
   declare -A FOLDER_SELECTION
-  if [[ $(find ${BACKUP_LOCATION}/mailcow-* -maxdepth 1 -type d 2> /dev/null| wc -l) -lt 1 ]]; then
+  if [[ $(find ${BACKUP_LOCATION}/openemail-* -maxdepth 1 -type d 2> /dev/null| wc -l) -lt 1 ]]; then
     echo "Selected backup location has no subfolders"
     exit 1
   fi
-  for folder in $(ls -d ${BACKUP_LOCATION}/mailcow-*/); do
+  for folder in $(ls -d ${BACKUP_LOCATION}/openemail-*/); do
     echo "[ ${i} ] - ${folder}"
     FOLDER_SELECTION[${i}]="${folder}"
     ((i++))
