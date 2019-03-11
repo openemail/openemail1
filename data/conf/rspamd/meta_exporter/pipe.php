@@ -23,7 +23,7 @@ catch (PDOException $e) {
 }
 // Init Redis
 $redis = new Redis();
-$redis->connect('redis-openemail', 6379);
+$redis->connect('redis-mailcow', 6379);
 
 // Functions
 function parse_email($email) {
@@ -86,8 +86,8 @@ $rcpt_final_mailboxes = array();
 foreach (json_decode($rcpts, true) as $rcpt) {
   // Break rcpt into local part and domain part
   $parsed_rcpt = parse_email($rcpt);
-
-  // Skip if not a openemail handled domain
+  
+  // Skip if not a mailcow handled domain
   try {
     if (!$redis->hGet('DOMAIN_MAP', $parsed_rcpt['domain'])) {
       continue;
@@ -150,7 +150,7 @@ foreach (json_decode($rcpts, true) as $rcpt) {
         else {
           $parsed_goto = parse_email($goto);
           if (!$redis->hGet('DOMAIN_MAP', $parsed_goto['domain'])) {
-            error_log("QUARANTINE:" . $goto . " is not a openemail handled mailbox or alias address");
+            error_log("QUARANTINE:" . $goto . " is not a mailcow handled mailbox or alias address");
           }
           else {
             $stmt = $pdo->prepare("SELECT `goto` FROM `alias` WHERE `address` = :goto AND `active` = '1'");
@@ -211,7 +211,7 @@ foreach ($rcpt_final_mailboxes as $rcpt) {
         WHERE `rcpt` = :rcpt2
         ORDER BY id DESC
         LIMIT :retention_size
-      ) x
+      ) x 
     );');
     $stmt->execute(array(
       ':rcpt' => $rcpt,
@@ -225,3 +225,4 @@ foreach ($rcpt_final_mailboxes as $rcpt) {
     exit;
   }
 }
+

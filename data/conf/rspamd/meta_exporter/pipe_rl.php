@@ -7,7 +7,7 @@ require_once "vars.inc.php";
 ini_set('error_reporting', 0);
 // Init Redis
 $redis = new Redis();
-$redis->connect('redis-openemail', 6379);
+$redis->connect('redis-mailcow', 6379);
 
 $raw_data_content = file_get_contents('php://input');
 $raw_data_decoded = json_decode($raw_data_content, true);
@@ -35,3 +35,4 @@ $data['header_from'] = implode(', ', $raw_data_decoded['header_from']);
 
 $redis->lpush('RL_LOG', json_encode($data));
 exit;
+
