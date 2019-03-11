@@ -53,6 +53,7 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.249
           aliases:
             - redis
+            - redis-mailcow
 
     clamd-openemail:
       image: openemail/clamd:1.22
