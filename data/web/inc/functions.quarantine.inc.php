@@ -248,7 +248,7 @@ function quarantine($_action, $_data = null) {
         $stmt = $pdo->prepare('SELECT `rcpt` FROM `quarantine` WHERE `id` = :id');
         $stmt->execute(array(':id' => $id));
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt']) && $_SESSION['openemail_cc_role'] != 'admin') {
+        if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt']) && $_SESSION['mailcow_cc_role'] != 'admin') {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -280,7 +280,7 @@ function quarantine($_action, $_data = null) {
       }
       // Edit settings
       if ($_data['action'] == 'settings') {
-        if ($_SESSION['openemail_cc_role'] != "admin") {
+        if ($_SESSION['mailcow_cc_role'] != "admin") {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -344,7 +344,7 @@ function quarantine($_action, $_data = null) {
           $stmt = $pdo->prepare('SELECT `msg`, `qid`, `sender`, `rcpt` FROM `quarantine` WHERE `id` = :id');
           $stmt->execute(array(':id' => $id));
           $row = $stmt->fetch(PDO::FETCH_ASSOC);
-          if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt'])) {
+          if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt'])) {
             $_SESSION['return'][] = array(
               'type' => 'danger',
               'msg' => 'access_denied'
@@ -506,7 +506,7 @@ function quarantine($_action, $_data = null) {
           $stmt = $pdo->prepare('SELECT `msg`, `rcpt` FROM `quarantine` WHERE `id` = :id');
           $stmt->execute(array(':id' => $id));
           $row = $stmt->fetch(PDO::FETCH_ASSOC);
-          if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt']) && $_SESSION['openemail_cc_role'] != 'admin') {
+          if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt']) && $_SESSION['mailcow_cc_role'] != 'admin') {
             $_SESSION['return'][] = array(
               'type' => 'danger',
               'msg' => 'access_denied'
@@ -613,15 +613,15 @@ function quarantine($_action, $_data = null) {
       return true;
     break;
     case 'get':
-      if ($_SESSION['openemail_cc_role'] == "user") {
+      if ($_SESSION['mailcow_cc_role'] == "user") {
         $stmt = $pdo->prepare('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created` FROM `quarantine` WHERE `rcpt` = :mbox');
-        $stmt->execute(array(':mbox' => $_SESSION['openemail_cc_username']));
+        $stmt->execute(array(':mbox' => $_SESSION['mailcow_cc_username']));
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         while($row = array_shift($rows)) {
           $q_meta[] = $row;
         }
       }
-      elseif ($_SESSION['openemail_cc_role'] == "admin") {
+      elseif ($_SESSION['mailcow_cc_role'] == "admin") {
         $stmt = $pdo->query('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created` FROM `quarantine`');
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         while($row = array_shift($rows)) {
@@ -643,7 +643,7 @@ function quarantine($_action, $_data = null) {
     break;
     case 'settings':
       try {
-        if ($_SESSION['openemail_cc_role'] == "admin") {
+        if ($_SESSION['mailcow_cc_role'] == "admin") {
           $settings['exclude_domains'] = json_decode($redis->Get('Q_EXCLUDE_DOMAINS'), true);
         }
         $settings['max_size'] = $redis->Get('Q_MAX_SIZE');
@@ -673,7 +673,7 @@ function quarantine($_action, $_data = null) {
       $stmt = $pdo->prepare('SELECT `rcpt`, `symbols`, `msg`, `domain` FROM `quarantine` WHERE `id`= :id');
       $stmt->execute(array(':id' => $_data));
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
-      if (hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt'])) {
+      if (hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt'])) {
         return $row;
       }
       return false;
