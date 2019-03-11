@@ -16,7 +16,6 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.254
           aliases:
             - unbound
-            - unbound-mailcow
 
     mysql-openemail:
       image: mariadb:10.2
@@ -39,7 +38,6 @@ services:
         openemail-network:
           aliases:
             - mysql
-            - mysql-mailcow
 
     redis-openemail:
       image: redis:5-alpine
@@ -55,7 +53,6 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.249
           aliases:
             - redis
-            - redis-mailcow
 
     clamd-openemail:
       image: openemail/clamd:1.22
@@ -72,7 +69,6 @@ services:
         openemail-network:
           aliases:
             - clamd
-            - clamd-mailcow
 
     rspamd-openemail:
       image: openemail/rspamd:1.34
@@ -96,7 +92,6 @@ services:
         openemail-network:
           aliases:
             - rspamd
-            - rspamd-mailcow
 
     php-fpm-openemail:
       image: openemail/phpfpm:1.34
@@ -142,7 +137,6 @@ services:
         openemail-network:
           aliases:
             - phpfpm
-            - php-fpm-mailcow
 
     sogo-openemail:
       image: openemail/sogo:1.52
@@ -168,7 +162,6 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
           aliases:
             - sogo
-            - sogo-mailcow
 
     dovecot-openemail:
       image: openemail/dovecot:1.63
@@ -216,7 +209,6 @@ services:
         openemail-network:
           aliases:
             - dovecot
-            - dovecot-mailcow
 
     postfix-openemail:
       image: openemail/postfix:1.29
@@ -259,7 +251,6 @@ services:
         openemail-network:
           aliases:
             - memcached
-            - memcached-mailcow
 
     nginx-openemail:
       depends_on:
@@ -302,7 +293,6 @@ services:
         openemail-network:
           aliases:
             - nginx
-            - nginx-mailcow
 
     acme-openemail:
       depends_on:
@@ -332,7 +322,6 @@ services:
         openemail-network:
           aliases:
             - acme
-            - acme-mailcow
 
     netfilter-openemail:
       image: openemail/netfilter:1.22
@@ -389,7 +378,7 @@ services:
         openemail-network:
           aliases:
             - watchdog
-            - watchdog-mailcow
+
     dockerapi-openemail:
       image: openemail/dockerapi:1.26
       restart: always
@@ -405,7 +394,6 @@ services:
         openemail-network:
           aliases:
             - dockerapi
-            - dockerapi-mailcow
 
     solr-openemail:
       image: openemail/solr:1.2
@@ -423,7 +411,6 @@ services:
         openemail-network:
           aliases:
             - solr
-            - solr-mailcow
 
     ipv6nat-openemail:
       depends_on:
@@ -462,7 +449,7 @@ networks:
         - subnet: ${IPV6_NETWORK:-fd4d:6169:6c63:6f77::/64}
 
 volumes:
-  # Storage for email files 
+  # Storage for email files
   vmail-vol-1:
   # Storage for attachments (deduplicated)
   vmail-attachments-vol-1:
