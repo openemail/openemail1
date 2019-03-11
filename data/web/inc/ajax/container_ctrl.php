@@ -5,7 +5,7 @@ if (!isset($_SESSION['mailcow_cc_role']) || $_SESSION['mailcow_cc_role'] != 'adm
 	exit();
 }
 
-if (preg_match('/^[a-z\-]{0,}-mailcow/', $_GET['service'])) {
+if (preg_match('/^[a-z\-]{0,}-openemail/', $_GET['service'])) {
   if ($_GET['action'] == "start") {
     header('Content-Type: text/html; charset=utf-8');
     $retry = 0;

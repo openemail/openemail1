@@ -27,4 +27,4 @@ Further information (where applicable):
  - All third-party firewalls and custom iptables rules are unsupported. Please check the Docker docs about how to use Docker with your own ruleset. Nevertheless, iptabels output can help _us_ to help _you_: `iptables -L -vn`, `ip6tables -L -vn`, `iptables -L -vn -t nat` and `ip6tables -L -vn -t nat `
  - Reverse proxy? If you think this problem is related to your reverse proxy, please post your configuration.
  - Browser (if it's a Web UI issue) - please clean your browser cache and try again, problem persists?
- - Check `docker exec -it $(docker ps -qf name=acme-mailcow) dig +short stackoverflow.com @172.22.1.254` (set the IP accordingly, if you changed the internal mailcow network) and `docker exec -it $(docker ps -qf name=acme-mailcow) dig +short stackoverflow.com @1.1.1.1` - output? Timeout?
+ - Check `docker exec -it $(docker ps -qf name=acme-openemail) dig +short stackoverflow.com @172.22.1.254` (set the IP accordingly, if you changed the internal mailcow network) and `docker exec -it $(docker ps -qf name=acme-mailcow) dig +short stackoverflow.com @1.1.1.1` - output? Timeout?

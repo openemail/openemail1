@@ -421,7 +421,7 @@ function mailbox($_action, $_type, $_data = null, $_extra = null) {
             ratelimit('edit', 'domain', array('rl_value' => $_data['rl_value'], 'rl_frame' => $_data['rl_frame'], 'object' => $domain));
           }
           if (!empty($restart_sogo)) {
-            $restart_reponse = json_decode(docker('post', 'sogo-mailcow', 'restart'), true);
+            $restart_reponse = json_decode(docker('post', 'sogo-openemail', 'restart'), true);
             if ($restart_reponse['type'] == "success") {
               $_SESSION['return'][] = array(
                 'type' => 'success',
@@ -2083,7 +2083,7 @@ function mailbox($_action, $_type, $_data = null, $_extra = null) {
                   // Check if user has domain access (if object is domain)
                   $domain = ltrim($sender_acl_domain_admin[$key], '@');
                   if (is_valid_domain_name($domain)) {
-                    // Check for- and skip non-mailcow domains
+                    // Check for- and skip non-openemail domains
                     $domains = array_merge(mailbox('get', 'domains'), mailbox('get', 'alias_domains'));
                     if (!empty($domains)) {
                       if (!in_array($domain, $domains)) {
@@ -2518,7 +2518,7 @@ function mailbox($_action, $_type, $_data = null, $_extra = null) {
             'task' => 'list',
             'username' => $_data
           );
-          $filters = docker('post', 'dovecot-mailcow', 'exec', $exec_fields);
+          $filters = docker('post', 'dovecot-openemail', 'exec', $exec_fields);
           $filters = array_filter(preg_split("/(\r\n|\n|\r)/",$filters));
           foreach ($filters as $filter) {
             if (preg_match('/.+ ACTIVE/i', $filter)) {
@@ -2528,7 +2528,7 @@ function mailbox($_action, $_type, $_data = null, $_extra = null) {
                 'script_name' => substr($filter, 0, -7),
                 'username' => $_data
               );
-              $script = docker('post', 'dovecot-mailcow', 'exec', $exec_fields);
+              $script = docker('post', 'dovecot-openemail', 'exec', $exec_fields);
               // Remove first line
               return preg_replace('/^.+\n/', '', $script);
             }
@@ -3322,7 +3322,7 @@ function mailbox($_action, $_type, $_data = null, $_extra = null) {
               continue;
             }
             $exec_fields = array('cmd' => 'maildir', 'task' => 'cleanup', 'maildir' => $domain);
-            $maildir_gc = json_decode(docker('post', 'dovecot-mailcow', 'exec', $exec_fields), true);
+            $maildir_gc = json_decode(docker('post', 'dovecot-openemail', 'exec', $exec_fields), true);
             if ($maildir_gc['type'] != 'success') {
               $_SESSION['return'][] = array(
                 'type' => 'warning',
@@ -3507,7 +3507,7 @@ function mailbox($_action, $_type, $_data = null, $_extra = null) {
             if (!empty($mailbox_details['domain']) && !empty($mailbox_details['local_part'])) {
               $maildir = $mailbox_details['domain'] . '/' . $mailbox_details['local_part'];
               $exec_fields = array('cmd' => 'maildir', 'task' => 'cleanup', 'maildir' => $maildir);
-              $maildir_gc = json_decode(docker('post', 'dovecot-mailcow', 'exec', $exec_fields), true);
+              $maildir_gc = json_decode(docker('post', 'dovecot-openemail', 'exec', $exec_fields), true);
               if ($maildir_gc['type'] != 'success') {
                 $_SESSION['return'][] = array(
                   'type' => 'warning',

@@ -11,9 +11,9 @@ if [[ -f /tmp/sa-rules.tar.gz ]]; then
   tar xfvz /tmp/sa-rules.tar.gz -C /tmp/sa-rules-heinlein
   # create complete list of rules in a single file
   cat /tmp/sa-rules-heinlein/*cf > /etc/rspamd/custom/sa-rules-heinlein
-  # Only restart rspamd-mailcow when rules changed
+  # Only restart rspamd-openemail when rules changed
   if [[ $(cat /etc/rspamd/custom/sa-rules-heinlein | md5sum | cut -d' ' -f1) != ${HASH_SA_RULES} ]]; then
-    CONTAINER_NAME=rspamd-mailcow
+    CONTAINER_NAME=rspamd-openemail
     CONTAINER_ID=$(curl --silent --insecure https://dockerapi/containers/json | \
       jq -r ".[] | {name: .Config.Labels[\"com.docker.compose.service\"], id: .Id}" | \
       jq -rc "select( .name | tostring | contains(\"${CONTAINER_NAME}\")) | .id")

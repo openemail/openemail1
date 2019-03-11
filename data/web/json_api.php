@@ -55,7 +55,7 @@ function api_log($_data) {
 
 api_log($_POST);
 
-if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_username'])) {
+if (isset($_SESSION['openemail_cc_role']) || isset($_SESSION['pending_openemail_cc_username'])) {
   if (isset($_GET['query'])) {
 
     $query = explode('/', $_GET['query']);
@@ -410,10 +410,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('dovecot-mailcow', $extra);
+                  $logs = get_logs('dovecot-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('dovecot-mailcow');
+                  $logs = get_logs('dovecot-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -432,10 +432,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('netfilter-mailcow', $extra);
+                  $logs = get_logs('netfilter-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('netfilter-mailcow');
+                  $logs = get_logs('netfilter-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -443,10 +443,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('postfix-mailcow', $extra);
+                  $logs = get_logs('postfix-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('postfix-mailcow');
+                  $logs = get_logs('postfix-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -454,10 +454,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('autodiscover-mailcow', $extra);
+                  $logs = get_logs('autodiscover-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('autodiscover-mailcow');
+                  $logs = get_logs('autodiscover-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -465,10 +465,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('sogo-mailcow', $extra);
+                  $logs = get_logs('sogo-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('sogo-mailcow');
+                  $logs = get_logs('sogo-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -476,10 +476,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('mailcow-ui', $extra);
+                  $logs = get_logs('openemail-ui', $extra);
                 }
                 else {
-                  $logs = get_logs('mailcow-ui');
+                  $logs = get_logs('openemail-ui');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -487,10 +487,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('watchdog-mailcow', $extra);
+                  $logs = get_logs('watchdog-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('watchdog-mailcow');
+                  $logs = get_logs('watchdog-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -498,10 +498,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('acme-mailcow', $extra);
+                  $logs = get_logs('acme-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('acme-mailcow');
+                  $logs = get_logs('acme-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -942,7 +942,7 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           break;
           case "u2f-registration":
             header('Content-Type: application/javascript');
-            if (($_SESSION["mailcow_cc_role"] == "admin" || $_SESSION["mailcow_cc_role"] == "domainadmin") && $_SESSION["mailcow_cc_username"] == $object) {
+            if (($_SESSION["openemail_cc_role"] == "admin" || $_SESSION["openemail_cc_role"] == "domainadmin") && $_SESSION["openemail_cc_username"] == $object) {
               list($req, $sigs) = $u2f->getRegisterData(get_u2f_registrations($object));
               $_SESSION['regReq'] = json_encode($req);
               $_SESSION['regSigs'] = json_encode($sigs);
@@ -957,7 +957,7 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           break;
           case "u2f-authentication":
             header('Content-Type: application/javascript');
-            if (isset($_SESSION['pending_mailcow_cc_username']) && $_SESSION['pending_mailcow_cc_username'] == $object) {
+            if (isset($_SESSION['pending_openemail_cc_username']) && $_SESSION['pending_openemail_cc_username'] == $object) {
               $auth_data = $u2f->getAuthenticateData(get_u2f_registrations($object));
               $challenge = $auth_data[0]->challenge;
               $appId = $auth_data[0]->appId;
@@ -1219,10 +1219,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
             process_edit_return(customize('edit', 'ui_texts', $attr));
           break;
           case "self":
-            if ($_SESSION['mailcow_cc_role'] == "domainadmin") {
+            if ($_SESSION['openemail_cc_role'] == "domainadmin") {
               process_edit_return(domain_admin('edit', $attr));
             }
-            elseif ($_SESSION['mailcow_cc_role'] == "user") {
+            elseif ($_SESSION['openemail_cc_role'] == "user") {
               process_edit_return(edit_user_account($attr));
             }
           break;

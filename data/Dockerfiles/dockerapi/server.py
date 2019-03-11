@@ -397,5 +397,5 @@ if __name__ == '__main__':
     time.sleep(1)
     if killer.kill_now:
       break
-  print "Stopping dockerapi-mailcow"
+  print "Stopping dockerapi-openemail"
 

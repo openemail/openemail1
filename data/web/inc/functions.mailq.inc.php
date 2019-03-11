@@ -36,7 +36,7 @@ function mailq($_action, $_data = null) {
 	global $lang;
   switch ($_action) {
     case 'get':
-      $mailq_lines = docker('post', 'postfix-mailcow', 'exec', array('cmd' => 'mailq', 'task' => 'list'));
+      $mailq_lines = docker('post', 'postfix-openemail', 'exec', array('cmd' => 'mailq', 'task' => 'list'));
       $lines = 0;
       // Hard limit to 10000 items
       foreach (preg_split("/((\r?\n)|(\r\n?))/", $mailq_lines) as $mailq_item) if ($lines++ < 10000) {
@@ -75,7 +75,7 @@ function mailq($_action, $_data = null) {
       else {
         $qids = $_data['qid'];
       }
-      $docker_return = docker('post', 'postfix-mailcow', 'exec', array('cmd' => 'mailq', 'task' => 'delete', 'items' => $qids));
+      $docker_return = docker('post', 'postfix-openemail', 'exec', array('cmd' => 'mailq', 'task' => 'delete', 'items' => $qids));
       process_mailq_output(json_decode($docker_return, true), $_action, $_data);
     break;
     case 'edit':
@@ -88,12 +88,12 @@ function mailq($_action, $_data = null) {
           $qids = $_data['qid'];
         }
         if (!empty($qids)) {
-          $docker_return = docker('post', 'postfix-mailcow', 'exec', array('cmd' => 'mailq', 'task' => $_data['action'], 'items' => $qids));
+          $docker_return = docker('post', 'postfix-openemail', 'exec', array('cmd' => 'mailq', 'task' => $_data['action'], 'items' => $qids));
           process_mailq_output(json_decode($docker_return, true), $_action, $_data);
         }
       }
       if (in_array($_data['action'], array('flush', 'super_delete'))) {
-        $docker_return = docker('post', 'postfix-mailcow', 'exec', array('cmd' => 'mailq', 'task' => $_data['action']));
+        $docker_return = docker('post', 'postfix-openemail', 'exec', array('cmd' => 'mailq', 'task' => $_data['action']));
         process_mailq_output(json_decode($docker_return, true), $_action, $_data);
       }
     break;
