@@ -3,8 +3,6 @@ rebuild-images.sh
 data/conf/sogo/sieve.creds
 data/conf/dovecot/dovecot-master.passwd
 data/conf/dovecot/dovecot-master.userdb
-mailcow.conf
-mailcow.conf_backup
 openemail.conf
 openemail.conf_backup
 data/conf/nginx/*.active
