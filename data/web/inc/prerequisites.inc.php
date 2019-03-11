@@ -40,7 +40,7 @@ $tfa = new RobThree\Auth\TwoFactorAuth($OTP_LABEL);
 
 // Redis
 $redis = new Redis();
-$redis->connect('redis-mailcow', 6379);
+$redis->connect('redis-openemail', 6379);
 
 // PDO
 // Calculate offset
@@ -100,7 +100,7 @@ set_exception_handler('exception_handler');
 // TODO: Move function
 function get_remote_ip($anonymize = null) {
   global $ANONYMIZE_IPS;
-  if ($anonymize === null) { 
+  if ($anonymize === null) {
     $anonymize = $ANONYMIZE_IPS;
   }
   elseif ($anonymize !== true && $anonymize !== false)  {
@@ -182,4 +182,3 @@ if (isset($_SESSION['mailcow_cc_role'])) {
   acl('to_session');
 }
 $UI_TEXTS = customize('get', 'ui_texts');
-
