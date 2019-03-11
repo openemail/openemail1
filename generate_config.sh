@@ -90,7 +90,7 @@ fi
 
 cat << EOF > openemail.conf
 # ------------------------------
-# mailcow web ui configuration
+# openemail web ui configuration
 # ------------------------------
 # example.org is _not_ a valid hostname, use a fqdn here.
 # Default admin user is "admin"
@@ -102,8 +102,8 @@ OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
 # SQL database configuration
 # ------------------------------
 
-DBNAME=mailcow
-DBUSER=mailcow
+DBNAME=openemail
+DBUSER=openemail
 
 # Please use long, random alphanumeric strings (A-Za-z0-9)
 
@@ -163,8 +163,8 @@ MAILDIR_GC_TIME=1440
 
 # Additional SAN for the certificate
 #
-# You can use wildcard records to create specific names for every domain you add to mailcow.
-# Example: Add domains "example.com" and "example.net" to mailcow, change ADDITIONAL_SAN to a value like:
+# You can use wildcard records to create specific names for every domain you add to openemail.
+# Example: Add domains "example.com" and "example.net" to openemail, change ADDITIONAL_SAN to a value like:
 #ADDITIONAL_SAN=imap.*,smtp.*
 # This will expand the certificate to "imap.example.com", "smtp.example.com", "imap.example.net", "imap.example.net"
 # plus every domain you add in the future.
@@ -177,7 +177,7 @@ MAILDIR_GC_TIME=1440
 
 ADDITIONAL_SAN=
 
-# Skip running ACME (acme-mailcow, Let's Encrypt certs) - y/n
+# Skip running ACME (acme-openemail, Let's Encrypt certs) - y/n
 
 SKIP_LETS_ENCRYPT=n
 
@@ -185,7 +185,7 @@ SKIP_LETS_ENCRYPT=n
 
 SKIP_IP_CHECK=n
 
-# Skip ClamAV (clamd-mailcow) anti-virus (Rspamd will auto-detect a missing ClamAV container) - y/n
+# Skip ClamAV (clamd-openemail) anti-virus (Rspamd will auto-detect a missing ClamAV container) - y/n
 
 SKIP_CLAMD=${SKIP_CLAMD}
 
@@ -196,7 +196,7 @@ SKIP_SOLR=${SKIP_SOLR}
 # Solr is a prone to run OOM and should be monitored. Unmonitored Solr setups are not recommended.
 SOLR_HEAP=1024
 
-# Enable watchdog (watchdog-mailcow) to restart unhealthy containers (experimental)
+# Enable watchdog (watchdog-openemail) to restart unhealthy containers (experimental)
 
 USE_WATCHDOG=n
 
@@ -241,7 +241,6 @@ mkdir -p data/assets/ssl
 cp -n data/assets/ssl-example/*.pem data/assets/ssl/
 
 rm -f /opt/openemail/.env
-rm -f /opt/openemail/mailcow.conf
+rm -f /opt/openemail/openemail.conf
 
 ln /opt/openemail/openemail.conf /opt/openemail/.env
-ln /opt/openemail/openemail.conf /opt/openemail/mailcow.conf
