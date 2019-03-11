@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# openemail.conf
+# Thanks to: https://github.com/mailcow/mailcow-dockerized
+
 # Check permissions
 if [ "$(id -u)" -ne "0" ]; then
   echo "You need to be root"
@@ -24,7 +27,7 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 docker_garbage() {
   IMGS_TO_DELETE=()
-  for container in $(grep -oP "image: \Kmailcow.+" docker-compose.yml); do
+  for container in $(grep -oP "image: \Kopenemail.+" docker-compose.yml); do
     REPOSITORY=${container/:*}
     TAG=${container/*:}
     V_MAIN=${container/*.}
@@ -92,7 +95,7 @@ while (($#)); do
     echo './update.sh [-c|--check, --ours, --gc, -h|--help]
 
   -c|--check   -   Check for updates and exit (exit codes => 0: update available, 3: no updates)
-  --ours       -   Use merge strategy "ours" to solve conflicts in favor of non-mailcow code (local changes)
+  --ours       -   Use merge strategy "ours" to solve conflicts in favor of non-openemail code (local changes)
   --gc         -   Run garbage collector to delete old image tags
 '
     exit 1
@@ -100,8 +103,8 @@ while (($#)); do
   shift
 done
 
-[[ ! -f mailcow.conf ]] && { echo "mailcow.conf is missing"; exit 1;}
-source mailcow.conf
+[[ ! -f openemail.conf ]] && { echo "openemail.conf is missing"; exit 1;}
+source openemail.conf
 DOTS=${OPENEMAIL_HOSTNAME//[^.]};
 if [ ${#DOTS} -lt 2 ]; then
   echo "OPENEMAIL_HOSTNAME (${OPENEMAIL_HOSTNAME}) is not a FQDN!"
@@ -135,112 +138,112 @@ CONFIG_ARRAY=(
   "SKIP_SOLR"
 )
 
-sed -i '$a\' mailcow.conf
+sed -i '$a\' openemail.conf
 for option in ${CONFIG_ARRAY[@]}; do
   if [[ ${option} == "ADDITIONAL_SAN" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo "${option}=" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo "${option}=" >> openemail.conf
     fi
   elif [[ ${option} == "COMPOSE_PROJECT_NAME" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo "COMPOSE_PROJECT_NAME=mailcowdockerized" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo "COMPOSE_PROJECT_NAME=openemail" >> openemail.conf
     fi
   elif [[ ${option} == "DOVEADM_PORT" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo "DOVEADM_PORT=127.0.0.1:19991" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo "DOVEADM_PORT=127.0.0.1:19991" >> openemail.conf
     fi
   elif [[ ${option} == "WATCHDOG_NOTIFY_EMAIL" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo "WATCHDOG_NOTIFY_EMAIL=" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo "WATCHDOG_NOTIFY_EMAIL=" >> openemail.conf
     fi
   elif [[ ${option} == "LOG_LINES" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Max log lines per service to keep in Redis logs' >> mailcow.conf
-      echo "LOG_LINES=9999" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Max log lines per service to keep in Redis logs' >> openemail.conf
+      echo "LOG_LINES=9999" >> openemail.conf
     fi
   elif [[ ${option} == "IPV4_NETWORK" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Internal IPv4 /24 subnet, format n.n.n. (expands to n.n.n.0/24)' >> mailcow.conf
-      echo "IPV4_NETWORK=172.22.1" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Internal IPv4 /24 subnet, format n.n.n. (expands to n.n.n.0/24)' >> openemail.conf
+      echo "IPV4_NETWORK=172.22.1" >> openemail.conf
     fi
   elif [[ ${option} == "IPV6_NETWORK" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Internal IPv6 subnet in fc00::/7' >> mailcow.conf
-      echo "IPV6_NETWORK=fd4d:6169:6c63:6f77::/64" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Internal IPv6 subnet in fc00::/7' >> openemail.conf
+      echo "IPV6_NETWORK=fd4d:6169:6c63:6f77::/64" >> openemail.conf
     fi
   elif [[ ${option} == "SQL_PORT" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Bind SQL to 127.0.0.1 on port 13306' >> mailcow.conf
-      echo "SQL_PORT=127.0.0.1:13306" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Bind SQL to 127.0.0.1 on port 13306' >> openemail.conf
+      echo "SQL_PORT=127.0.0.1:13306" >> openemail.conf
     fi
   elif [[ ${option} == "API_KEY" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Create or override API key for web UI' >> mailcow.conf
-      echo "#API_KEY=" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Create or override API key for web UI' >> openemail.conf
+      echo "#API_KEY=" >> openemail.conf
     fi
   elif [[ ${option} == "API_ALLOW_FROM" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Must be set for API_KEY to be active' >> mailcow.conf
-      echo "#API_ALLOW_FROM=" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Must be set for API_KEY to be active' >> openemail.conf
+      echo "#API_ALLOW_FROM=" >> openemail.conf
     fi
   elif [[ ${option} == "SNAT_TO_SOURCE" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Use this IPv4 for outgoing connections (SNAT)' >> mailcow.conf
-      echo "#SNAT_TO_SOURCE=" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Use this IPv4 for outgoing connections (SNAT)' >> openemail.conf
+      echo "#SNAT_TO_SOURCE=" >> openemail.conf
     fi
   elif [[ ${option} == "SNAT6_TO_SOURCE" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Use this IPv6 for outgoing connections (SNAT)' >> mailcow.conf
-      echo "#SNAT6_TO_SOURCE=" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Use this IPv6 for outgoing connections (SNAT)' >> openemail.conf
+      echo "#SNAT6_TO_SOURCE=" >> openemail.conf
     fi
   elif [[ ${option} == "MAILDIR_GC_TIME" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Garbage collector cleanup' >> mailcow.conf
-      echo '# Deleted domains and mailboxes are moved to /var/vmail/_garbage/timestamp_sanitizedstring' >> mailcow.conf
-      echo '# How long should objects remain in the garbage until they are being deleted? (value in minutes)' >> mailcow.conf
-      echo '# Check interval is hourly' >> mailcow.conf
-      echo 'MAILDIR_GC_TIME=1440' >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Garbage collector cleanup' >> openemail.conf
+      echo '# Deleted domains and mailboxes are moved to /var/vmail/_garbage/timestamp_sanitizedstring' >> openemail.conf
+      echo '# How long should objects remain in the garbage until they are being deleted? (value in minutes)' >> openemail.conf
+      echo '# Check interval is hourly' >> openemail.conf
+      echo 'MAILDIR_GC_TIME=1440' >> openemail.conf
     fi
   elif [[ ${option} == "ACL_ANYONE" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Set this to "allow" to enable the anyone pseudo user. Disabled by default.' >> mailcow.conf
-      echo '# When enabled, ACL can be created, that apply to "All authenticated users"' >> mailcow.conf
-      echo '# This should probably only be activated on mail hosts, that are used exclusivly by one organisation.' >> mailcow.conf
-      echo '# Otherwise a user might share data with too many other users.' >> mailcow.conf
-      echo 'ACL_ANYONE=disallow' >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Set this to "allow" to enable the anyone pseudo user. Disabled by default.' >> openemail.conf
+      echo '# When enabled, ACL can be created, that apply to "All authenticated users"' >> openemail.conf
+      echo '# This should probably only be activated on mail hosts, that are used exclusivly by one organisation.' >> openemail.conf
+      echo '# Otherwise a user might share data with too many other users.' >> openemail.conf
+      echo 'ACL_ANYONE=disallow' >> openemail.conf
     fi
   elif [[ ${option} == "SOLR_HEAP" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Solr heap size, there is no recommendation, please see Solr docs.' >> mailcow.conf
-      echo '# Solr is a prone to run OOM on large systems and should be monitored. Unmonitored Solr setups are not recommended.' >> mailcow.conf
-      echo '# Solr will refuse to start with total system memory below or equal to 2 GB.' >> mailcow.conf
-      echo "SOLR_HEAP=1024" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Solr heap size, there is no recommendation, please see Solr docs.' >> openemail.conf
+      echo '# Solr is a prone to run OOM on large systems and should be monitored. Unmonitored Solr setups are not recommended.' >> openemail.conf
+      echo '# Solr will refuse to start with total system memory below or equal to 2 GB.' >> openemail.conf
+      echo "SOLR_HEAP=1024" >> openemail.conf
   fi
   elif [[ ${option} == "SKIP_SOLR" ]]; then
-    if ! grep -q ${option} mailcow.conf; then
-      echo "Adding new option \"${option}\" to mailcow.conf"
-      echo '# Solr is disabled by default after upgrading from non-Solr to Solr-enabled mailcows.' >> mailcow.conf
-      echo '# Disable Solr or if you do not want to store a readable index of your mails in solr-vol-1.' >> mailcow.conf
-      echo "SKIP_SOLR=y" >> mailcow.conf
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Solr is disabled by default after upgrading from non-Solr to Solr-enabled Openemail.' >> openemail.conf
+      echo '# Disable Solr or if you do not want to store a readable index of your mails in solr-vol-1.' >> openemail.conf
+      echo "SKIP_SOLR=y" >> openemail.conf
   fi
-  elif ! grep -q ${option} mailcow.conf; then
-    echo "Adding new option \"${option}\" to mailcow.conf"
-    echo "${option}=n" >> mailcow.conf
+  elif ! grep -q ${option} openemail.conf; then
+    echo "Adding new option \"${option}\" to openemail.conf"
+    echo "${option}=n" >> openemail.conf
   fi
 done
 
@@ -264,25 +267,25 @@ if [[ ${SHA1_1} != ${SHA1_2} ]]; then
   exit 0
 fi
 
-if [[ -f mailcow.conf ]]; then
-  source mailcow.conf
+if [[ -f openemail.conf ]]; then
+  source openemail.conf
 else
-  echo -e "\e[31mNo mailcow.conf - is mailcow installed?\e[0m"
+  echo -e "\e[31mNo openemail.conf - is Openmail installed?\e[0m"
   exit 1
 fi
 
-read -r -p "Are you sure you want to update mailcow: dockerized? All containers will be stopped. [y/N] " response
+read -r -p "Are you sure you want to update Openemail: All containers will be stopped. [y/N] " response
 if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
   echo "OK, exiting."
   exit 0
 fi
 
-echo -e "Stopping mailcow... "
+echo -e "Stopping Openemail... "
 sleep 2
 docker-compose down
 
-# Silently fixing remote url from andryyy to mailcow
-git remote set-url origin https://github.com/mailcow/mailcow-dockerized
+# Silently fixing remote url from openemail
+git remote set-url origin https://github.com/openemail/openemail
 echo -e "\e[32mCommitting current status...\e[0m"
 [[ -z "$(git config user.name)" ]] && git config user.name moo
 [[ -z "$(git config user.email)" ]] && git config user.email moo@cow.moo
@@ -297,7 +300,7 @@ git merge -X${MERGE_STRATEGY:-theirs} -Xpatience -m "After update on ${DATE}"
 # Need to use a variable to not pass return codes of if checks
 MERGE_RETURN=$?
 if [[ ${MERGE_RETURN} == 128 ]]; then
-  echo -e "\e[31m\nOh no, what happened?\n=> You most likely added files to your local mailcow instance that were now added to the official mailcow repository. Please move them to another location before updating mailcow.\e[0m"
+  echo -e "\e[31m\nOh no, what happened?\n=> You most likely added files to your local openemail instance that were now added to the official openemail repository. Please move them to another location before updating openemail.\e[0m"
   exit 1
 elif [[ ${MERGE_RETURN} == 1 ]]; then
   echo -e "\e[93mPotenial conflict, trying to fix...\e[0m"
@@ -342,12 +345,12 @@ docker-compose pull
 cp -n data/assets/ssl-example/*.pem data/assets/ssl/
 
 echo -e "Checking IPv6 settings... "
-if grep -q 'SYSCTL_IPV6_DISABLED=1' mailcow.conf; then
+if grep -q 'SYSCTL_IPV6_DISABLED=1' openemail.conf; then
   echo
   echo '!! IMPORTANT !!'
   echo
   echo 'SYSCTL_IPV6_DISABLED was removed due to complications. IPv6 can be disabled by editing "docker-compose.yml" and setting "enabled_ipv6: true" to "enabled_ipv6: false".'
-  echo 'This setting will only be active after a complete shutdown of mailcow by running "docker-compose down" followed by "docker-compose up -d".'
+  echo 'This setting will only be active after a complete shutdown of openemail by running "docker-compose down" followed by "docker-compose up -d".'
   echo
   echo '!! IMPORTANT !!'
   echo
@@ -355,8 +358,8 @@ if grep -q 'SYSCTL_IPV6_DISABLED=1' mailcow.conf; then
 fi
 
 echo -e "Fixing project name... "
-sed -i 's#COMPOSEPROJECT_NAME#COMPOSE_PROJECT_NAME#g' mailcow.conf
-sed -i '/COMPOSE_PROJECT_NAME=/s/-//g' mailcow.conf
+sed -i 's#COMPOSEPROJECT_NAME#COMPOSE_PROJECT_NAME#g' openemail.conf
+sed -i '/COMPOSE_PROJECT_NAME=/s/-//g' openemail.conf
 
 echo -e "Fixing PHP-FPM worker ports for Nginx sites..."
 sed -i 's#phpfpm:9000#phpfpm:9002#g' data/conf/nginx/*.conf
@@ -372,19 +375,19 @@ if [ -f data/conf/rspamd/custom/global_from_whitelist.map ]; then
   mv data/conf/rspamd/custom/global_from_whitelist.map data/conf/rspamd/custom/global_smtp_from_whitelist.map
 fi
 
-echo -e "\e[32mStarting mailcow...\e[0m"
+echo -e "\e[32mStarting openemail...\e[0m"
 sleep 2
 docker-compose up -d --remove-orphans
 
 if [[ -f "data/web/nextcloud/occ" ]]; then
   echo "Setting Nextcloud Redis timeout to 0.0..."
-  docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) bash -c "/web/nextcloud/occ config:system:set redis timeout --value=0.0 --type=integer"
+  docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) bash -c "/web/nextcloud/occ config:system:set redis timeout --value=0.0 --type=integer"
 fi
 
 echo -e "\e[32mCollecting garbage...\e[0m"
 docker_garbage
 
-#echo "In case you encounter any problem, hard-reset to a state before updating mailcow:"
+#echo "In case you encounter any problem, hard-reset to a state before updating openemail:"
 #echo
 #git reflog --color=always | grep "Before update on "
 #echo
