@@ -26,7 +26,7 @@ fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPT_DIR}/../
-source mailcow.conf
+source openemail.conf
 
 if [[ ${NC_PURGE} == "y" ]]; then
   read -r -p "Are you sure you want to purge Nextcloud? [y/N] " response
@@ -36,9 +36,9 @@ if [[ ${NC_PURGE} == "y" ]]; then
     exit 1
   fi
 
-  docker exec -it $(docker ps -f name=mysql-mailcow -q) mysql -uroot -p${DBROOT} -e \
-    "$(docker exec -it $(docker ps -f name=mysql-mailcow -q) mysql -uroot -p${DBROOT} -e "SELECT IFNULL(GROUP_CONCAT('DROP TABLE ', TABLE_SCHEMA, '.', TABLE_NAME SEPARATOR ';'),'SELECT NULL;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 'nc_%' AND TABLE_SCHEMA = '${DBNAME}';" -BN)"
-  docker exec -it $(docker ps -f name=redis-mailcow -q) /bin/sh -c ' cat <<EOF | redis-cli
+  docker exec -it $(docker ps -f name=mysql-openemail -q) mysql -uroot -p${DBROOT} -e \
+    "$(docker exec -it $(docker ps -f name=mysql-openemail -q) mysql -uroot -p${DBROOT} -e "SELECT IFNULL(GROUP_CONCAT('DROP TABLE ', TABLE_SCHEMA, '.', TABLE_NAME SEPARATOR ';'),'SELECT NULL;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 'nc_%' AND TABLE_SCHEMA = '${DBNAME}';" -BN)"
+  docker exec -it $(docker ps -f name=redis-openemail -q) /bin/sh -c ' cat <<EOF | redis-cli
 SELECT 10
 FLUSHDB
 EOF
@@ -51,7 +51,7 @@ EOF
   [[ -f ./data/conf/nginx/site.nextcloud.custom ]] && mv ./data/conf/nginx/site.nextcloud.custom ./data/conf/nginx/site.nextcloud.custom-$(date +%s).bak
   [[ -f ./data/conf/nginx/nextcloud.conf ]] && mv ./data/conf/nginx/nextcloud.conf ./data/conf/nginx/nextcloud.conf-$(date +%s).bak
 
-  docker restart $(docker ps -aqf name=nginx-mailcow)
+  docker restart $(docker ps -aqf name=nginx-openemail)
 
 elif [[ ${NC_UPDATE} == "y" ]]; then
   exit;
@@ -66,10 +66,10 @@ elif [[ ${NC_UPDATE} == "y" ]]; then
     echo "Nextcloud occ not found. Is Nextcloud installed?"
     exit 1
   fi
-  if ! grep -q 'installed: true' <<<$(docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) bash -c "/web/nextcloud/occ --no-warnings status"); then
+  if ! grep -q 'installed: true' <<<$(docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) bash -c "/web/nextcloud/occ --no-warnings status"); then
     echo "Nextcloud seems not to be installed."
     exit 1
-  elif ! grep -q 'version: 15\.' <<<$(docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) bash -c "/web/nextcloud/occ --no-warnings status"); then
+  elif ! grep -q 'version: 15\.' <<<$(docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) bash -c "/web/nextcloud/occ --no-warnings status"); then
     echo "Cannot upgrade to new major version, please update manually."
     exit 1
   else
@@ -80,8 +80,8 @@ elif [[ ${NC_UPDATE} == "y" ]]; then
       && mkdir -p ./data/web/nextcloud/data \
       && mkdir -p ./data/web/nextcloud/custom_apps \
       && chmod +x ./data/web/nextcloud/occ
-    docker exec -it $(docker ps -f name=php-fpm-mailcow -q) bash -c "chown www-data:www-data -R /web/nextcloud"
-    docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) bash -c "/web/nextcloud/occ --no-warnings upgrade"
+    docker exec -it $(docker ps -f name=php-fpm-openemail -q) bash -c "chown www-data:www-data -R /web/nextcloud"
+    docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) bash -c "/web/nextcloud/occ --no-warnings upgrade"
   fi
 
 elif [[ ${NC_INSTALL} == "y" ]]; then
@@ -111,8 +111,8 @@ elif [[ ${NC_INSTALL} == "y" ]]; then
     && mkdir -p ./data/web/nextcloud/custom_apps \
     && chmod +x ./data/web/nextcloud/occ
 
-  docker exec -it $(docker ps -f name=php-fpm-mailcow -q) /bin/bash -c "chown -R www-data:www-data /web/nextcloud/data /web/nextcloud/config /web/nextcloud/apps /web/nextcloud/custom_apps"
-  docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) /web/nextcloud/occ --no-warnings maintenance:install \
+  docker exec -it $(docker ps -f name=php-fpm-openemail -q) /bin/bash -c "chown -R www-data:www-data /web/nextcloud/data /web/nextcloud/config /web/nextcloud/apps /web/nextcloud/custom_apps"
+  docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) /web/nextcloud/occ --no-warnings maintenance:install \
     --database mysql \
     --database-host mysql \
     --database-name ${DBNAME} \
@@ -123,7 +123,7 @@ elif [[ ${NC_INSTALL} == "y" ]]; then
     --admin-pass ${ADMIN_NC_PASS} \
       --data-dir /web/nextcloud/data
 
-  docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) bash -c "/web/nextcloud/occ --no-warnings config:system:set redis host --value=redis --type=string; \
+  docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) bash -c "/web/nextcloud/occ --no-warnings config:system:set redis host --value=redis --type=string; \
     /web/nextcloud/occ --no-warnings config:system:set redis port --value=6379 --type=integer; \
     /web/nextcloud/occ --no-warnings config:system:set redis timeout --value=0.0 --type=integer; \
     /web/nextcloud/occ --no-warnings config:system:set redis dbindex --value=10 --type=integer; \
@@ -147,16 +147,16 @@ elif [[ ${NC_INSTALL} == "y" ]]; then
     /web/nextcloud/occ --no-warnings db:convert-filecache-bigint -n"
 
   if [[ ${NC_TYPE} == "subdomain" ]]; then
-    docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) /web/nextcloud/occ --no-warnings config:system:set trusted_domains 1 --value=${NC_SUBD}
-    docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) /web/nextcloud/occ --no-warnings config:system:set overwritewebroot --value=/
-    docker exec -it -u www-data $(docker ps -f name=php-fpm-mailcow -q) /web/nextcloud/occ --no-warnings config:system:set overwritehost --value=${NC_SUBD}
+    docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) /web/nextcloud/occ --no-warnings config:system:set trusted_domains 1 --value=${NC_SUBD}
+    docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) /web/nextcloud/occ --no-warnings config:system:set overwritewebroot --value=/
+    docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) /web/nextcloud/occ --no-warnings config:system:set overwritehost --value=${NC_SUBD}
     cp ./data/assets/nextcloud/nextcloud.conf ./data/conf/nginx/
     sed -i "s/NC_SUBD/${NC_SUBD}/g" ./data/conf/nginx/nextcloud.conf
   elif [[ ${NC_TYPE} == "subfolder" ]]; then
     cp ./data/assets/nextcloud/site.nextcloud.custom ./data/conf/nginx/
   fi
 
-  docker restart $(docker ps -aqf name=nginx-mailcow)
+  docker restart $(docker ps -aqf name=nginx-openemail)
 
   echo "Login as admin with password: ${ADMIN_NC_PASS}"
 
