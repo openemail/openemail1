@@ -4,8 +4,8 @@ read -r -p "Are you sure you want to reset learned hashes from Rspamd (fuzzy, ba
 response=${response,,}    # tolower
 if [[ "$response" =~ ^(yes|y)$ ]]; then
   echo "Working, please wait..."
-  REDIS_ID=$(docker ps -qf name=redis-mailcow)
-  RSPAMD_ID=$(docker ps -qf name=rspamd-mailcow)
+  REDIS_ID=$(docker ps -qf name=redis-openemail)
+  RSPAMD_ID=$(docker ps -qf name=rspamd-openemail)
 
   if [ -z ${REDIS_ID} ] || [ -z ${RSPAMD_ID} ]; then
     echo "Cannot determine Redis or Rspamd container ID"
