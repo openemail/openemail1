@@ -15,7 +15,7 @@ If applicable, add screenshots to help explain your problem. Very useful for bug
 
 **System information and quick debugging**
 General logs:
-- Please take a look at the [documentation](https://mailcow.github.io/mailcow-dockerized-docs/debug-logs/).
+- Please take a look at the [documentation](https://openemail.io/debug-logs/).
 
 Further information (where applicable):
  - Your OS (is Apparmor or SELinux active?)
