@@ -240,4 +240,4 @@ mkdir -p data/assets/ssl
 # copy but don't overwrite existing certificate
 cp -n data/assets/ssl-example/*.pem data/assets/ssl/
 
-ln /opt/openemail/openemail.conf /opt/openemail/.env
+ln ./openemail.conf ./.env
