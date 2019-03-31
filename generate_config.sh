@@ -238,15 +238,15 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 HOSTNAME=${OPENEMAIL_HOSTNAME}
 BACKEND=mdb
 LOG_LEVEL=256
-DOMAIN=$(hostname -d)
+export DOMAIN=$(hostname -d)
 ADMIN_PASS=openemail
 CONFIG_PASS=openemail
 FUSIONDIRECTORY_ADMIN_USER=fdadmin
 FUSIONDIRECTORY_ADMIN_PASS=openemail
 ORGANIZATION="Openemail IO"
-SLD=$(echo $(hostname -d) | cut -f1 -d .)
-TLD=$(echo $(hostname -d) | cut -f2 -d .)
-BASE_DN="dc=`echo ${SLD}`,dc=`echo ${TLD}`"
+export SLD=$(echo $(hostname -d) | cut -f1 -d .)
+export TLD=$(echo $(hostname -d) | cut -f2 -d .)
+export BASE_DN="dc=`echo ${SLD}`,dc=`echo ${TLD}`"
 ENABLE_READONLY_USER=true
 READONLY_USER_USER=reader
 READONLY_USER_PASS=openemail
