@@ -323,7 +323,7 @@ services:
         openemail-network:
           aliases:
             - acme
-    openemail-openldap-fusiondirectory:
+    openldap-fusiondirectory-openemail:
       container_name: openldap-fusiondirectory
       image: tiredofit/openldap-fusiondirectory
       environment:
@@ -371,7 +371,7 @@ services:
       networks:
         - openemail-network
 
-    openemail-fusiondirectory:
+    fusiondirectory-openemail:
       container_name: fusiondirectory
       image: tiredofit/fusiondirectory
       environment:
@@ -453,8 +453,8 @@ services:
         - sogo-openemail
         - php-fpm-openemail
         - redis-openemail
-        - openldap-fusiondirectory
-        - fusiondirectory
+        - openldap-fusiondirectory-openemail
+        - fusiondirectory-openemail
       restart: always
       privileged: true
       environment:
