@@ -89,6 +89,11 @@ fi
 
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
+DOMAIN=$(hostname -d)
+SLD=$(echo $(hostname -d) | cut -f1 -d .)
+TLD=$(echo $(hostname -d) | cut -f2 -d .)
+BASE_DN=dc=$(echo ${SLD}),dc=$(echo ${TLD})
+
 cat << EOF > openemail.conf
 # ------------------------------
 # openemail web ui configuration
@@ -238,15 +243,13 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 HOSTNAME=${OPENEMAIL_HOSTNAME}
 BACKEND=mdb
 LOG_LEVEL=256
-DOMAIN=$(hostname -d)
+DOMAIN=${DOMAIN}
 ADMIN_PASS=openemail
 CONFIG_PASS=openemail
 FUSIONDIRECTORY_ADMIN_USER=fdadmin
 FUSIONDIRECTORY_ADMIN_PASS=openemail
 OORGANIZATION=(Openemail\ IO)
-SLD=$(echo $(hostname -d) | cut -f1 -d .)
-TLD=$(echo $(hostname -d) | cut -f2 -d .)
-BASE_DN=dc=$(echo ${SLD}),dc=$(echo ${TLD})
+BASE_DN=${BASE_DN}
 ENABLE_READONLY_USER=true
 READONLY_USER_USER=reader
 READONLY_USER_PASS=openemail
@@ -261,8 +264,8 @@ SSL_HELPER_PREFIX=ldap
 ENABLE_REPLICATION=false
 REPLICATION_CONFIG_SYNCPROV=(binddn="cn=admin,cn=config"\ bindmethod=simple\ credentials="openemail"\ searchbase="cn=config"\ type=refreshAndPersist\ retry="60 +"\ timeout=1)
 REPLICATION_DB_SYNCPROV=(binddn="cn=admin,${BASE_DN}"\ bindmethod=simple\ credentials="admin"\ searchbase=${BASE_DN}\ type=refreshAndPersist\ interval=00:00:00:10\ retry="60 +"\ timeout=1)
-LDAP1=ldap1.$DOMAIN
-LDAP2=ldap2.$DOMAIN
+LDAP1=ldap1.${DOMAIN}
+LDAP2=ldap2.${DOMAIN}
 REPLICATION_HOSTS=(ldap://$LDAP1\ ldap://$LDAP2)
 REMOVE_CONFIG_AFTER_SETUP=false
 ZABBIX_HOSTNAME=openldap-fusiondirectory
