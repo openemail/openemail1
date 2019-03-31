@@ -371,6 +371,78 @@ services:
       networks:
         - openemail-network
 
+    openemail-fusiondirectory:
+      container_name: fusiondirectory
+      image: tiredofit/fusiondirectory
+      environment:
+        - PLUGIN_ALIAS=TRUE
+        - PLUGIN_APPLICATIONS=TRUE
+        - PLUGIN_ARGONAUT=TRUE
+        - PLUGIN_AUDIT=TRUE
+        - PLUGIN_AUTOFS=TRUE
+        - PLUGIN_CERTIFICATES=TRUE
+        - PLUGIN_COMMUNITY=TRUE
+        - PLUGIN_CYRUS=TRUE
+        - PLUGIN_DEBCONF=TRUE
+        - PLUGIN_DEVELOPERS=TRUE
+        - PLUGIN_DHCP=TRUE
+        - PLUGIN_DNS=TRUE
+        - PLUGIN_DOVECOT=TRUE
+        - PLUGIN_DSA=TRUE
+        - PLUGIN_EJBCA=TRUE
+        - PLUGIN_FAI=TRUE
+        - PLUGIN_FREERADIUS=TRUE
+        - PLUGIN_FUSIONINVENTORY=TRUE
+        - PLUGIN_GPG=TRUE
+        - PLUGIN_IPMI=TRUE
+        - PLUGIN_LDAPDUMP=TRUE
+        - PLUGIN_LDAPMANAGER=TRUE
+        - PLUGIN_MAIL=TRUE
+        - PLUGIN_MIXEDGROUPS=TRUE
+        - PLUGIN_NAGIOS=TRUE
+        - PLUGIN_NETGROUPS=TRUE
+        - PLUGIN_NEWSLETTER=TRUE
+        - PLUGIN_OPSI=TRUE
+        - PLUGIN_PERSONAL=TRUE
+        - PLUGIN_POSIX=TRUE
+        - PLUGIN_POSTFIX=TRUE
+        - PLUGIN_PPOLICY=TRUE
+        - PLUGIN_PUPPET=TRUE
+        - PLUGIN_PUREFTPD=TRUE
+        - PLUGIN_QUOTA=TRUE
+        - PLUGIN_RENATER_PARTAGE=TRUE
+        - PLUGIN_REPOSITORY=TRUE
+        - PLUGIN_SAMBA=TRUE
+        - PLUGIN_SOGO=TRUE
+        - PLUGIN_SPAMASSASSIN=TRUE
+        - PLUGIN_SQUID=TRUE
+        - PLUGIN_SSH=TRUE
+        - PLUGIN_SUBCONTRACTING=TRUE
+        - PLUGIN_SUDO=TRUE
+        - PLUGIN_SUPANN=TRUE
+        - PLUGIN_SYMPA=TRUE
+        - PLUGIN_SYSTEMS=TRUE
+        - PLUGIN_USER_REMINDER=TRUE
+        - PLUGIN_WEBLINK=TRUE
+        - LDAP1_HOST=openldap-fusiondirectory
+        - LDAP1_BASE_DN=${BASE_DN}
+        - LDAP1_ADMIN_DN=${LDAP1_BASE_DN}
+        - LDAP1_ADMIN_PASS=${LDAP1_ADMIN_PASS}
+        - LDAP1_NAME=${LDAP1_NAME}
+        - ZABBIX_HOSTNAME=fusiondirectory
+      volumes:
+        - ./fushiond/logs:/www/logs
+        - ./fushiond/custom:/assets/fusiondirectory
+        - ./fushiond/plugins-custom:/assets/plugins-custom
+        - ./data/assets/ssl/:/assets/ssl/certs
+      ports:
+        - 80389:80
+      restart: always
+      dns:
+        - ${IPV4_NETWORK:-172.22.1}.254
+      networks:
+        - openemail-network
+
     netfilter-openemail:
       image: openemail/netfilter:1.22
       build: ./data/Dockerfiles/netfilter
@@ -381,6 +453,8 @@ services:
         - sogo-openemail
         - php-fpm-openemail
         - redis-openemail
+        - openldap-fusiondirectory
+        - fusiondirectory
       restart: always
       privileged: true
       environment:
