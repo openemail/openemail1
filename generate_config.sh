@@ -242,7 +242,7 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 #API_KEY=
 #API_ALLOW_FROM=127.0.0.1,1.2.3.4
 
-# FusionDirectory Enviorenment Variables
+# OpenLDAP FusionDirectory Enviorenment Variables
 HOSTNAME=${OPENEMAIL_HOSTNAME}
 BACKEND=mdb
 LOG_LEVEL=256
@@ -269,7 +269,14 @@ REPLICATION_CONFIG_SYNCPROV=(binddn="cn=admin,cn=config"\ bindmethod=simple\ cre
 REPLICATION_DB_SYNCPROV=(binddn="cn=admin,${BASE_DN}"\ bindmethod=simple\ credentials="admin"\ searchbase=${BASE_DN}\ type=refreshAndPersist\ interval=00:00:00:10\ retry="60 +"\ timeout=1)
 REPLICATION_HOSTS=(ldap://${LDAP1}\ ldap://${LDAP2})
 REMOVE_CONFIG_AFTER_SETUP=false
-ZABBIX_HOSTNAME=openldap-fusiondirectory
+
+# FusionDirectory Web UI Enviorenment Variables
+
+LDAP1_HOST=openldap-fusiondirectory
+LDAP1_BASE_DN=${BASE_DN}
+LDAP1_ADMIN_DN=cn=admin,${BASE_DN}
+LDAP1_ADMIN_PASS=openemail
+LDAP1_NAME=dev
 
 EOF
 

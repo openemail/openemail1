@@ -356,7 +356,7 @@ services:
         - BACKUP_CONFIG_CRON_PERIOD=0 4 * * *
         - BACKUP_DATA_CRON_PERIOD=0 4 * * *
         - BACKUP_TTL=15
-        - ZABBIX_HOSTNAME=${ZABBIX_HOSTNAME}
+        - ZABBIX_HOSTNAME=openldap-fusiondirectory
       volumes:
         - ./ldap/backup:/data/backup
         - ./ldap/data:/var/lib/openldap
