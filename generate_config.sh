@@ -95,7 +95,7 @@ TLD=$(echo $(hostname -d) | cut -f2 -d .)
 BASE_DN=dc=$(echo ${SLD}),dc=$(echo ${TLD})
 LDAP1=ldap1.${DOMAIN}
 LDAP2=ldap2.${DOMAIN}
-REPLICATION_HOSTS=(ldap://${LDAP1}\ ldap://${LDAP2})
+
 
 cat << EOF > openemail.conf
 # ------------------------------
@@ -190,7 +190,7 @@ ADDITIONAL_SAN=
 
 SKIP_LETS_ENCRYPT=n
 
-# Skip IPv4 check in ACME container - y/n
+# Skip IPv4 cheREPLICATION_HOSTSck in ACME container - y/n
 
 SKIP_IP_CHECK=n
 
@@ -212,7 +212,7 @@ USE_WATCHDOG=n
 # Send notifications by mail (no DKIM signature, sent from watchdog@OPENEMAIL_HOSTNAME)
 # Can by multiple rcpts, NO quotation marks
 
-#WATCHDOG_NOTIFY_EMAIL=a@example.com,b@example.com,c@example.com
+#WATCHDOG_NOTIFYREPLICATION_HOSTS_EMAIL=a@example.com,b@example.com,c@example.com
 #WATCHDOG_NOTIFY_EMAIL=
 
 # Max log lines per service to keep in Redis logs
@@ -221,7 +221,7 @@ LOG_LINES=9999
 
 # Internal IPv4 /24 subnet, format n.n.n (expands to n.n.n.0/24)
 
-IPV4_NETWORK=172.22.1
+IPV4_NETWORKREPLICATION_HOSTS=172.22.1
 
 # Internal IPv6 subnet in fc00::/7
 
@@ -235,7 +235,7 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 
 #SNAT6_TO_SOURCE=
 
-# Create or override API key for web uI
+# Create or oREPLICATION_HOSTSverride API key for web uI
 # You _must_ define API_ALLOW_FROM, which is a comma separated list of IPs
 # API_KEY allowed chars: a-z, A-Z, 0-9, -
 
@@ -267,7 +267,7 @@ SSL_HELPER_PREFIX=ldap
 ENABLE_REPLICATION=false
 REPLICATION_CONFIG_SYNCPROV=(binddn="cn=admin,cn=config"\ bindmethod=simple\ credentials="openemail"\ searchbase="cn=config"\ type=refreshAndPersist\ retry="60 +"\ timeout=1)
 REPLICATION_DB_SYNCPROV=(binddn="cn=admin,${BASE_DN}"\ bindmethod=simple\ credentials="admin"\ searchbase=${BASE_DN}\ type=refreshAndPersist\ interval=00:00:00:10\ retry="60 +"\ timeout=1)
-REPLICATION_HOSTS=(${REPLICATION_HOSTS})
+REPLICATION_HOSTS=(ldap://${LDAP1}\ ldap://${LDAP2})
 REMOVE_CONFIG_AFTER_SETUP=false
 ZABBIX_HOSTNAME=openldap-fusiondirectory
 
