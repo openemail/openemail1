@@ -78,7 +78,7 @@ elif [ ${MEM_TOTAL} -le "3670016" ]; then
   case $response in
     [nN][oO]|[nN])
       SKIP_SOLR=n
-      ;;export
+      ;;
     *)
       SKIP_SOLR=y
     ;;
