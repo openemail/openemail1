@@ -323,6 +323,53 @@ services:
         openemail-network:
           aliases:
             - acme
+    openemail-openldap-fusiondirectory:
+      container_name: openldap-fusiondirectory
+      image: tiredofit/openldap-fusiondirectory
+      environment:
+        - HOSTNAME=${HOSTNAME}
+        - BACKEND=${BACKEND}
+        - LOG_LEVEL=${LOG_LEVEL}
+        - DOMAIN=${DOMAIN}
+        - ADMIN_PASS=${ADMIN_PASS}
+        - CONFIG_PASS=${CONFIG_PASS}
+        - FUSIONDIRECTORY_ADMIN_USER=${FUSIONDIRECTORY_ADMIN_USER}
+        - FUSIONDIRECTORY_ADMIN_PASS=${FUSIONDIRECTORY_ADMIN_PASS}
+        - ORGANIZATION=${ORGANIZATION}
+        - BASE_DN=${BASE_DN}
+        - ENABLE_READONLY_USER=${ENABLE_READONLY_USER}
+        - READONLY_USER_USER=${READONLY_USER_USER}
+        - READONLY_USER_PASS=${READONLY_USER_PASS}
+        - ENABLE_TLS=${ENABLE_TLS}
+        - TLS_CRT_FILENAME=${TLS_CRT_FILENAME}
+        - TLS_KEY_FILENAME=${TLS_KEY_FILENAME}
+        - TLS_CA_CRT_FILENAME=${TLS_CA_CRT_FILENAME}
+        - TLS_ENFORCE=${TLS_ENFORCE}
+        - TLS_CIPHER_SUITE=${TLS_CIPHER_SUITE}
+        - TLS_VERIFY_CLIENT=${TLS_VERIFY_CLIENT}
+        - SSL_HELPER_PREFIX=${SSL_HELPER_PREFIX}
+        - ENABLE_REPLICATION=${ENABLE_REPLICATION}
+        - REPLICATION_CONFIG_SYNCPROV=${REPLICATION_CONFIG_SYNCPROV}
+        - REPLICATION_DB_SYNCPROV=${REPLICATION_DB_SYNCPROV}
+        - REPLICATION_HOSTS=${REPLICATION_HOSTS}
+        - REMOVE_CONFIG_AFTER_SETUP=${REMOVE_CONFIG_AFTER_SETUP}
+        - BACKUP_CONFIG_CRON_PERIOD=${BACKUP_CONFIG_CRON_PERIOD}
+        - BACKUP_DATA_CRON_PERIOD=${BACKUP_DATA_CRON_PERIOD}
+        - BACKUP_TTL=${BACKUP_TTL}
+        - ZABBIX_HOSTNAME=${ZABBIX_HOSTNAME}
+      volumes:
+        - ./ldap/backup:/data/backup
+        - ./ldap/data:/var/lib/openldap
+        - ./ldap/config:/etc/openldap/slapd.d
+        - ./data/assets/ssl/:/assets/slapd/certs
+      ports:
+        - 389:389
+        - 636:636
+      restart: always
+      dns:
+        - ${IPV4_NETWORK:-172.22.1}.254
+      networks:
+        - openemail-network
 
     netfilter-openemail:
       image: openemail/netfilter:1.22
