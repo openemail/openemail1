@@ -16,7 +16,8 @@ if [ -f openemail.conf ]; then
   case $response in
     [yY][eE][sS]|[yY])
       mv openemail.conf openemail.conf_backup
-      ;;
+      rm -f ./.env
+    ;;
     *)
       exit 1
     ;;
