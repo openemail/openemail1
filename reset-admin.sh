@@ -22,8 +22,8 @@ docker exec -it $(docker ps -qf name=mysql-openemail) mysql -u${DBUSER} -p${DBPA
 docker exec -it $(docker ps -qf name=mysql-openemail) mysql -u${DBUSER} -p${DBPASS} ${DBNAME} -e "INSERT INTO admin (username, password, superadmin, active) VALUES ('admin', '{SSHA256}Ho6L15mrvXcGkXSRrr7BYqgJVqbieQP3XIj4nUkZUhA5MmQ0ZjYzNzA4ODUwMWE1', 1, 1);"
 docker exec -it $(docker ps -qf name=mysql-openemail) mysql -u${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM tfa WHERE username='admin';"
 echo "
-Admin credentials:
----
+Your Super Admin credentials:
+-----
 Username: admin
 Password: openemail
 TFA: none
