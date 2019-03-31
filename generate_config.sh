@@ -262,8 +262,8 @@ SSL_HELPER_PREFIX=ldap
 ENABLE_REPLICATION=false
 REPLICATION_CONFIG_SYNCPROV=binddn="cn=admin,cn=config" bindmethod=simple credentials="openemail" searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1
 REPLICATION_DB_SYNCPROV=binddn="cn=admin,${BASE_DN}" bindmethod=simple credentials="admin" searchbase="${BASE_DN}" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1
-LDAP1="ldap1.${DOMAIN}"
-LDAP2="ldap2.${DOMAIN}"
+exporrt LDAP1="ldap1.${DOMAIN}"
+expot LDAP2="ldap2.${DOMAIN}"
 REPLICATION_HOSTS="ldap://${LDAP1} ldap://${LDAP2}"
 REMOVE_CONFIG_AFTER_SETUP=false
 
