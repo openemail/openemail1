@@ -242,10 +242,10 @@ ADMIN_PASS=openemail
 CONFIG_PASS=openemail
 FUSIONDIRECTORY_ADMIN_USER=fdadmin
 FUSIONDIRECTORY_ADMIN_PASS=openemail
-ORGANIZATION=Openemail IO
+ORGANIZATION="Openemail IO"
 SLD=$(echo $(hostname -d) | cut -f1 -d .)
 TLD=$(echo $(hostname -d) | cut -f2 -d .)
-BASE_DN=dc=`echo ${SLD}`,dc=`echo ${TLD}`
+BASE_DN="dc=`echo ${SLD}`,dc=`echo ${TLD}`"
 ENABLE_READONLY_USER=true
 READONLY_USER_USER=reader
 READONLY_USER_PASS=openemail
@@ -260,12 +260,14 @@ SSL_HELPER_PREFIX=ldap
 
 ENABLE_REPLICATION=false
 REPLICATION_CONFIG_SYNCPROV=binddn="cn=admin,cn=config" bindmethod=simple credentials="openemail" searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1
-REPLICATION_DB_SYNCPROV=binddn="cn=admin,dc=`echo ${SLD}`,dc=`echo ${TLD}`" bindmethod=simple credentials="admin" searchbase="dc=`echo ${SLD}`,dc=`echo ${TLD}`" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1
-REPLICATION_HOSTS=ldap://ldap1.$(echo ${DOMAIN}) ldap://ldap2.$(echo ${DOMAIN})
+REPLICATION_DB_SYNCPROV=binddn="cn=admin,${BASE_DN}" bindmethod=simple credentials="admin" searchbase="${BASE_DN}" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1
+LDAP1="ldap1.${DOMAIN}"
+LDAP2="ldap2.${DOMAIN}"
+REPLICATION_HOSTS="ldap://${LDAP1} ldap://${LDAP2}"
 REMOVE_CONFIG_AFTER_SETUP=false
 
-BACKUP_CONFIG_CRON_PERIOD=0 4 * * *
-BACKUP_DATA_CRON_PERIOD=0 4 * * *
+BACKUP_CONFIG_CRON_PERIOD="0 4 * * *"
+BACKUP_DATA_CRON_PERIOD="0 4 * * *"
 BACKUP_TTL=15
 
 ZABBIX_HOSTNAME=openldap-fusiondirectory
