@@ -432,7 +432,9 @@ services:
         - LDAP1_NAME=${LDAP1_NAME}
         - ZABBIX_HOSTNAME=fusiondirectory
       volumes:
-        - ./fusiond/config:/etc/fusiondirectory
+        - ./fusiond/config/fd:/etc/fusiondirectory
+        - ./fusiond/config/php:/etc/php7
+        - ./fusiond/config/nginx:/etc/nginx
         - ./fusiond/logs:/www/logs
         - ./fusiond/custom:/assets/fusiondirectory
         - ./fusiond/plugins-custom:/assets/plugins-custom
