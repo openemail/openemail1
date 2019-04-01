@@ -432,6 +432,7 @@ services:
         - LDAP1_NAME=${LDAP1_NAME}
         - ZABBIX_HOSTNAME=fusiondirectory
       volumes:
+        - ./fushiond/config:/etc/fusiondirectory
         - ./fushiond/logs:/www/logs
         - ./fushiond/custom:/assets/fusiondirectory
         - ./fushiond/plugins-custom:/assets/plugins-custom
