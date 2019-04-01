@@ -438,7 +438,7 @@ services:
         - ./fushiond/plugins-custom:/assets/plugins-custom
         - ./data/assets/ssl/:/assets/ssl/certs
       ports:
-        - 1080:80
+        "${SQL_PORT:-127.0.0.1:1080}:80"
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
