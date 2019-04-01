@@ -367,6 +367,7 @@ services:
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
+      hostname: ${OPENEMAIL_HOSTNAME}
       networks:
         openemail-network:
           aliases: 
