@@ -89,6 +89,7 @@ fi
 
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
+HOSTNAME=$(hostname -s)
 DOMAIN=$(hostname -d)
 SLD=$(echo $(hostname -d) | cut -f1 -d .)
 TLD=$(echo $(hostname -d) | cut -f2 -d .)
@@ -243,7 +244,7 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 #API_ALLOW_FROM=127.0.0.1,1.2.3.4
 
 # OpenLDAP FusionDirectory Enviorenment Variables
-HOSTNAME=${OPENEMAIL_HOSTNAME}
+HOSTNAME=${HOSTNAME}
 BACKEND=mdb
 LOG_LEVEL=256
 DOMAIN=${DOMAIN}
