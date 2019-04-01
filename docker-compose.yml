@@ -368,9 +368,9 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        - openemail-network
-            aliases: 
-              - openldap-fusiondirectory
+        openemail-network:
+          aliases: 
+            - openldap-fusiondirectory
 
     fusiondirectory-openemail:
       image: tiredofit/fusiondirectory
@@ -441,9 +441,9 @@ services:
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
-        - openemail-network
-            aliases: 
-              - fusiondirectory
+        openemail-network:
+          aliases: 
+            - fusiondirectory
 
     netfilter-openemail:
       image: openemail/netfilter:1.22
