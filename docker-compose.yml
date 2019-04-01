@@ -432,10 +432,10 @@ services:
         - LDAP1_NAME=${LDAP1_NAME}
         - ZABBIX_HOSTNAME=fusiondirectory
       volumes:
-        - ./fushiond/config:/etc/fusiondirectory
-        - ./fushiond/logs:/www/logs
-        - ./fushiond/custom:/assets/fusiondirectory
-        - ./fushiond/plugins-custom:/assets/plugins-custom
+        - ./fusiond/config:/etc/fusiondirectory
+        - ./fusiond/logs:/www/logs
+        - ./fusiond/custom:/assets/fusiondirectory
+        - ./fusiond/plugins-custom:/assets/plugins-custom
         - ./data/assets/ssl/:/assets/ssl/certs
       ports:
         "${FDUI_PORT:-127.0.0.1:1080}:80"
