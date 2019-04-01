@@ -324,7 +324,6 @@ services:
           aliases:
             - acme
     openldap-fusiondirectory-openemail:
-      container_name: openldap-fusiondirectory
       image: tiredofit/openldap-fusiondirectory
       environment:
         - HOSTNAME=${HOSTNAME}
@@ -370,9 +369,10 @@ services:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
         - openemail-network
+        - alias: 
+            - openldap-fusiondirectory
 
     fusiondirectory-openemail:
-      container_name: fusiondirectory
       image: tiredofit/fusiondirectory
       environment:
         - PLUGIN_ALIAS=TRUE
@@ -442,6 +442,8 @@ services:
         - ${IPV4_NETWORK:-172.22.1}.254
       networks:
         - openemail-network
+         - alias: 
+            - fusiondirectory
 
     netfilter-openemail:
       image: openemail/netfilter:1.22
