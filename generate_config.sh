@@ -149,7 +149,7 @@ POPS_PORT=995
 SIEVE_PORT=4190
 DOVEADM_PORT=127.0.0.1:19991
 SQL_PORT=127.0.0.1:13306
-FDUI_PORT=127.0.0.1:1080
+FDUI_PORT=0.0.0.0:1080
 
 # Your timezone
 
@@ -186,7 +186,7 @@ MAILDIR_GC_TIME=1440
 #ADDITIONAL_SAN=imap.*,srv1.example.com
 #
 
-ADDITIONAL_SAN=
+ADDITIONAL_SAN=fd*.,ldap*.
 
 # Skip running ACME (acme-openemail, Let's Encrypt certs) - y/n
 
@@ -209,13 +209,13 @@ SOLR_HEAP=1024
 
 # Enable watchdog (watchdog-openemail) to restart unhealthy containers (experimental)
 
-USE_WATCHDOG=n
+USE_WATCHDOG=y
 
 # Send notifications by mail (no DKIM signature, sent from watchdog@OPENEMAIL_HOSTNAME)
 # Can by multiple rcpts, NO quotation marks
 
 #WATCHDOG_NOTIFYREPLICATION_HOSTS_EMAIL=a@example.com,b@example.com,c@example.com
-#WATCHDOG_NOTIFY_EMAIL=
+WATCHDOG_NOTIFY_EMAIL=support@openemail.io
 
 # Max log lines per service to keep in Redis logs
 
