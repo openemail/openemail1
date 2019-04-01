@@ -1,1 +1,1 @@
-server_name ${MAILCOW_HOSTNAME} autodiscover.* autoconfig.*;
+server_name ${OPENEMAIL_HOSTNAME} autodiscover.* autoconfig.*;
