@@ -271,6 +271,10 @@ services:
         until ping rspamd -c1 > /dev/null; do sleep 1; done &&
         exec nginx -g 'daemon off;'"
       environment:
+        - VIRTUAL_HOST=admin.openemail.io
+        - VIRTUAL_NETWORK=nginx-proxy
+        - LETSENCRYPT_HOST=admin.openemail.io
+        - LETSENCRYPT_EMAIL=devops@openemail.io
         - HTTPS_PORT=${HTTPS_PORT:-443}
         - HTTP_PORT=${HTTP_PORT:-80}
         - OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
@@ -294,7 +298,8 @@ services:
         openemail-network:
           aliases:
             - nginx
-
+        proxy-tier:
+      
     acme-openemail:
       depends_on:
         - nginx-openemail
@@ -376,6 +381,10 @@ services:
     fusiondirectory-openemail:
       image: tiredofit/fusiondirectory
       environment:
+        - VIRTUAL_HOST=fd.openemail.io
+        - VIRTUAL_NETWORK=nginx-proxy
+        - LETSENCRYPT_HOST=fd.openemail.io
+        - LETSENCRYPT_EMAIL=devops@openemail.io
         - PLUGIN_ALIAS=TRUE
         - PLUGIN_APPLICATIONS=TRUE
         - PLUGIN_ARGONAUT=TRUE
@@ -446,7 +455,8 @@ services:
         openemail-network:
           aliases: 
             - fusiondirectory
-
+        proxy-tier:
+        
     netfilter-openemail:
       image: openemail/netfilter:1.22
       build: ./data/Dockerfiles/netfilter
@@ -573,6 +583,9 @@ networks:
       config:
         - subnet: ${IPV4_NETWORK:-172.22.1}.0/24
         - subnet: ${IPV6_NETWORK:-fd4d:6169:6c63:6f77::/64}
+  proxy-tier:
+    external:
+      name: nginx-proxy
 
 volumes:
   # Storage for email files
