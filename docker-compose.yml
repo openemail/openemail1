@@ -1,36 +1,36 @@
 ---
 version: '2.1'
 services:
-  letsencrypt:
-    image: linuxserver/letsencrypt
-    container_name: letsencrypt
-    cap_add:
-      - NET_ADMIN
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - URL=${DOMAIN}
-      - SUBDOMAINS=${SUBDOMAINS}
-      - VALIDATION=http
-      - DNSPLUGIN=cloudflare #optional
-      - DUCKDNSTOKEN=<token> #optonal
-      - EMAIL=devops@openemail.io #optional
-      - DHLEVEL=2048 #optional
-      - ONLY_SUBDOMAINS=true #optional
-      - EXTRA_DOMAINS=${EXTRA_DOMAINS} #optional
-      - STAGING=false #optional
-    volumes:
-      - ./letsencrypt/config:/config
-    ports:
-      - 443:443
-      - 80:80 #optional
-    networks:
-        openemail-network:
-          aliases:
-            - letsencrypt
+   letsencrypt:
+      image: linuxserver/letsencrypt
+      container_name: letsencrypt
+      cap_add:
+        - NET_ADMIN
+      environment:
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=${TZ}
+        - URL=${DOMAIN}
+        - SUBDOMAINS=${SUBDOMAINS}
+        - VALIDATION=http
+        - DNSPLUGIN=cloudflare #optional
+        -  DUCKDNSTOKEN=<token> #optonal
+        - EMAIL=devops@openemail.io #optional
+        - DHLEVEL=2048 #optional
+        - ONLY_SUBDOMAINS=true #optional
+        - EXTRA_DOMAINS=${EXTRA_DOMAINS} #optional
+        - STAGING=false #optional
+      volumes:
+        - ./letsencrypt/config:/config
+      ports:
+        - 443:443
+        - 80:80 #optional
+      networks:
+         openemail-network:
+           aliases:
+             - letsencrypt
             
-  unbound-openemail:
+   unbound-openemail:
       image: openemail/unbound:1.6
       build: ./data/Dockerfiles/unbound
       command: /usr/sbin/unbound
@@ -46,29 +46,29 @@ services:
           aliases:
             - unbound
 
-  mysql-openemail:
-    image: mariadb:10.2
-    volumes:
-      - mysql-vol-1:/var/lib/mysql/
-      - mysql-socket-vol-1:/var/run/mysqld/
-      - ./data/conf/mysql/:/etc/mysql/conf.d/:ro
-    environment:
-      - TZ=${TZ}
-      - MYSQL_ROOT_PASSWORD=${DBROOT}
-      - MYSQL_DATABASE=${DBNAME}
-      - MYSQL_USER=${DBUSER}
-      - MYSQL_PASSWORD=${DBPASS}
-    restart: always
-    dns:
-      - ${IPV4_NETWORK:-172.22.1}.254
-    ports:
-      - "${SQL_PORT:-127.0.0.1:13306}:3306"
-    networks:
-      openemail-network:
-        aliases:
+    mysql-openemail:
+      image: mariadb:10.2
+      volumes:
+        - mysql-vol-1:/var/lib/mysql/
+        - mysql-socket-vol-1:/var/run/mysqld/
+        - ./data/conf/mysql/:/etc/mysql/conf.d/:ro
+       environment:
+        - TZ=${TZ}
+        - MYSQL_ROOT_PASSWORD=${DBROOT}
+        - MYSQL_DATABASE=${DBNAME}
+        - MYSQL_USER=${DBUSER}
+        - MYSQL_PASSWORD=${DBPASS}
+      restart: always
+      dns:
+        - ${IPV4_NETWORK:-172.22.1}.254
+      ports:
+        - "${SQL_PORT:-127.0.0.1:13306}:3306"
+      networks:
+        openemail-network:
+          aliases:
           - mysql
 
-  redis-openemail:
+    redis-openemail:
       image: redis:5-alpine
       volumes:
         - redis-vol-1:/data/
@@ -83,8 +83,7 @@ services:
           aliases:
             - redis
             - redis-mailcow
-
-  clamd-openemail:
+    clamd-openemail:
       image: openemail/clamd:1.22
       build: ./data/Dockerfiles/clamd
       restart: always
@@ -100,7 +99,7 @@ services:
           aliases:
             - clamd
 
-  rspamd-openemail:
+    rspamd-openemail:
       image: openemail/rspamd:1.34
       build: ./data/Dockerfiles/rspamd
       stop_grace_period: 30s
@@ -123,7 +122,7 @@ services:
           aliases:
             - rspamd
 
-  php-fpm-openemail:
+    php-fpm-openemail:
       image: openemail/phpfpm:1.34
       build: ./data/Dockerfiles/phpfpm
       command: "php-fpm -d date.timezone=${TZ} -d expose_php=0"
@@ -167,7 +166,7 @@ services:
         openemail-network:
           aliases:
             - phpfpm
-  sogo-openemail:
+    sogo-openemail:
       image: openemail/sogo:1.52
       build: ./data/Dockerfiles/sogo
       environment:
@@ -192,7 +191,7 @@ services:
           aliases:
             - sogo
 
-  dovecot-openemail:
+    dovecot-openemail:
       image: openemail/dovecot:1.63
       build: ./data/Dockerfiles/dovecot
       cap_add:
@@ -239,7 +238,7 @@ services:
           aliases:
             - dovecot
 
-  postfix-openemail:
+    postfix-openemail:
       image: openemail/postfix:1.29
       build: ./data/Dockerfiles/postfix
       volumes:
@@ -281,7 +280,7 @@ services:
           aliases:
             - memcached
 
-  nginx-openemail:
+    nginx-openemail:
       depends_on:
         - sogo-openemail
         - php-fpm-openemail
@@ -327,35 +326,7 @@ services:
           aliases:
             - nginx
           
-  acme-openemail:
-      depends_on:
-        - nginx-openemail
-      image: openemail/acme:1.48
-      build: ./data/Dockerfiles/acme
-      dns:
-        - ${IPV4_NETWORK:-172.22.1}.254
-      environment:
-        - LOG_LINES=${LOG_LINES:-9999}
-        - ADDITIONAL_SAN=${ADDITIONAL_SAN}
-        - OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
-        - DBNAME=${DBNAME}
-        - DBUSER=${DBUSER}
-        - DBPASS=${DBPASS}
-        - SKIP_LETS_ENCRYPT=${SKIP_LETS_ENCRYPT:-n}
-        - SKIP_IP_CHECK=${SKIP_IP_CHECK:-n}
-        - LE_STAGING=${LE_STAGING:-n}
-        - TZ=${TZ}
-      volumes:
-        - ./data/web/.well-known/acme-challenge:/var/www/acme:rw
-        - ./data/assets/ssl:/var/lib/acme/:rw
-        - ./data/assets/ssl-example:/var/lib/ssl-example/:ro
-        - mysql-socket-vol-1:/var/run/mysqld/
-      restart: always
-      networks:
-        openemail-network:
-          aliases:
-            - acme
-  openldap-fusiondirectory-openemail:
+    openldap-fusiondirectory-openemail:
       image: tiredofit/openldap-fusiondirectory
       environment:
         - HOSTNAME=${HOSTNAME}
@@ -483,7 +454,7 @@ services:
           aliases: 
             - fusiondirectory
             
-  netfilter-openemail:
+    netfilter-openemail:
       image: openemail/netfilter:1.22
       build: ./data/Dockerfiles/netfilter
       stop_grace_period: 30s
@@ -509,7 +480,7 @@ services:
       volumes:
         - /lib/modules:/lib/modules:ro
 
-  watchdog-openemail:
+    watchdog-openemail:
       image: openemail/watchdog:1.35
       # Debug
       #command: /watchdog.sh
@@ -541,7 +512,7 @@ services:
           aliases:
             - watchdog
 
-  dockerapi-openemail:
+    dockerapi-openemail:
       image: openemail/dockerapi:1.26
       restart: always
       build: ./data/Dockerfiles/dockerapi
@@ -574,7 +545,7 @@ services:
           aliases:
             - solr
 
-  ipv6nat-openemail:
+    ipv6nat-openemail:
       depends_on:
         - unbound-openemail
         - mysql-openemail
@@ -587,7 +558,6 @@ services:
         - postfix-openemail
         - memcached-openemail
         - nginx-openemail
-        - acme-openemail
         - netfilter-openemail
         - watchdog-openemail
         - dockerapi-openemail
@@ -609,10 +579,7 @@ networks:
       config:
         - subnet: ${IPV4_NETWORK:-172.22.1}.0/24
         - subnet: ${IPV6_NETWORK:-fd4d:6169:6c63:6f77::/64}
-  proxy-tier:
-    external:
-      name: nginx-proxy
-
+ 
 volumes:
   # Storage for email files
   vmail-vol-1:
