@@ -96,6 +96,9 @@ TLD=$(echo $(hostname -d) | cut -f2 -d .)
 BASE_DN=dc=$(echo ${SLD}),dc=$(echo ${TLD})
 LDAP1=ldap1.${DOMAIN}
 LDAP2=ldap2.${DOMAIN}
+PUID=$(id -u)
+PGID=$(id -g)
+
 
 
 cat << EOF > openemail.conf
@@ -107,6 +110,8 @@ cat << EOF > openemail.conf
 # Default password is "moohoo"
 
 OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
+PUID=${PUID}
+PGID=${PGID}
 
 # ------------------------------
 # SQL database configuration
@@ -149,7 +154,7 @@ POPS_PORT=995
 SIEVE_PORT=4190
 DOVEADM_PORT=127.0.0.1:19991
 SQL_PORT=127.0.0.1:13306
-FDUI_PORT=0.0.0.0:1080
+
 
 # Your timezone
 
