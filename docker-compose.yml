@@ -47,27 +47,27 @@ services:
 
   mysql-openemail:
     image: mariadb:10.2
-      volumes:
-        - mysql-vol-1:/var/lib/mysql/
-        - mysql-socket-vol-1:/var/run/mysqld/
-        - ./data/conf/mysql/:/etc/mysql/conf.d/:ro
-      environment:
-        - TZ=${TZ}
-        - MYSQL_ROOT_PASSWORD=${DBROOT}
-        - MYSQL_DATABASE=${DBNAME}
-        - MYSQL_USER=${DBUSER}
-        - MYSQL_PASSWORD=${DBPASS}
-      restart: always
-      dns:
-        - ${IPV4_NETWORK:-172.22.1}.254
-      ports:
-        - "${SQL_PORT:-127.0.0.1:13306}:3306"
-      networks:
-        openemail-network:
-          aliases:
-            - mysql
+    volumes:
+      - mysql-vol-1:/var/lib/mysql/
+      - mysql-socket-vol-1:/var/run/mysqld/
+      - ./data/conf/mysql/:/etc/mysql/conf.d/:ro
+    environment:
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${DBROOT}
+      - MYSQL_DATABASE=${DBNAME}
+      - MYSQL_USER=${DBUSER}
+      - MYSQL_PASSWORD=${DBPASS}
+    restart: always
+    dns:
+      - ${IPV4_NETWORK:-172.22.1}.254
+    ports:
+      - "${SQL_PORT:-127.0.0.1:13306}:3306"
+    networks:
+      openemail-network:
+        aliases:
+          - mysql
 
-    redis-openemail:
+  redis-openemail:
       image: redis:5-alpine
       volumes:
         - redis-vol-1:/data/
@@ -166,7 +166,7 @@ services:
         openemail-network:
           aliases:
             - phpfpm
-
+SUBDOMAINS
     sogo-openemail:
       image: openemail/sogo:1.52
       build: ./data/Dockerfiles/sogo
@@ -191,7 +191,7 @@ services:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.248
           aliases:
             - sogo
-
+SUBDOMAINS
     dovecot-openemail:
       image: openemail/dovecot:1.63
       build: ./data/Dockerfiles/dovecot
@@ -201,7 +201,7 @@ services:
         - ./data/conf/dovecot:/usr/local/etc/dovecot
         - ./data/assets/ssl:/etc/ssl/mail/:ro
         - ./data/conf/sogo/:/etc/sogo/
-        - vmail-vol-1:/var/vmail
+        - vmail-vol-1:/var/vmailSUBDOMAINS
         - vmail-attachments-vol-1:/var/attachments
         - crypt-vol-1:/mail_crypt/
         - ./data/conf/rspamd/custom/:/etc/rspamd/custom
@@ -211,7 +211,7 @@ services:
       environment:
         - LOG_LINES=${LOG_LINES:-9999}
         - DBNAME=${DBNAME}
-        - DBUSER=${DBUSER}
+        - DBUSER=${DBUSER}SUBDOMAINS
         - DBPASS=${DBPASS}
         - TZ=${TZ}
         - MAILDIR_GC_TIME=${MAILDIR_GC_TIME:-1440}
@@ -306,7 +306,7 @@ services:
         - HTTPS_PORT=${HTTPS_PORT:-443}
         - HTTP_PORT=${HTTP_PORT:-80}
         - OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
-        - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
+    SUBDOMAINS    - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
         - TZ=${TZ}
       volumes:
         - ./data/web:/web:ro
@@ -322,7 +322,7 @@ services:
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
-      networks:
+    SUBDOMAINS  networks:
         openemail-network:
           aliases:
             - nginx
@@ -359,7 +359,7 @@ services:
       image: tiredofit/openldap-fusiondirectory
       environment:
         - HOSTNAME=${HOSTNAME}
-        - BACKEND=${BACKEND}
+        SUBDOMAINS- BACKEND=${BACKEND}
         - LOG_LEVEL=${LOG_LEVEL}
         - DOMAIN=${DOMAIN}
         - ADMIN_PASS=${ADMIN_PASS}
@@ -370,7 +370,7 @@ services:
         - BASE_DN=${BASE_DN}
         - ENABLE_READONLY_USER=${ENABLE_READONLY_USER}
         - READONLY_USER_USER=${READONLY_USER_USER}
-        - READONLY_USER_PASS=${READONLY_USER_PASS}
+    SUBDOMAINS    - READONLY_USER_PASS=${READONLY_USER_PASS}
         - ENABLE_TLS=${ENABLE_TLS}
         - TLS_CRT_FILENAME=${TLS_CRT_FILENAME}
         - TLS_KEY_FILENAME=${TLS_KEY_FILENAME}
@@ -382,7 +382,7 @@ services:
         - ENABLE_REPLICATION=${ENABLE_REPLICATION}
         - REPLICATION_CONFIG_SYNCPROV=${REPLICATION_CONFIG_SYNCPROV}
         - REPLICATION_DB_SYNCPROV=${REPLICATION_DB_SYNCPROV}
-        - REPLICATION_HOSTS=${REPLICATION_HOSTS}
+ SUBDOMAINS       - REPLICATION_HOSTS=${REPLICATION_HOSTS}
         - REMOVE_CONFIG_AFTER_SETUP=${REMOVE_CONFIG_AFTER_SETUP}
         - BACKUP_CONFIG_CRON_PERIOD=0 4 * * *
         - BACKUP_DATA_CRON_PERIOD=0 4 * * *
