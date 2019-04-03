@@ -1,7 +1,35 @@
 version: '2.1'
 services:
-
-    unbound-openemail:
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - URL=${DOMAIN}
+      - SUBDOMAINS=${SUBDOMAINS}
+      - VALIDATION=http
+      - DNSPLUGIN=cloudflare #optional
+      - DUCKDNSTOKEN=<token> #optonal
+      - EMAIL=devops@openemail.io #optional
+      - DHLEVEL=2048 #optional
+      - ONLY_SUBDOMAINS=true #optional
+      - EXTRA_DOMAINS=${EXTRA_DOMAINS} #optional
+      - STAGING=false #optional
+    volumes:
+      - ./letsencrypt/config:/config
+    ports:
+      - 443:443
+      - 80:80 #optional
+    networks:
+        openemail-network:
+          aliases:
+            - letsencrypt
+            
+  unbound-openemail:
       image: openemail/unbound:1.6
       build: ./data/Dockerfiles/unbound
       command: /usr/sbin/unbound
@@ -17,8 +45,8 @@ services:
           aliases:
             - unbound
 
-    mysql-openemail:
-      image: mariadb:10.2
+  mysql-openemail:
+    image: mariadb:10.2
       volumes:
         - mysql-vol-1:/var/lib/mysql/
         - mysql-socket-vol-1:/var/run/mysqld/
@@ -288,9 +316,9 @@ services:
         - ./data/conf/rspamd/meta_exporter:/meta_exporter:ro
       volumes_from:
         - sogo-openemail
-      ports:
-        - "${HTTPS_BIND:-0.0.0.0}:${HTTPS_PORT:-443}:${HTTPS_PORT:-443}"
-        - "${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-80}:${HTTP_PORT:-80}"
+     # ports:
+     #   - "${HTTPS_BIND:-0.0.0.0}:${HTTPS_PORT:-443}:${HTTPS_PORT:-443}"
+     #   - "${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-80}:${HTTP_PORT:-80}"
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
@@ -298,8 +326,7 @@ services:
         openemail-network:
           aliases:
             - nginx
-        proxy-tier:
-      
+          
     acme-openemail:
       depends_on:
         - nginx-openemail
@@ -446,8 +473,8 @@ services:
         - ./fusiond/custom:/assets/fusiondirectory
         - ./fusiond/plugins-custom:/assets/plugins-custom
         - ./data/assets/ssl/:/assets/ssl/certs
-      ports:
-        - "${FDUI_PORT:-0.0.0.0:1080}:80"
+      #  ports:
+      #   - "${FDUI_PORT:-0.0.0.0:1080}:80"
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
@@ -455,8 +482,7 @@ services:
         openemail-network:
           aliases: 
             - fusiondirectory
-        proxy-tier:
-        
+            
     netfilter-openemail:
       image: openemail/netfilter:1.22
       build: ./data/Dockerfiles/netfilter
