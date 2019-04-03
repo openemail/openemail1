@@ -331,7 +331,7 @@ services:
       image: tiredofit/openldap-fusiondirectory
       environment:
         - HOSTNAME=${HOSTNAME}
-        SUBDOMAINS- BACKEND=${BACKEND}
+        - BACKEND=${BACKEND}
         - LOG_LEVEL=${LOG_LEVEL}
         - DOMAIN=${DOMAIN}
         - ADMIN_PASS=${ADMIN_PASS}
