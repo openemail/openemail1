@@ -1,5 +1,6 @@
 version: '2.1'
 services:
+   
    letsencrypt:
       image: linuxserver/letsencrypt
       container_name: letsencrypt
@@ -13,7 +14,7 @@ services:
         - SUBDOMAINS=${SUBDOMAINS}
         - VALIDATION=http
         - DNSPLUGIN=cloudflare #optional
-        -  DUCKDNSTOKEN=<token> #optonal
+        - DUCKDNSTOKEN=<token> #optonal
         - EMAIL=devops@openemail.io #optional
         - DHLEVEL=2048 #optional
         - ONLY_SUBDOMAINS=true #optional
