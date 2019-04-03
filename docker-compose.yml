@@ -68,7 +68,7 @@ services:
           aliases:
           - mysql
 
-    redis-openemail:
+   redis-openemail:
       image: redis:5-alpine
       volumes:
         - redis-vol-1:/data/
