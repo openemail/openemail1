@@ -112,7 +112,8 @@ cat << EOF > openemail.conf
 OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
 PUID=${PUID}
 PGID=${PGID}
-
+SUBDOMAINS=dev,fd,nc,admin
+EXTRA_DOMAINS=
 # ------------------------------
 # SQL database configuration
 # ------------------------------
