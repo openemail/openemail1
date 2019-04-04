@@ -32,6 +32,8 @@ services:
    heimdall:
      image: linuxserver/heimdall
      container_name: heimdall
+     depends_on:
+        - letsencrypt
      environment:
         - PUID=${PUID}
         - PGID=&{PGID}
@@ -120,6 +122,7 @@ services:
       stop_grace_period: 30s
       depends_on:
         - nginx-openemail
+        - letsencrypt
       environment:
         - TZ=${TZ}
       volumes:
@@ -289,7 +292,7 @@ services:
             - postfix-dovecot
 
    memcached-openemail:
-      image: itnami/memcached:latest
+      image: bitnami/memcached:latest
       environment:
         - PUID=${PUID}
         - PGID=${PGID}
