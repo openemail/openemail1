@@ -218,7 +218,7 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 
 #SNAT6_TO_SOURCE=
 
-# Create or oREPLICATION_HOSTSverride API key for web uI
+# Create or override API key for web uI
 # You _must_ define API_ALLOW_FROM, which is a comma separated list of IPs
 # API_KEY allowed chars: a-z, A-Z, 0-9, -
 
