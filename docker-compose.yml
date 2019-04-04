@@ -427,7 +427,7 @@ services:
         - ./ldap/backup:/data/backup
         - ./ldap/data:/var/lib/openldap
         - ./ldap/config:/etc/openldap/slapd.d
-        - ./letsencrypt/config/keys/letsencrypt/:/assets/slapd/certs:ro
+        - ./letsencrypt/config/keys/letsencrypt:/assets/slapd/certs
       ports:
         - 389:389
         - 636:636
