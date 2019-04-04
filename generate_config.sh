@@ -89,7 +89,7 @@ fi
 
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
-HOSTNAME=$(hostname -s)
+HOSTNAME=${OPENEMAIL_HOSTNAME}
 DOMAIN=$(hostname -d)
 SLD=$(echo $(hostname -d) | cut -f1 -d .)
 TLD=$(echo $(hostname -d) | cut -f2 -d .)
@@ -98,8 +98,6 @@ LDAP1=ldap1.${DOMAIN}
 LDAP2=ldap2.${DOMAIN}
 PUID=$(id -u)
 PGID=$(id -g)
-
-
 
 cat << EOF > openemail.conf
 # ------------------------------
@@ -110,6 +108,7 @@ cat << EOF > openemail.conf
 # Default password is "moohoo"
 
 OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
+
 PUID=${PUID}
 PGID=${PGID}
 SUBDOMAINS=dev,fd,nc,admin
@@ -251,7 +250,7 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 #API_ALLOW_FROM=127.0.0.1,1.2.3.4
 
 # OpenLDAP FusionDirectory Enviorenment Variables
-HOSTNAME=${HOSTNAME}
+HOSTNAME=${OPENEMAIL_HOSTNAME}
 BACKEND=mdb
 LOG_LEVEL=256
 DOMAIN=${DOMAIN}
@@ -265,9 +264,9 @@ ENABLE_READONLY_USER=true
 READONLY_USER_USER=reader
 READONLY_USER_PASS=openemail
 ENABLE_TLS=true
-TLS_CRT_FILENAME=cert.pem
-TLS_KEY_FILENAME=key.pem
-TLS_CA_CRT_FILENAME=ca.pem
+TLS_CRT_FILENAME=fullchain.pem
+TLS_KEY_FILENAME=privkey.pem
+TLS_CA_CRT_FILENAME=fullchain.pem
 TLS_ENFORCE=false
 TLS_CIPHER_SUITE=ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
 TLS_VERIFY_CLIENT=never
@@ -284,7 +283,7 @@ LDAP1_HOST=openldap-fusiondirectory
 LDAP1_BASE_DN=${BASE_DN}
 LDAP1_ADMIN_DN=cn=admin,${BASE_DN}
 LDAP1_ADMIN_PASS=openemail
-LDAP1_NAME=dev
+LDAP1_NAME=Primary
 
 EOF
 
