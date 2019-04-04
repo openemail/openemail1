@@ -34,8 +34,8 @@ services:
      container_name: heimdall
      environment:
         - PUID=${PUID}
-        - PGID=&{
-        - TZ=Europe/London
+        - PGID=&{PGID}
+        - TZ=${TZ}
      volumes:
         - ./heimdall/config:/config
      restart: unless-stopped
