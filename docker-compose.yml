@@ -29,6 +29,20 @@ services:
          openemail-network:
            aliases:
              - letsencrypt
+   heimdall:
+     image: linuxserver/heimdall
+     container_name: heimdall
+     environment:
+        - PUID=${PUID}
+        - PGID=&{
+        - TZ=Europe/London
+     volumes:
+        - ./heimdall/config:/config
+     restart: unless-stopped
+     networks:
+        openemail-network:
+           aliases:
+             - heimdall
             
    unbound-openemail:
       image: openemail/unbound:1.6
