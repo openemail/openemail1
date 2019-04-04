@@ -98,6 +98,7 @@ LDAP1=ldap1.${DOMAIN}
 LDAP2=ldap2.${DOMAIN}
 PUID=$(id -u)
 PGID=$(id -g)
+ADMINPASS=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 
 cat << EOF > openemail.conf
 # ------------------------------
@@ -127,7 +128,6 @@ DBUSER=openemail
 
 DBPASS=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 DBROOT=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
-ADMINPASS=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 
 # ------------------------------
 # HTTP/S Bindings
@@ -241,7 +241,7 @@ ORGANIZATION=(Openemail}
 BASE_DN=${BASE_DN}
 ENABLE_READONLY_USER=true
 READONLY_USER_USER=reader
-READONLY_USER_PASS=openemail
+READONLY_USER_PASS={ADMINPASS}
 ENABLE_TLS=true
 TLS_CRT_FILENAME=fullchain.pem
 TLS_KEY_FILENAME=privkey.pem
@@ -261,7 +261,7 @@ REMOVE_CONFIG_AFTER_SETUP=false
 LDAP1_HOST=openldap-fusiondirectory
 LDAP1_BASE_DN=${BASE_DN}
 LDAP1_ADMIN_DN=cn=admin,${BASE_DN}
-LDAP1_ADMIN_PASS=openemail
+LDAP1_ADMIN_PASS={ADMINPASS}
 LDAP1_NAME=Primary
 
 EOF
