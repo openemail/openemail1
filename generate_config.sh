@@ -124,6 +124,7 @@ DBUSER=openemail
 
 DBPASS=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 DBROOT=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
+ADMINPASS=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 
 # ------------------------------
 # HTTP/S Bindings
@@ -155,7 +156,6 @@ SIEVE_PORT=4190
 DOVEADM_PORT=127.0.0.1:19991
 SQL_PORT=127.0.0.1:13306
 
-
 # Your timezone
 
 TZ=${OPENEMAIL_TZ}
@@ -176,30 +176,6 @@ ACL_ANYONE=disallow
 # Check interval is hourly
 
 MAILDIR_GC_TIME=1440
-
-# Additional SAN for the certificate
-#
-# You can use wildcard records to create specific names for every domain you add to openemail.
-# Example: Add domains "example.com" and "example.net" to openemail, change ADDITIONAL_SAN to a value like:
-#ADDITIONAL_SAN=imap.*,smtp.*
-# This will expand the certificate to "imap.example.com", "smtp.example.com", "imap.example.net", "imap.example.net"
-# plus every domain you add in the future.
-#
-# You can also just add static names...
-#ADDITIONAL_SAN=srv1.example.net
-# ...or combine wildcard and static names:
-#ADDITIONAL_SAN=imap.*,srv1.example.com
-#
-
-ADDITIONAL_SAN=fd*.,ldap*.
-
-# Skip running ACME (acme-openemail, Let's Encrypt certs) - y/n
-
-SKIP_LETS_ENCRYPT=n
-
-# Skip IPv4 cheREPLICATION_HOSTSck in ACME container - y/n
-
-SKIP_IP_CHECK=n
 
 # Skip ClamAV (clamd-openemail) anti-virus (Rspamd will auto-detect a missing ClamAV container) - y/n
 
@@ -254,11 +230,11 @@ HOSTNAME=${OPENEMAIL_HOSTNAME}
 BACKEND=mdb
 LOG_LEVEL=256
 DOMAIN=${DOMAIN}
-ADMIN_PASS=openemail
-CONFIG_PASS=openemail
+ADMIN_PASS=${ADMINPASS}
+CONFIG_PASS=${ADMINPASS}
 FUSIONDIRECTORY_ADMIN_USER=fdadmin
-FUSIONDIRECTORY_ADMIN_PASS=openemail
-ORGANIZATION=(Openemail\ IO)
+FUSIONDIRECTORY_ADMIN_PASS=${ADMINPASS}
+ORGANIZATION=(Openemail}
 BASE_DN=${BASE_DN}
 ENABLE_READONLY_USER=true
 READONLY_USER_USER=reader
