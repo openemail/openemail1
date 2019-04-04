@@ -97,6 +97,7 @@ services:
           aliases:
             - redis
             - redis-mailcow
+            
    clamd-openemail:
       image: openemail/clamd:1.22
       build: ./data/Dockerfiles/clamd
@@ -180,6 +181,7 @@ services:
         openemail-network:
           aliases:
             - phpfpm
+            
    sogo-openemail:
       image: openemail/sogo:1.52
       build: ./data/Dockerfiles/sogo
@@ -222,6 +224,8 @@ services:
         - rspamd-vol-1:/var/lib/rspamd
         - mysql-socket-vol-1:/var/run/mysqld/
       environment:
+        - PUID=${PUID}
+        - PGID=${PGID}
         - LOG_LINES=${LOG_LINES:-9999}
         - DBNAME=${DBNAME}
         - DBUSER=${DBUSER}SUBDOMAINS
@@ -285,7 +289,10 @@ services:
             - postfix-dovecot
 
    memcached-openemail:
-      image: memcached:alpine
+      image: itnami/memcached:latest
+      environment:
+        - PUID=${PUID}
+        - PGID=${PGID}
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
