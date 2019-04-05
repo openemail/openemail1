@@ -104,6 +104,8 @@ OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
 
 DBNAME=openemail
 DBUSER=openemail
+DBHOST=mariadb
+
 
 # Please use long, random alphanumeric strings (A-Za-z0-9)
 
