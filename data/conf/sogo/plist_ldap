@@ -18,11 +18,11 @@
                     <string>ldap</string>
                     <key>bindDN</key>
                     <string>${ADMIN_DN}</string>
-                    <key>${ADMINPASS}</key>
-                    <string>password</string>
+                    <key>password</key>
+                    <string>${ADMINPASS}</string>
                     <key>baseDN</key>
                     <string>ou=People,${BASE_DN}</string>
                     <key>hostname</key>
-                    <string>ldap://${LDAP_HOST}:389</string>
+                    <string>ldap://${LDAP1_HOST}:389</string>
                 </example>
                 -->
