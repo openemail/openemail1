@@ -264,6 +264,9 @@ LDAP1_ADMIN_DN=cn=admin,${BASE_DN}
 LDAP1_ADMIN_PASS={ADMINPASS}
 LDAP1_NAME=Primary
 
+# 
+
+
 EOF
 
 mkdir -p data/assets/ssl
