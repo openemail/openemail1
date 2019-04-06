@@ -17,12 +17,12 @@
                     <key>type</key>
                     <string>ldap</string>
                     <key>bindDN</key>
-                    <string>cn=admin,dc=example,dc=local</string>
-                    <key>bindPassword</key>
+                    <string>${ADMIN_DN}</string>
+                    <key>${ADMINPASS}</key>
                     <string>password</string>
                     <key>baseDN</key>
-                    <string>ou=People,dc=example,dc=local</string>
+                    <string>ou=People,${BASE_DN}</string>
                     <key>hostname</key>
-                    <string>ldap://1.2.3.4:389</string>
+                    <string>ldap://${LDAP_HOST}:389</string>
                 </example>
                 -->
