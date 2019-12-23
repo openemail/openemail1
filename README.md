@@ -1,3 +1,3 @@
 # Openemail Deployment Guide
 
-[Openemail Documentation](https://openemail.io)
+To learn more please visit: [Openemail Documentation](https://openemail.io) 
