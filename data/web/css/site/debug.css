@@ -5,7 +5,7 @@ table.footable>tbody>tr.footable-empty>td {
 .pagination a {
   text-decoration: none !important;
 }
-.panel panel-default {
+.panel.panel-default {
   overflow: visible !important;
 }
 .table-responsive {
@@ -40,4 +40,8 @@ table.footable>tbody>tr.footable-empty>td {
 }
 tbody {
   font-size:14px;
+}
+.container-indicator {
+  width: 15px;
+  height: 15px;
 }

@@ -3,7 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/prerequisites.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/vars.inc.php';
 
 error_reporting(0);
-if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admin") {
+if (isset($_SESSION['openemail_cc_role']) && $_SESSION['openemail_cc_role'] == "admin") {
   $transport_id = intval($_GET['transport_id']);
   $transport_type = $_GET['transport_type'];
   if (isset($_GET['mail_from']) && filter_var($_GET['mail_from'], FILTER_VALIDATE_EMAIL)) {
@@ -58,9 +58,11 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admi
       )
     );
     $mail->SMTPDebug = 3;
-    if ($port == 465) {
-      $mail->SMTPSecure = "ssl";
-    }
+    // smtp: and smtp_enforced_tls: do not support wrapped tls, todo?
+    // change postfix map to detect wrapped tls or add a checkbox to toggle wrapped tls
+    // if ($port == 465) {
+      // $mail->SMTPSecure = "ssl";
+    // }
     $mail->Debugoutput = function($str, $level) {
       foreach(preg_split("/((\r?\n)|(\r\n?)|\n)/", $str) as $line){
         if (empty($line)) { continue; }

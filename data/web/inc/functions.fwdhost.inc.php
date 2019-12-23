@@ -7,7 +7,7 @@ function fwdhost($_action, $_data = null) {
   switch ($_action) {
     case 'add':
       global $lang;
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -62,7 +62,7 @@ function fwdhost($_action, $_data = null) {
     break;
     case 'edit':
       global $lang;
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -130,7 +130,7 @@ function fwdhost($_action, $_data = null) {
       }
     break;
     case 'get':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         return false;
       }
       $fwdhostsdata = array();

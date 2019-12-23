@@ -5,7 +5,7 @@ function dkim($_action, $_data = null) {
 	global $lang;
   switch ($_action) {
     case 'add':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data),
@@ -99,7 +99,7 @@ function dkim($_action, $_data = null) {
       }
     break;
     case 'duplicate':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data),
@@ -141,7 +141,7 @@ function dkim($_action, $_data = null) {
       }
     break;
     case 'import':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data),
@@ -227,7 +227,7 @@ function dkim($_action, $_data = null) {
       return true;
     break;
     case 'details':
-      if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $_data) && $_SESSION['mailcow_cc_role'] != "admin") {
+      if (!hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $_data) && $_SESSION['openemail_cc_role'] != "admin") {
         return false;
       }
       $dkimdata = array();
@@ -247,12 +247,17 @@ function dkim($_action, $_data = null) {
         }
         $dkimdata['dkim_txt'] = 'v=DKIM1;k=rsa;t=s;s=email;p=' . $redis_dkim_key_data;
         $dkimdata['dkim_selector'] = $redis->hGet('DKIM_SELECTORS', $_data);
-        $dkimdata['privkey'] = base64_encode($redis->hGet('DKIM_PRIV_KEYS', $dkimdata['dkim_selector'] . '.' . $_data));
+        if ($GLOBALS['SHOW_DKIM_PRIV_KEYS']) {
+          $dkimdata['privkey'] = base64_encode($redis->hGet('DKIM_PRIV_KEYS', $dkimdata['dkim_selector'] . '.' . $_data));
+        }
+        else {
+          $dkimdata['privkey'] = '';
+        }
       }
       return $dkimdata;
     break;
     case 'blind':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data),
@@ -268,7 +273,7 @@ function dkim($_action, $_data = null) {
     break;
     case 'delete':
       $domains = (array)$_data['domains'];
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data),

@@ -84,10 +84,13 @@ $rcpt_final_mailboxes = array();
 
 // Loop through all rcpts
 foreach (json_decode($rcpts, true) as $rcpt) {
+  // Remove tag
+  $rcpt = preg_replace('/^(.*?)\+.*(@.*)$/', '$1$2', $rcpt);
+
   // Break rcpt into local part and domain part
   $parsed_rcpt = parse_email($rcpt);
-  
-  // Skip if not a mailcow handled domain
+
+  // Skip if not a openemail handled domain
   try {
     if (!$redis->hGet('DOMAIN_MAP', $parsed_rcpt['domain'])) {
       continue;
@@ -128,6 +131,14 @@ foreach (json_decode($rcpts, true) as $rcpt) {
       ));
       $gotos = $stmt->fetch(PDO::FETCH_ASSOC)['goto'];
     }
+    if (empty($gotos)) {
+      $stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain` WHERE `alias_domain` = :rcpt AND `active` = '1'");
+      $stmt->execute(array(':rcpt' => $parsed_rcpt['domain']));
+      $goto_branch = $stmt->fetch(PDO::FETCH_ASSOC)['target_domain'];
+      if ($goto_branch) {
+        $gotos = $parsed_rcpt['local'] . '@' . $goto_branch;
+      }
+    }
     $gotos_array = explode(',', $gotos);
 
     $loop_c = 0;
@@ -150,14 +161,24 @@ foreach (json_decode($rcpts, true) as $rcpt) {
         else {
           $parsed_goto = parse_email($goto);
           if (!$redis->hGet('DOMAIN_MAP', $parsed_goto['domain'])) {
-            error_log("QUARANTINE:" . $goto . " is not a mailcow handled mailbox or alias address");
+            error_log("QUARANTINE:" . $goto . " is not a openemail handled mailbox or alias address");
           }
           else {
             $stmt = $pdo->prepare("SELECT `goto` FROM `alias` WHERE `address` = :goto AND `active` = '1'");
             $stmt->execute(array(':goto' => $goto));
             $goto_branch = $stmt->fetch(PDO::FETCH_ASSOC)['goto'];
-            error_log("QUARANTINE: quarantine pipe: goto address " . $goto . " is a alias branch for " . $goto_branch);
-            $goto_branch_array = explode(',', $goto_branch);
+            if ($goto_branch) {
+              error_log("QUARANTINE: quarantine pipe: goto address " . $goto . " is a alias branch for " . $goto_branch);
+              $goto_branch_array = explode(',', $goto_branch);
+            } else {
+              $stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain` WHERE `alias_domain` = :domain AND `active` AND '1'");
+              $stmt->execute(array(':domain' => $parsed_goto['domain']));
+              $goto_branch = $stmt->fetch(PDO::FETCH_ASSOC)['target_domain'];
+              if ($goto_branch) {
+                error_log("QUARANTINE: quarantine pipe: goto domain " . $parsed_gto['domain'] . " is a domain alias branch for " . $goto_branch);
+                $goto_branch_array = array($parsed_gto['local'] . '@' . $goto_branch);
+              }
+            }
           }
         }
         // goto item was processed, unset
@@ -211,7 +232,7 @@ foreach ($rcpt_final_mailboxes as $rcpt) {
         WHERE `rcpt` = :rcpt2
         ORDER BY id DESC
         LIMIT :retention_size
-      ) x 
+      ) x
     );');
     $stmt->execute(array(
       ':rcpt' => $rcpt,
@@ -225,4 +246,3 @@ foreach ($rcpt_final_mailboxes as $rcpt) {
     exit;
   }
 }
-

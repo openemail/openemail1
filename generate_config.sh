@@ -2,6 +2,20 @@
 
 set -o pipefail
 
+if [[ "$(uname -r)" =~ ^4\.15\.0-60 ]]; then
+  echo "DO NOT RUN openemail ON THIS UBUNTU KERNEL!";
+  echo "Please update to 5.x or use another distribution."
+  exit 1
+fi
+
+if [[ "$(uname -r)" =~ ^4\.4\. ]]; then
+  if grep -q Ubuntu <<< $(uname -a); then
+    echo "DO NOT RUN openemail ON THIS UBUNTU KERNEL!";
+    echo "Please update to linux-generic-hwe-16.04 by running \"apt-get install --install-recommends linux-generic-hwe-16.04\""
+  fi
+  exit 1
+fi
+
 if grep --help 2>&1 | grep -q -i "busybox"; then
   echo "BusybBox grep detected, please install gnu grep, \"apk add --no-cache --upgrade grep\""
   exit 1
@@ -16,6 +30,7 @@ if [ -f openemail.conf ]; then
   case $response in
     [yY][eE][sS]|[yY])
       mv openemail.conf openemail.conf_backup
+      chmod 600 openemail.conf_backup
       ;;
     *)
       exit 1
@@ -23,9 +38,19 @@ if [ -f openemail.conf ]; then
   esac
 fi
 
+echo "Press enter to confirm the entered value."
+while [ -z "${OPENEMAIL_VERSION}" ]; do
+  read -p "OpenEMAIL version : " -e OPENEMAIL_VERSION
+  DOTS=${OPENEMAIL_VERSION//[^.]};
+  if [ ${#DOTS} -lt 2 ] && [ ! -z ${OPENEMAIL_VERSION} ]; then
+    echo "${OPENEMAIL_VERSION} is not the format of X.Y.Z format. An example is 1.0.0"
+    OPENEMAIL_VERSION=
+  fi
+done
+
 echo "Press enter to confirm the detected value '[value]' where applicable or enter a custom value."
 while [ -z "${OPENEMAIL_HOSTNAME}" ]; do
-  read -p "Hostname (FQDN): " -e OPENEMAIL_HOSTNAME
+  read -p "Mail server hostname (FQDN) - this is not your mail domain, but your mail servers hostname: " -e OPENEMAIL_HOSTNAME
   DOTS=${OPENEMAIL_HOSTNAME//[^.]};
   if [ ${#DOTS} -lt 2 ] && [ ! -z ${OPENEMAIL_HOSTNAME} ]; then
     echo "${OPENEMAIL_HOSTNAME} is not a FQDN"
@@ -86,6 +111,10 @@ else
   SKIP_SOLR=n
 fi
 
+
+OPENEMAIL_DOMAIN=$(echo ${OPENEMAIL_HOSTNAME} | cut -f 1 -d . --complement)
+
+
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
 cat << EOF > openemail.conf
@@ -97,6 +126,9 @@ cat << EOF > openemail.conf
 # Default password is "moohoo"
 
 OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
+OPENEMAIL_VERSION=${OPENEMAIL_VERSION}
+OPENEMAIL_DOMAIN=${OPENEMAIL_DOMAIN}
+
 
 # ------------------------------
 # SQL database configuration
@@ -104,8 +136,6 @@ OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
 
 DBNAME=openemail
 DBUSER=openemail
-DBHOST=mariadb
-
 
 # Please use long, random alphanumeric strings (A-Za-z0-9)
 
@@ -117,6 +147,8 @@ DBROOT=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 # ------------------------------
 
 # You should use HTTPS, but in case of SSL offloaded reverse proxies:
+# Might be important: This will also change the binding within the container.
+# If you use a proxy within Docker, point it to the ports you set below.
 
 HTTP_PORT=80
 HTTP_BIND=0.0.0.0
@@ -141,6 +173,7 @@ POPS_PORT=995
 SIEVE_PORT=4190
 DOVEADM_PORT=127.0.0.1:19991
 SQL_PORT=127.0.0.1:13306
+SOLR_PORT=127.0.0.1:18983
 
 # Your timezone
 
@@ -148,7 +181,7 @@ TZ=${OPENEMAIL_TZ}
 
 # Fixed project name
 
-COMPOSE_PROJECT_NAME=openemail
+COMPOSE_PROJECT_NAME=openemaildockerized
 
 # Set this to "allow" to enable the anyone pseudo user. Disabled by default.
 # When enabled, ACL can be created, that apply to "All authenticated users"
@@ -183,30 +216,48 @@ ADDITIONAL_SAN=
 
 SKIP_LETS_ENCRYPT=n
 
+# Create seperate certificates for all domains - y/n
+# this will allow adding more than 100 domains, but some email clients will not be able to connect with alternative hostnames
+# see https://wiki.dovecot.org/SSL/SNIClientSupport
+ENABLE_SSL_SNI=n
+
 # Skip IPv4 check in ACME container - y/n
 
 SKIP_IP_CHECK=n
+
+# Skip HTTP verification in ACME container - y/n
+
+SKIP_HTTP_VERIFICATION=n
 
 # Skip ClamAV (clamd-openemail) anti-virus (Rspamd will auto-detect a missing ClamAV container) - y/n
 
 SKIP_CLAMD=${SKIP_CLAMD}
 
 # Skip Solr on low-memory systems or if you do not want to store a readable index of your mails in solr-vol-1.
+
 SKIP_SOLR=${SKIP_SOLR}
 
 # Solr heap size in MB, there is no recommendation, please see Solr docs.
 # Solr is a prone to run OOM and should be monitored. Unmonitored Solr setups are not recommended.
+
 SOLR_HEAP=1024
 
 # Enable watchdog (watchdog-openemail) to restart unhealthy containers (experimental)
 
 USE_WATCHDOG=n
 
+# Allow admins to log into SOGo as email user (without any password)
+
+ALLOW_ADMIN_EMAIL_LOGIN=n
+
 # Send notifications by mail (no DKIM signature, sent from watchdog@OPENEMAIL_HOSTNAME)
 # Can by multiple rcpts, NO quotation marks
 
 #WATCHDOG_NOTIFY_EMAIL=a@example.com,b@example.com,c@example.com
-#WATCHDOG_NOTIFY_EMAIL=
+WATCHDOG_NOTIFY_EMAIL=watchdog@${OPENEMAIL_DOMAIN}
+
+# Notify about banned IP (includes whois lookup)
+WATCHDOG_NOTIFY_BAN=y
 
 # Max log lines per service to keep in Redis logs
 
@@ -228,18 +279,30 @@ IPV6_NETWORK=fd4d:6169:6c63:6f77::/64
 
 #SNAT6_TO_SOURCE=
 
-# Create or override API key for web uI
+# Create or override API key for web ui
 # You _must_ define API_ALLOW_FROM, which is a comma separated list of IPs
 # API_KEY allowed chars: a-z, A-Z, 0-9, -
 
 #API_KEY=
-#API_ALLOW_FROM=127.0.0.1,1.2.3.4
+#API_ALLOW_FROM=172.22.1.1,127.0.0.1
+
+# mail_home is ~/Maildir
+MAILDIR_SUB=Maildir
+
+# SOGo session timeout in minutes
+SOGO_EXPIRE_SESSION=480
+
+# openemail version
 
 EOF
 
 mkdir -p data/assets/ssl
 
+chmod 600 openemail.conf
+
 # copy but don't overwrite existing certificate
-cp -n data/assets/ssl-example/*.pem data/assets/ssl/
+cp -n -d data/assets/ssl-example/*.pem data/assets/ssl/
+
+# Hardlink config file to .env
 
 ln ./openemail.conf ./.env

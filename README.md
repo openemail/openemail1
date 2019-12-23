@@ -1,7 +1,14 @@
-# Openemail - Open Source Email and Collaboration Server in dockers
+# openemail: dockerized - 🐮 + 🐋 = 💕
 
-## Information and documentation
+## Want to support openemail?
 
-Please see [the official documentation](https://openemail.io/) for instructions.
+Please [consider a support contract (around 30 € per month) with Servercow](https://openemail.io) to support further development. _We_ support _you_ while _you_ support _us_. :)
 
-**Important**: openemail makes use of various open-source software. Please assure you agree with their license before using openemail. Any part of openemail itself is released under **GNU General Public License, Version 3**.
+Or just spread the word: moo.
+
+## Info and documentation
+
+Please see [the official documentation](https://openemail.io) for instructions.
+
+**Important**: openemail makes use of various open-source software. Please assure you agree with their license before using openemail.
+Any part of openemail itself is released under **GNU General Public License, Version 3**.

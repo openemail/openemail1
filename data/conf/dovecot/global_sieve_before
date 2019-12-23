@@ -1,0 +1,2 @@
+# global_sieve_before script
+# global_sieve_before -> user sieve_before (openemail UI) -> user sieve_after (openemail UI) -> global_sieve_after

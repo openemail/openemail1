@@ -176,7 +176,7 @@ function quarantine($_action, $_data = null) {
             array('221', '')
           );
           // Thanks to https://stackoverflow.com/questions/6632399/given-an-email-as-raw-text-how-can-i-send-it-using-php
-          $smtp_connection = fsockopen($postfix, 590, $errno, $errstr, 1); 
+          $smtp_connection = fsockopen($postfix, 590, $errno, $errstr, 1);
           if (!$smtp_connection) {
             logger(array('return' => array(
               array(
@@ -188,7 +188,7 @@ function quarantine($_action, $_data = null) {
             return false;
           }
           for ($i=0; $i < count($postfix_talk); $i++) {
-            $smtp_resource = fgets($smtp_connection, 256); 
+            $smtp_resource = fgets($smtp_connection, 256);
             if (substr($smtp_resource, 0, 3) !== $postfix_talk[$i][0]) {
               $ret = substr($smtp_resource, 0, 3);
               $ret = (empty($ret)) ? '-' : $ret;
@@ -248,7 +248,7 @@ function quarantine($_action, $_data = null) {
         $stmt = $pdo->prepare('SELECT `rcpt` FROM `quarantine` WHERE `id` = :id');
         $stmt->execute(array(':id' => $id));
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt']) && $_SESSION['mailcow_cc_role'] != 'admin') {
+        if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt']) && $_SESSION['openemail_cc_role'] != 'admin') {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -280,7 +280,7 @@ function quarantine($_action, $_data = null) {
       }
       // Edit settings
       if ($_data['action'] == 'settings') {
-        if ($_SESSION['mailcow_cc_role'] != "admin") {
+        if ($_SESSION['openemail_cc_role'] != "admin") {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -296,13 +296,23 @@ function quarantine($_action, $_data = null) {
           $release_format = 'raw';
         }
         $max_size = $_data['max_size'];
+        $max_age = intval($_data['max_age']);
         $subject = $_data['subject'];
-        $sender = $_data['sender'];
+        if (!filter_var($_data['sender'], FILTER_VALIDATE_EMAIL)) {
+          $sender = '';
+        }
+        else {
+          $sender = $_data['sender'];
+        }
         $html = $_data['html_tmpl'];
+        if ($max_age <= 0) {
+          $max_age = 365;
+        }
         $exclude_domains = (array)$_data['exclude_domains'];
         try {
           $redis->Set('Q_RETENTION_SIZE', intval($retention_size));
           $redis->Set('Q_MAX_SIZE', intval($max_size));
+          $redis->Set('Q_MAX_AGE', $max_age);
           $redis->Set('Q_EXCLUDE_DOMAINS', json_encode($exclude_domains));
           $redis->Set('Q_RELEASE_FORMAT', $release_format);
           $redis->Set('Q_SENDER', $sender);
@@ -344,7 +354,7 @@ function quarantine($_action, $_data = null) {
           $stmt = $pdo->prepare('SELECT `msg`, `qid`, `sender`, `rcpt` FROM `quarantine` WHERE `id` = :id');
           $stmt->execute(array(':id' => $id));
           $row = $stmt->fetch(PDO::FETCH_ASSOC);
-          if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt'])) {
+          if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt'])) {
             $_SESSION['return'][] = array(
               'type' => 'danger',
               'msg' => 'access_denied'
@@ -438,7 +448,7 @@ function quarantine($_action, $_data = null) {
               array('221', '')
             );
             // Thanks to https://stackoverflow.com/questions/6632399/given-an-email-as-raw-text-how-can-i-send-it-using-php
-            $smtp_connection = fsockopen($postfix, 590, $errno, $errstr, 1); 
+            $smtp_connection = fsockopen($postfix, 590, $errno, $errstr, 1);
             if (!$smtp_connection) {
               $_SESSION['return'][] = array(
                 'type' => 'warning',
@@ -448,7 +458,7 @@ function quarantine($_action, $_data = null) {
               return false;
             }
             for ($i=0; $i < count($postfix_talk); $i++) {
-              $smtp_resource = fgets($smtp_connection, 256); 
+              $smtp_resource = fgets($smtp_connection, 256);
               if (substr($smtp_resource, 0, 3) !== $postfix_talk[$i][0]) {
                 $ret = substr($smtp_resource, 0, 3);
                 $ret = (empty($ret)) ? '-' : $ret;
@@ -506,7 +516,7 @@ function quarantine($_action, $_data = null) {
           $stmt = $pdo->prepare('SELECT `msg`, `rcpt` FROM `quarantine` WHERE `id` = :id');
           $stmt->execute(array(':id' => $id));
           $row = $stmt->fetch(PDO::FETCH_ASSOC);
-          if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt']) && $_SESSION['mailcow_cc_role'] != 'admin') {
+          if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt']) && $_SESSION['openemail_cc_role'] != 'admin') {
             $_SESSION['return'][] = array(
               'type' => 'danger',
               'msg' => 'access_denied'
@@ -553,6 +563,28 @@ function quarantine($_action, $_data = null) {
                   'msg' => array('fuzzy_learn_error', $response['error'])
                 );
               }
+              curl_close($curl);
+              $curl = curl_init();
+              curl_setopt($curl, CURLOPT_UNIX_SOCKET_PATH, '/var/lib/rspamd/rspamd.sock');
+              curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+              curl_setopt($curl, CURLOPT_POST, 1);
+              curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+              curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: text/plain', 'Flag: 13'));
+              curl_setopt($curl, CURLOPT_URL,"http://rspamd/fuzzydel");
+              curl_setopt($curl, CURLOPT_POSTFIELDS, $row['msg']);
+              // It is most likely not a ham hash, so we ignore any error/warning response
+              // $response = curl_exec($curl);
+              curl_exec($curl);
+              // if (!curl_errno($curl)) {
+                // $response = json_decode($response, true);
+                // if (isset($response['error'])) {
+                  // $_SESSION['return'][] = array(
+                    // 'type' => 'warning',
+                    // 'log' => array(__FUNCTION__),
+                    // 'msg' => array('fuzzy_learn_error', $response['error'])
+                  // );
+                // }
+              // }
               curl_close($curl);
               try {
                 $stmt = $pdo->prepare("DELETE FROM `quarantine` WHERE `id` = :id");
@@ -613,16 +645,16 @@ function quarantine($_action, $_data = null) {
       return true;
     break;
     case 'get':
-      if ($_SESSION['mailcow_cc_role'] == "user") {
-        $stmt = $pdo->prepare('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created` FROM `quarantine` WHERE `rcpt` = :mbox');
-        $stmt->execute(array(':mbox' => $_SESSION['mailcow_cc_username']));
+      if ($_SESSION['openemail_cc_role'] == "user") {
+        $stmt = $pdo->prepare('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `score`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created`, `notified` FROM `quarantine` WHERE `rcpt` = :mbox');
+        $stmt->execute(array(':mbox' => $_SESSION['openemail_cc_username']));
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         while($row = array_shift($rows)) {
           $q_meta[] = $row;
         }
       }
-      elseif ($_SESSION['mailcow_cc_role'] == "admin") {
-        $stmt = $pdo->query('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created` FROM `quarantine`');
+      elseif ($_SESSION['openemail_cc_role'] == "admin") {
+        $stmt = $pdo->query('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `score`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created`, `notified` FROM `quarantine`');
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         while($row = array_shift($rows)) {
           $q_meta[] = $row;
@@ -631,7 +663,7 @@ function quarantine($_action, $_data = null) {
       else {
         $domains = array_merge(mailbox('get', 'domains'), mailbox('get', 'alias_domains'));
         foreach ($domains as $domain) {
-          $stmt = $pdo->prepare('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created` FROM `quarantine` WHERE `rcpt` REGEXP :domain');
+          $stmt = $pdo->prepare('SELECT `id`, `qid`, `subject`, LOCATE("VIRUS_FOUND", `symbols`) AS `virus_flag`, `score`, `rcpt`, `sender`, UNIX_TIMESTAMP(`created`) AS `created`, `notified` FROM `quarantine` WHERE `rcpt` REGEXP :domain');
           $stmt->execute(array(':domain' => '@' . $domain . '$'));
           $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
           while($row = array_shift($rows)) {
@@ -643,10 +675,11 @@ function quarantine($_action, $_data = null) {
     break;
     case 'settings':
       try {
-        if ($_SESSION['mailcow_cc_role'] == "admin") {
+        if ($_SESSION['openemail_cc_role'] == "admin") {
           $settings['exclude_domains'] = json_decode($redis->Get('Q_EXCLUDE_DOMAINS'), true);
         }
         $settings['max_size'] = $redis->Get('Q_MAX_SIZE');
+        $settings['max_age'] = $redis->Get('Q_MAX_AGE');
         $settings['retention_size'] = $redis->Get('Q_RETENTION_SIZE');
         $settings['release_format'] = $redis->Get('Q_RELEASE_FORMAT');
         $settings['subject'] = $redis->Get('Q_SUBJ');
@@ -670,10 +703,10 @@ function quarantine($_action, $_data = null) {
       if (!is_numeric($_data) || empty($_data)) {
         return false;
       }
-      $stmt = $pdo->prepare('SELECT `rcpt`, `symbols`, `msg`, `domain` FROM `quarantine` WHERE `id`= :id');
+      $stmt = $pdo->prepare('SELECT `rcpt`, `score`, `symbols`, `msg`, `domain` FROM `quarantine` WHERE `id`= :id');
       $stmt->execute(array(':id' => $_data));
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
-      if (hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $row['rcpt'])) {
+      if (hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $row['rcpt'])) {
         return $row;
       }
       return false;

@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/prerequisites.inc.php';
 
-if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
+if (isset($_SESSION['openemail_cc_role']) && ($_SESSION['openemail_cc_role'] == "admin" || $_SESSION['openemail_cc_role'] == "domainadmin")) {
 require_once $_SERVER['DOCUMENT_ROOT'] .  '/inc/header.inc.php';
 $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 ?>
@@ -22,7 +22,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
     <li role="presentation"><a href="#tab-syncjobs" aria-controls="tab-syncjobs" role="tab" data-toggle="tab"><?=$lang['mailbox']['sync_jobs'];?></a></li>
     <li role="presentation"><a href="#tab-filters" aria-controls="tab-filters" role="tab" data-toggle="tab"><?=$lang['mailbox']['filters'];?></a></li>
     <li role="presentation"><a href="#tab-bcc" aria-controls="tab-filters" role="tab" data-toggle="tab"><?=$lang['mailbox']['address_rewriting'];?></a></li>
-    <li role="presentation"<?=($_SESSION['mailcow_cc_role'] == "admin") ?: ' class="hidden"';?>><a href="#tab-tls-policy" aria-controls="tab-tls-policy" role="tab" data-toggle="tab"><?=$lang['mailbox']['tls_policy_maps'];?></a></li>
+    <li role="presentation"<?=($_SESSION['openemail_cc_role'] == "admin") ?: ' class="hidden"';?>><a href="#tab-tls-policy" aria-controls="tab-tls-policy" role="tab" data-toggle="tab"><?=$lang['mailbox']['tls_policy_maps'];?></a></li>
   </ul>
 
 	<div class="row">
@@ -44,14 +44,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
                 <a class="btn btn-sm btn-default" id="toggle_multi_select_all" data-id="domain" href="#"><span class="glyphicon glyphicon-check" aria-hidden="true"></span> <?=$lang['mailbox']['toggle_all'];?></a>
                 <a class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" href="#"><?=$lang['mailbox']['quick_actions'];?> <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <? if($_SESSION['mailcow_cc_role'] == "admin"): ?>
+                  <? if($_SESSION['openemail_cc_role'] == "admin"): ?>
                     <li><a data-action="edit_selected" data-id="domain" data-api-url='edit/domain' data-api-attr='{"active":"1"}' href="#"><?=$lang['mailbox']['activate'];?></a></li>
                     <li><a data-action="edit_selected" data-id="domain" data-api-url='edit/domain' data-api-attr='{"active":"0"}' href="#"><?=$lang['mailbox']['deactivate'];?></a></li>
                     <li role="separator" class="divider"></li>
                     <li><a data-action="delete_selected" data-id="domain" data-api-url='delete/domain' href="#"><?=$lang['mailbox']['remove'];?></a></li>
                   <? endif; ?>
                 </ul>
-                <? if($_SESSION['mailcow_cc_role'] == "admin"): ?>
+                <? if($_SESSION['openemail_cc_role'] == "admin"): ?>
                   <a class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#addDomainModal"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain'];?></a>
                 <? endif; ?>
               </div>
@@ -67,6 +67,15 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
                 <button class="btn btn-xs btn-default refresh_table" data-draw="draw_mailbox_table" data-table="mailbox_table"><?=$lang['admin']['refresh'];?></button>
               </div>
             </div>
+            <?php
+            if (preg_match("/^([yY][eE][sS]|[yY])+$/", $_ENV["ALLOW_ADMIN_EMAIL_LOGIN"])):
+            ?>
+            <div class="panel-body help-block">
+            <?=$lang['mailbox']['sogo_allow_admin_hint'];?>
+            </div>
+            <?php
+            endif;
+            ?>
             <div class="table-responsive">
               <table id="mailbox_table" class="table table-striped"></table>
             </div>
@@ -108,6 +117,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
                 <button class="btn btn-xs btn-default refresh_table" data-draw="draw_resource_table" data-table="resource_table"><?=$lang['admin']['refresh'];?></button>
               </div>
             </div>
+            <div class="panel-body help-block">
+            <p><span class="label label-success"><?=$lang['mailbox']['booking_0_short'];?></span> - <?=$lang['mailbox']['booking_0'];?></p>
+            <p><span class="label label-warning"><?=$lang['mailbox']['booking_lt0_short'];?></span> - <?=$lang['mailbox']['booking_lt0'];?></p>
+            <p><span class="label label-danger"><?=$lang['mailbox']['booking_custom_short'];?></span> - <?=$lang['mailbox']['booking_custom'];?></p>
+            </div>
             <div class="table-responsive">
               <table id="resource_table" class="table table-striped"></table>
             </div>
@@ -123,12 +137,6 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
                 </ul>
                 <a class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#addResourceModal"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_resource'];?></a>
               </div>
-            </div>
-            <hr>
-            <div class="panel-body help-block">
-            <p><span class="label label-success"><?=$lang['mailbox']['booking_0_short'];?></span> - <?=$lang['mailbox']['booking_0'];?></p>
-            <p><span class="label label-warning"><?=$lang['mailbox']['booking_lt0_short'];?></span> - <?=$lang['mailbox']['booking_lt0'];?></p>
-            <p><span class="label label-danger"><?=$lang['mailbox']['booking_custom_short'];?></span> - <?=$lang['mailbox']['booking_custom'];?></p>
             </div>
           </div>
         </div>
@@ -168,6 +176,9 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
                 <button class="btn btn-xs btn-default refresh_table" data-draw="draw_alias_table" data-table="alias_table"><?=$lang['admin']['refresh'];?></button>
               </div>
             </div>
+            <div class="panel-body help-block">
+            <?=$lang['mailbox']['alias_domain_alias_hint'];?>
+            </div>
             <div class="table-responsive">
               <table id="alias_table" class="table table-striped"></table>
             </div>
@@ -180,6 +191,9 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
                   <li><a data-action="edit_selected" data-id="alias" data-api-url='edit/alias' data-api-attr='{"active":"0"}' href="#"><?=$lang['mailbox']['deactivate'];?></a></li>
                   <li role="separator" class="divider"></li>
                   <li><a data-action="delete_selected" data-id="alias" data-api-url='delete/alias' href="#"><?=$lang['mailbox']['remove'];?></a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a data-action="edit_selected" data-id="alias" data-api-url='edit/alias' data-api-attr='{"sogo_visible":"1"}' href="#"><?=$lang['mailbox']['sogo_visible_y'];?></a></li>
+                  <li><a data-action="edit_selected" data-id="alias" data-api-url='edit/alias' data-api-attr='{"sogo_visible":"0"}' href="#"><?=$lang['mailbox']['sogo_visible_n'];?></a></li>
                 </ul>
                 <a class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#addAliasModal"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_alias'];?></a>
               </div>
@@ -276,7 +290,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
               </div>
             </div>
           </div>
-          <div class="panel panel-default <?=($_SESSION['mailcow_cc_role'] == "admin") ?: 'hidden';?>">
+          <div class="panel panel-default <?=($_SESSION['openemail_cc_role'] == "admin") ?: 'hidden';?>">
             <div class="panel-heading">
               <?=$lang['mailbox']['recipient_maps'];?> <span class="badge badge-info table-lines"></span>
               <div class="btn-group pull-right">
@@ -303,7 +317,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
           </div>
         </div>
 
-        <div role="tabpanel" class="tab-pane <?=($_SESSION['mailcow_cc_role'] == "admin") ?: 'hidden';?>" id="tab-tls-policy">
+        <div role="tabpanel" class="tab-pane <?=($_SESSION['openemail_cc_role'] == "admin") ?: 'hidden';?>" id="tab-tls-policy">
           <div class="panel panel-default">
             <div class="panel-heading">
               <?=$lang['mailbox']['tls_policy_maps_long'];?> <span class="badge badge-info table-lines"></span>
@@ -343,15 +357,22 @@ $lang_mailbox = json_encode($lang['mailbox']);
 echo "var lang = ". $lang_mailbox . ";\n";
 echo "var acl = '". json_encode($_SESSION['acl']) . "';\n";
 echo "var csrf_token = '". $_SESSION['CSRF']['TOKEN'] . "';\n";
-$role = ($_SESSION['mailcow_cc_role'] == "admin") ? 'admin' : 'domainadmin';
+$role = ($_SESSION['openemail_cc_role'] == "admin") ? 'admin' : 'domainadmin';
 $is_dual = (!empty($_SESSION["dual-login"]["username"])) ? 'true' : 'false';
 echo "var role = '". $role . "';\n";
 echo "var is_dual = " . $is_dual . ";\n";
 echo "var pagination_size = '". $PAGINATION_SIZE . "';\n";
+$ALLOW_ADMIN_EMAIL_LOGIN = (preg_match(
+	"/^([yY][eE][sS]|[yY])+$/",
+    $_ENV["ALLOW_ADMIN_EMAIL_LOGIN"]
+)) ? "true" : "false";
+echo "var ALLOW_ADMIN_EMAIL_LOGIN = " . $ALLOW_ADMIN_EMAIL_LOGIN . ";\n";
 ?>
 </script>
 <?php
 $js_minifier->add('/web/js/site/mailbox.js');
+$js_minifier->add('/web/js/presets/sieveMailbox.js');
+$js_minifier->add('/web/js/site/pwgen.js');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/footer.inc.php';
 }
 else {

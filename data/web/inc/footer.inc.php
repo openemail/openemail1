@@ -1,9 +1,15 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modals/footer.php';
 logger();
+
+$hash = $js_minifier->getDataHash();
+$JSPath = '/tmp/' . $hash . '.js';
+if(!file_exists($JSPath)) {
+  $js_minifier->minify($JSPath);
+  cleanupJS($hash);
+}
 ?>
-<div style="margin-bottom: 100px;"></div>
-<script type='text/javascript'><?=$js_minifier->minify();?></script>
+<script src="/cache/<?=basename($JSPath)?>"></script>
 <script>
 <?php
 $lang_footer = json_encode($lang['footer']);
@@ -26,14 +32,18 @@ $(window).load(function() {
   $(".overlay").hide();
 });
 $(document).ready(function() {
+  $(document).on('shown.bs.modal', function(e) {
+    modal_id = $(e.relatedTarget).data('target');
+    $(modal_id).attr("aria-hidden","false");
+  });
   // TFA, CSRF, Alerts in footer.inc.php
-  // Other general functions in mailcow.js
+  // Other general functions in openemail.js
   <?php
   $alertbox_log_parser = alertbox_log_parser($_SESSION);
   if (is_array($alertbox_log_parser)) {
     foreach($alertbox_log_parser as $log) {
   ?>
-  mailcow_alert_box(<?=$log['msg'];?>, <?=$log['type'];?>);
+  openemail_alert_box(<?=$log['msg'];?>, <?=$log['type'];?>);
   <?php
     }
   unset($_SESSION['return']);
@@ -45,7 +55,7 @@ $(document).ready(function() {
     backdrop: 'static',
     keyboard: false
   });
-  $('#u2f_status_auth').html('<p><span class="glyphicon glyphicon-refresh glyphicon-spin"></span> Initializing, please wait...</p>');
+  $('#u2f_status_auth').html('<p><span class="glyphicon glyphicon-refresh glyphicon-spin"></span> ' + lang_tfa.init_u2f + '</p>');
   $('#ConfirmTFAModal').on('shown.bs.modal', function(){
       $(this).find('input[name=token]').focus();
       // If U2F
@@ -54,7 +64,7 @@ $(document).ready(function() {
           type: "GET",
           cache: false,
           dataType: 'script',
-          url: "/api/v1/get/u2f-authentication/<?= (isset($_SESSION['pending_mailcow_cc_username'])) ? rawurlencode($_SESSION['pending_mailcow_cc_username']) : null; ?>",
+          url: "/api/v1/get/u2f-authentication/<?= (isset($_SESSION['pending_openemail_cc_username'])) ? rawurlencode($_SESSION['pending_openemail_cc_username']) : null; ?>",
           complete: function(data){
             $('#u2f_status_auth').html(lang_tfa.waiting_usb_auth);
             data;
@@ -93,38 +103,56 @@ $(document).ready(function() {
     }
     if ($(this).val() == "totp") {
       $('#TOTPModal').modal('show');
+      request_token = $('#tfa-qr-img').data('totp-secret');
+      $.ajax({
+        url: '/inc/ajax/qr_gen.php',
+        data: {
+          token: request_token,
+        },
+      }).done(function (result) {
+        $("#tfa-qr-img").attr("src", result);
+      });
       $("option:selected").prop("selected", false);
     }
     if ($(this).val() == "u2f") {
       $('#U2FModal').modal('show');
       $("option:selected").prop("selected", false);
-      $('#u2f_status_reg').html('<p><span class="glyphicon glyphicon-refresh glyphicon-spin"></span> Initializing, please wait...</p>');
-      $.ajax({
-        type: "GET",
-        cache: false,
-        dataType: 'script',
-        url: "/api/v1/get/u2f-registration/<?= (isset($_SESSION['mailcow_cc_username'])) ? rawurlencode($_SESSION['mailcow_cc_username']) : null; ?>",
-        complete: function(data){
-          data;
-          setTimeout(function() {
-            console.log("Ready to register");
-            $('#u2f_status_reg').html(lang_tfa.waiting_usb_register);
-            u2f.register(appId, registerRequests, registeredKeys, function(deviceResponse) {
-              var form  = document.getElementById('u2f_reg_form');
-              var reg   = document.getElementById('u2f_register_data');
-              console.log("Register callback: ", data);
-              if (deviceResponse.errorCode && deviceResponse.errorCode != 0) {
-                var u2f_return_code = document.getElementById('u2f_return_code');
-                u2f_return_code.style.display = u2f_return_code.style.display === 'none' ? '' : null;
-                if (deviceResponse.errorCode == "4") { deviceResponse.errorCode = "4 - The presented device is not eligible for this request. For a registration request this may mean that the token is already registered, and for a sign request it may mean that the token does not know the presented key handle"; }
-                u2f_return_code.innerHTML = 'Error code: ' + deviceResponse.errorCode;
-                return;
-              }
-              reg.value = JSON.stringify(deviceResponse);
-              form.submit();
-            });
-          }, 1000);
-        }
+      $("#start_u2f_register").click(function(){
+        $('#u2f_return_code').html('');
+        $('#u2f_return_code').hide();
+        $('#u2f_status_reg').html('<p><span class="glyphicon glyphicon-refresh glyphicon-spin"></span> ' + lang_tfa.init_u2f + '</p>');
+        $.ajax({
+          type: "GET",
+          cache: false,
+          dataType: 'script',
+          url: "/api/v1/get/u2f-registration/<?= (isset($_SESSION['openemail_cc_username'])) ? rawurlencode($_SESSION['openemail_cc_username']) : null; ?>",
+          complete: function(data){
+            data;
+            setTimeout(function() {
+              console.log("Ready to register");
+              $('#u2f_status_reg').html(lang_tfa.waiting_usb_register);
+              u2f.register(appId, registerRequests, registeredKeys, function(deviceResponse) {
+                var form  = document.getElementById('u2f_reg_form');
+                var reg   = document.getElementById('u2f_register_data');
+                console.log("Register callback: ", data);
+                if (deviceResponse.errorCode && deviceResponse.errorCode != 0) {
+                  var u2f_return_code = document.getElementById('u2f_return_code');
+                  u2f_return_code.style.display = u2f_return_code.style.display === 'none' ? '' : null;
+                  if (deviceResponse.errorCode == "4") {
+                    deviceResponse.errorCode = "4 - The presented device is not eligible for this request. For a registration request this may mean that the token is already registered, and for a sign request it may mean that the token does not know the presented key handle";
+                  }
+                  else if (deviceResponse.errorCode == "5") {
+                    deviceResponse.errorCode = "5 - Timeout reached before request could be satisfied.";
+                  }
+                  u2f_return_code.innerHTML = lang_tfa.error_code + ': ' + deviceResponse.errorCode + ' ' + lang_tfa.reload_retry;
+                  return;
+                }
+                reg.value = JSON.stringify(deviceResponse);
+                form.submit();
+              });
+            }, 1000);
+          }
+        });
       });
     }
     if ($(this).val() == "none") {
@@ -132,6 +160,18 @@ $(document).ready(function() {
       $("option:selected").prop("selected", false);
     }
   });
+
+  // Reload after session timeout
+  var session_lifetime = <?=((int)$SESSION_LIFETIME * 1000) + 15000;?>;
+  <?php
+  if (isset($_SESSION['openemail_cc_username'])):
+  ?>
+  setTimeout(function() {
+    location.reload();
+  }, session_lifetime);
+  <?php
+  endif;
+  ?>
 
   // CSRF
   $('<input type="hidden" value="<?= $_SESSION['CSRF']['TOKEN']; ?>">').attr('name', 'csrf_token').appendTo('form');
@@ -141,6 +181,15 @@ $(document).ready(function() {
 });
 </script>
 
+  <div class="container footer">
+    <?php
+    if (!empty($UI_TEXTS['ui_footer'])):
+    ?>
+     <hr><?=$UI_TEXTS['ui_footer'];?>
+    <?php
+    endif;
+    ?>
+  </div>
 </body>
 </html>
 <?php

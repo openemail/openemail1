@@ -19,16 +19,22 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/lib/vendor/autoload.php';
 // Load Sieve
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/lib/sieve/SieveParser.php';
 
+// minifierExtended
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/lib/JSminifierExtended.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/lib/CSSminifierExtended.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/lib/array_merge_real.php';
+
 // Minify JS
 use MatthiasMullie\Minify;
-$js_minifier = new Minify\JS();
+$js_minifier = new JSminifierExtended();
 $js_dir = array_diff(scandir('/web/js/build'), array('..', '.'));
 foreach ($js_dir as $js_file) {
   $js_minifier->add('/web/js/build/' . $js_file);
 }
 
 // Minify CSS
-$css_minifier = new Minify\CSS();
+$css_minifier = new CSSminifierExtended();
 $css_dir = array_diff(scandir('/web/css/build'), array('..', '.'));
 foreach ($css_dir as $css_file) {
   $css_minifier->add('/web/css/build/' . $css_file);
@@ -36,11 +42,20 @@ foreach ($css_dir as $css_file) {
 
 // U2F API + T/HOTP API
 $u2f = new u2flib_server\U2F('https://' . $_SERVER['HTTP_HOST']);
-$tfa = new RobThree\Auth\TwoFactorAuth($OTP_LABEL);
+$qrprovider = new RobThree\Auth\Providers\Qr\QRServerProvider();
+$tfa = new RobThree\Auth\TwoFactorAuth($OTP_LABEL, 6, 30, 'sha1', $qrprovider);
 
 // Redis
 $redis = new Redis();
-$redis->connect('redis-openemail', 6379);
+try {
+  $redis->connect('redis-openemail', 6379);
+}
+catch (Exception $e) {
+?>
+<center style='font-family:sans-serif;'>Connection to Redis failed.<br /><br />The following error was reported:<br/><?=$e->getMessage();?></center>
+<?php
+exit;
+}
 
 // PDO
 // Calculate offset
@@ -76,6 +91,35 @@ if (fsockopen("tcp://dockerapi", 443, $errno, $errstr) === false) {
 <?php
 exit;
 }
+
+// OAuth2
+class openemailPdo extends OAuth2\Storage\Pdo {
+  public function __construct($connection, $config = array()) {
+    parent::__construct($connection, $config);
+    $this->config['user_table'] = 'mailbox';
+  }
+  public function checkUserCredentials($username, $password) {
+    if (check_login($username, $password) == 'user') {
+      return true;
+    }
+    return false;
+  }
+  public function getUserDetails($username) {
+    return $this->getUser($username);
+  }
+}
+$oauth2_scope_storage = new OAuth2\Storage\Memory(array('default_scope' => 'profile', 'supported_scopes' => array('profile')));
+$oauth2_storage = new openemailPdo(array('dsn' => $dsn, 'username' => $database_user, 'password' => $database_pass));
+$oauth2_server = new OAuth2\Server($oauth2_storage, array(
+    'refresh_token_lifetime'         => $REFRESH_TOKEN_LIFETIME,
+    'access_lifetime'                => $ACCESS_TOKEN_LIFETIME,
+));
+$oauth2_server->setScopeUtil(new OAuth2\Scope($oauth2_scope_storage));
+$oauth2_server->addGrantType(new OAuth2\GrantType\AuthorizationCode($oauth2_storage));
+$oauth2_server->addGrantType(new OAuth2\GrantType\UserCredentials($oauth2_storage));
+$oauth2_server->addGrantType(new OAuth2\GrantType\RefreshToken($oauth2_storage, array(
+    'always_issue_new_refresh_token' => true
+)));
 
 function exception_handler($e) {
     if ($e instanceof PDOException) {
@@ -130,29 +174,38 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/sessions.inc.php';
 // $imap_server = new Server('dovecot', 143, '/imap/tls/novalidate-cert');
 
 // Set language
-if (!isset($_SESSION['mailcow_locale']) && !isset($_COOKIE['mailcow_locale'])) {
+if (!isset($_SESSION['openemail_locale']) && !isset($_COOKIE['openemail_locale'])) {
   if ($DETECT_LANGUAGE && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $header_lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
     if (in_array($header_lang, $AVAILABLE_LANGUAGES)) {
-      $_SESSION['mailcow_locale'] = $header_lang;
+      $_SESSION['openemail_locale'] = $header_lang;
     }
   }
   else {
-    $_SESSION['mailcow_locale'] = strtolower(trim($DEFAULT_LANG));
+    $_SESSION['openemail_locale'] = strtolower(trim($DEFAULT_LANG));
   }
 }
-if (isset($_COOKIE['mailcow_locale'])) {
-  (preg_match('/^[a-z]{2}$/', $_COOKIE['mailcow_locale'])) ? $_SESSION['mailcow_locale'] = $_COOKIE['mailcow_locale'] : setcookie("mailcow_locale", "", time() - 300);
+if (isset($_COOKIE['openemail_locale'])) {
+  (preg_match('/^[a-z]{2}$/', $_COOKIE['openemail_locale'])) ? $_SESSION['openemail_locale'] = $_COOKIE['openemail_locale'] : setcookie("openemail_locale", "", time() - 300);
 }
 if (isset($_GET['lang']) && in_array($_GET['lang'], $AVAILABLE_LANGUAGES)) {
-  $_SESSION['mailcow_locale'] = $_GET['lang'];
-  setcookie("mailcow_locale", $_GET['lang'], time()+30758400); // one year
+  $_SESSION['openemail_locale'] = $_GET['lang'];
+  setcookie("openemail_locale", $_GET['lang'], time()+30758400); // one year
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/lang/lang.en.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/lang/lang.'.$_SESSION['mailcow_locale'].'.php';
+/*
+ * load language
+ */
+$lang = json_decode(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/lang/lang.en.json'), true);
+
+$langFile = $_SERVER['DOCUMENT_ROOT'] . '/lang/lang.'.$_SESSION['openemail_locale'].'.json';
+if(file_exists($langFile)) {
+  $lang = array_merge_real($lang, json_decode(file_get_contents($langFile), true));
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.acl.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.app_passwd.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.mailbox.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.customize.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.address_rewriting.inc.php';
@@ -164,19 +217,21 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.policy.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.dkim.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.fwdhost.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.mailq.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.oauth2.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.ratelimit.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.transports.inc.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.rsettings.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.rspamd.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.tls_policy_maps.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.fail2ban.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.docker.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/functions.presets.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/init_db.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/triggers.inc.php';
 init_db_schema();
-if (isset($_SESSION['mailcow_cc_role'])) {
-  // if ($_SESSION['mailcow_cc_role'] == 'user') {
+if (isset($_SESSION['openemail_cc_role'])) {
+  // if ($_SESSION['openemail_cc_role'] == 'user') {
     // list($master_user, $master_passwd) = explode(':', file_get_contents('/etc/sogo/sieve.creds'));
-    // $imap_connection = $imap_server->authenticate($_SESSION['mailcow_cc_username'] . '*' . trim($master_user), trim($master_passwd));
+    // $imap_connection = $imap_server->authenticate($_SESSION['openemail_cc_username'] . '*' . trim($master_user), trim($master_passwd));
     // $master_user = $master_passwd = null;
   // }
   acl('to_session');

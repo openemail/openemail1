@@ -2,7 +2,7 @@
 function bcc($_action, $_data = null, $attr = null) {
 	global $pdo;
 	global $lang;
-  if ($_SESSION['mailcow_cc_role'] != "admin" && $_SESSION['mailcow_cc_role'] != "domainadmin") {
+  if ($_SESSION['openemail_cc_role'] != "admin" && $_SESSION['openemail_cc_role'] != "domainadmin") {
     return false;
   }
   switch ($_action) {
@@ -36,7 +36,7 @@ function bcc($_action, $_data = null, $attr = null) {
         return false;
       }
       if (is_valid_domain_name($local_dest)) {
-        if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $local_dest)) {
+        if (!hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $local_dest)) {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data, $_attr),
@@ -48,7 +48,7 @@ function bcc($_action, $_data = null, $attr = null) {
         $local_dest_sane = '@' . idn_to_ascii($local_dest, 0, INTL_IDNA_VARIANT_UTS46);
       }
       elseif (filter_var($local_dest, FILTER_VALIDATE_EMAIL)) {
-        if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $local_dest)) {
+        if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $local_dest)) {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data, $_attr),
@@ -69,7 +69,7 @@ function bcc($_action, $_data = null, $attr = null) {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_data, $_attr),
-          'msg' => 'bcc_must_be_email'
+          'msg' => array('bcc_must_be_email', htmlspecialchars($bcc_dest))
         );
         return false;
       }
@@ -190,7 +190,7 @@ function bcc($_action, $_data = null, $attr = null) {
       $stmt->execute(array(':id' => $id));
       $bccdata = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $bccdata['domain'])) {
+      if (!hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $bccdata['domain'])) {
         $bccdata = null;
         return false;
       }
@@ -205,7 +205,7 @@ function bcc($_action, $_data = null, $attr = null) {
       $all_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       foreach ($all_items as $i) {
-        if (hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $i['domain'])) {
+        if (hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $i['domain'])) {
           $bccdata[] = $i['id'];
         }
       }
@@ -229,7 +229,7 @@ function bcc($_action, $_data = null, $attr = null) {
         $stmt = $pdo->prepare("SELECT `domain` FROM `bcc_maps` WHERE id = :id");
         $stmt->execute(array(':id' => $id));
         $domain = $stmt->fetch(PDO::FETCH_ASSOC)['domain'];
-        if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+        if (!hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $domain)) {
           $_SESSION['return'][] = array(
             'type' => 'danger',
             'log' => array(__FUNCTION__, $_action, $_data, $_attr),
@@ -253,7 +253,7 @@ function bcc($_action, $_data = null, $attr = null) {
 function recipient_map($_action, $_data = null, $attr = null) {
 	global $pdo;
 	global $lang;
-  if ($_SESSION['mailcow_cc_role'] != "admin") {
+  if ($_SESSION['openemail_cc_role'] != "admin") {
     return false;
   }
   switch ($_action) {

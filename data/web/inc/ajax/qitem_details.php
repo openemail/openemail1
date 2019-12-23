@@ -2,9 +2,10 @@
 session_start();
 header("Content-Type: application/json");
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/prerequisites.inc.php';
-if (!isset($_SESSION['mailcow_cc_role'])) {
-	exit();
+if (!isset($_SESSION['openemail_cc_role'])) {
+  exit();
 }
+
 function rrmdir($src) {
   $dir = opendir($src);
   while(false !== ( $file = readdir($dir)) ) {
@@ -21,6 +22,13 @@ function rrmdir($src) {
   closedir($dir);
   rmdir($src);
 }
+function addAddresses(&$list, $mail, $headerName) {
+  $addresses = $mail->getAddresses($headerName);
+  foreach ($addresses as $address) {
+    $list[] = array('address' => $address['address'], 'type' => $headerName);
+  }
+}
+
 if (!empty($_GET['id']) && ctype_alnum($_GET['id'])) {
   $tmpdir = '/tmp/' . $_GET['id'] . '/';
   $mailc = quarantine('details', $_GET['id']);
@@ -36,6 +44,20 @@ if (!empty($_GET['id']) && ctype_alnum($_GET['id'])) {
     $html2text = new Html2Text\Html2Text();
     // Load msg to parser
     $mail_parser->setText($mailc['msg']);
+
+    // Get mail recipients
+    {
+      $recipientsList = array();
+      addAddresses($recipientsList, $mail_parser, 'to');
+      addAddresses($recipientsList, $mail_parser, 'cc');
+      addAddresses($recipientsList, $mail_parser, 'bcc');
+      $data['recipients'] = $recipientsList;
+    }
+
+    // Get rspamd score
+    $data['score'] = $mailc['score'];
+    // Get rspamd symbols
+    $data['symbols'] = json_decode($mailc['symbols']);
     // Get text/plain content
     $data['text_plain'] = $mail_parser->getMessageBody('text');
     // Get html content and convert to text
@@ -72,6 +94,19 @@ if (!empty($_GET['id']) && ctype_alnum($_GET['id'])) {
           'https://www.virustotal.com/file/' . hash_file('SHA256', $tmpdir . $val->getFilename()) . '/analysis/'
         );
       }
+    }
+    if (isset($_GET['eml'])) {
+      $dl_filename = str_replace('/', '_', $data['subject']);
+      header('Pragma: public');
+      header('Expires: 0');
+      header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+      header('Cache-Control: private', false);
+      header('Content-Type: message/rfc822');
+      header('Content-Disposition: attachment; filename="'. $dl_filename . '.eml";');
+      header('Content-Transfer-Encoding: binary');
+      header('Content-Length: ' . strlen($mailc['msg']));
+      echo $mailc['msg'];
+      exit;
     }
     if (isset($_GET['att'])) {
       if ($_SESSION['acl']['quarantine_attachments'] == 0) {

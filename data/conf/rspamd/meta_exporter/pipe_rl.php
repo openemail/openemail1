@@ -35,4 +35,3 @@ $data['header_from'] = implode(', ', $raw_data_decoded['header_from']);
 
 $redis->lpush('RL_LOG', json_encode($data));
 exit;
-

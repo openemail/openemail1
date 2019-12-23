@@ -3,7 +3,7 @@ function quota_notification($_action, $_data = null) {
 	global $redis;
 	global $lang;
 	$_data_log = $_data;
-  if ($_SESSION['mailcow_cc_role'] != "admin") {
+  if ($_SESSION['openemail_cc_role'] != "admin") {
     $_SESSION['return'][] = array(
       'type' => 'danger',
       'log' => array(__FUNCTION__, $_action, $_data_log),
@@ -21,7 +21,10 @@ function quota_notification($_action, $_data = null) {
         $release_format = 'raw';
       }
       $subject = $_data['subject'];
-      $sender = $_data['sender'];
+      $sender = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $_data['sender']);
+      if (filter_var($sender, FILTER_VALIDATE_EMAIL) === false) {
+        $sender = '';
+      }
       $html = $_data['html_tmpl'];
       try {
         $redis->Set('QW_SENDER', $sender);

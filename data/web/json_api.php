@@ -53,9 +53,7 @@ function api_log($_data) {
   }
 }
 
-api_log($_POST);
-
-if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_username'])) {
+if (isset($_SESSION['openemail_cc_role']) || isset($_SESSION['pending_openemail_cc_username'])) {
   if (isset($_GET['query'])) {
 
     $query = explode('/', $_GET['query']);
@@ -64,9 +62,43 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
     $object =     (isset($query[2])) ? $query[2] : null;
     $extra =      (isset($query[3])) ? $query[3] : null;
 
+    // accept json in request body
+    if($_SERVER['HTTP_CONTENT_TYPE'] === 'application/json') {
+      $request = file_get_contents('php://input');
+      $requestDecoded = json_decode($request, true);
+
+      // check for valid json
+      if ($action != 'get' && $requestDecoded === null) {
+        http_response_code(400);
+        echo json_encode(array(
+            'type' => 'error',
+            'msg' => 'Request body doesn\'t contain valid json!'
+        ));
+        exit;
+      }
+
+      // add
+      if ($action == 'add') {
+        $_POST['attr'] = $request;
+      }
+
+      // edit
+      if ($action == 'edit') {
+        $_POST['attr']  = json_encode($requestDecoded['attr']);
+        $_POST['items'] = json_encode($requestDecoded['items']);
+      }
+
+      // delete
+      if ($action == 'delete') {
+        $_POST['items'] = $request;
+      }
+
+    }
+    api_log($_POST);
+
     $request_incomplete = json_encode(array(
-    'type' => 'error',
-    'msg' => 'Cannot find attributes in post data'
+      'type' => 'error',
+      'msg' => 'Cannot find attributes in post data'
     ));
 
     switch ($action) {
@@ -95,6 +127,15 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           $attr = (array)json_decode($_POST['attr'], true);
           unset($attr['csrf_token']);
         }
+        // only allow POST requests to POST API endpoints
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+          http_response_code(405);
+          echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'only POST method is allowed'
+          ));
+          exit();
+        }
         switch ($category) {
           case "time_limited_alias":
             process_add_return(mailbox('add', 'time_limited_alias', $attr));
@@ -110,6 +151,9 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           break;
           case "mailbox":
             process_add_return(mailbox('add', 'mailbox', $attr));
+          break;
+          case "oauth2-client":
+            process_add_return(oauth2('add', 'client', $attr));
           break;
           case "domain":
             process_add_return(mailbox('add', 'domain', $attr));
@@ -162,11 +206,31 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           case "tls-policy-map":
             process_add_return(tls_policy_maps('add', $attr));
           break;
+          case "app-passwd":
+            process_add_return(app_passwd('add', $attr));
+          break;
+          // return no route found if no case is matched
+          default:
+            http_response_code(404);
+            echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'route not found'
+            ));
+            exit();
         }
       break;
       case "get":
         function process_get_return($data) {
           echo (!isset($data) || empty($data)) ? '{}' : json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        }
+        // only allow GET requests to GET API endpoints
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+          http_response_code(405);
+          echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'only GET method is allowed'
+          ));
+          exit();
         }
         switch ($category) {
           case "rspamd":
@@ -216,6 +280,39 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
 
               default:
                 $data = mailbox('get', 'domain_details', $object);
+                process_get_return($data);
+              break;
+            }
+          break;
+
+          case "app-passwd":
+            switch ($object) {
+              case "all":
+                if (empty($extra)) {
+                  $app_passwds = app_passwd('get');
+                }
+                else {
+                  $app_passwds = app_passwd('get', array('username' => $extra));
+                }
+                if (!empty($app_passwds)) {
+                  foreach ($app_passwds as $app_passwd) {
+                    $details = app_passwd('details', array('id' => $app_passwd['id']));
+                    if ($details !== false) {
+                      $data[] = $details;
+                    }
+                    else {
+                      continue;
+                    }
+                  }
+                  process_get_return($data);
+                }
+                else {
+                  echo '{}';
+                }
+              break;
+
+              default:
+                $data = app_passwd('details', array('id' => $object['id']));
                 process_get_return($data);
               break;
             }
@@ -454,10 +551,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('autodiscover-mailcow', $extra);
+                  $logs = get_logs('autodiscover-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('autodiscover-mailcow');
+                  $logs = get_logs('autodiscover-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -476,10 +573,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('mailcow-ui', $extra);
+                  $logs = get_logs('openemail-ui', $extra);
                 }
                 else {
-                  $logs = get_logs('mailcow-ui');
+                  $logs = get_logs('openemail-ui');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -509,10 +606,10 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 // 0 is first record, so empty is fine
                 if (isset($extra)) {
                   $extra = preg_replace('/[^\d\-]/i', '', $extra);
-                  $logs = get_logs('api-mailcow', $extra);
+                  $logs = get_logs('api-openemail', $extra);
                 }
                 else {
-                  $logs = get_logs('api-mailcow');
+                  $logs = get_logs('api-openemail');
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
@@ -527,12 +624,25 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
                 }
                 echo (isset($logs) && !empty($logs)) ? json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : '{}';
               break;
+              // return no route found if no case is matched
+              default:
+                http_response_code(404);
+                echo json_encode(array(
+                  'type' => 'error',
+                  'msg' => 'route not found'
+                ));
+                exit();
             }
           break;
           case "mailbox":
             switch ($object) {
               case "all":
-                $domains = mailbox('get', 'domains');
+                if (empty($extra)) {
+                  $domains = mailbox('get', 'domains');
+                }
+                else {
+                  $domains = array($extra);
+                }
                 if (!empty($domains)) {
                   foreach ($domains as $domain) {
                     $mailboxes = mailbox('get', 'mailboxes', $domain);
@@ -788,6 +898,14 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
               break;
             }
           break;
+          case "fail2ban":
+            switch ($object) {
+              default:
+                $data = fail2ban('get');
+                process_get_return($data);
+              break;
+            }
+          break;
           case "resource":
             switch ($object) {
               case "all":
@@ -863,7 +981,12 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           case "alias":
             switch ($object) {
               case "all":
-                $domains = array_merge(mailbox('get', 'domains'), mailbox('get', 'alias_domains'));
+                if (empty($extra)) {
+                  $domains = array_merge(mailbox('get', 'domains'), mailbox('get', 'alias_domains'));
+                }
+                else {
+                  $domains = array($extra);
+                }
                 if (!empty($domains)) {
                   foreach ($domains as $domain) {
                     $aliases = mailbox('get', 'aliases', $domain);
@@ -942,7 +1065,7 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           break;
           case "u2f-registration":
             header('Content-Type: application/javascript');
-            if (($_SESSION["mailcow_cc_role"] == "admin" || $_SESSION["mailcow_cc_role"] == "domainadmin") && $_SESSION["mailcow_cc_username"] == $object) {
+            if (($_SESSION["openemail_cc_role"] == "admin" || $_SESSION["openemail_cc_role"] == "domainadmin") && $_SESSION["openemail_cc_username"] == $object) {
               list($req, $sigs) = $u2f->getRegisterData(get_u2f_registrations($object));
               $_SESSION['regReq'] = json_encode($req);
               $_SESSION['regSigs'] = json_encode($sigs);
@@ -957,7 +1080,7 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           break;
           case "u2f-authentication":
             header('Content-Type: application/javascript');
-            if (isset($_SESSION['pending_mailcow_cc_username']) && $_SESSION['pending_mailcow_cc_username'] == $object) {
+            if (isset($_SESSION['pending_openemail_cc_username']) && $_SESSION['pending_openemail_cc_username'] == $object) {
               $auth_data = $u2f->getAuthenticateData(get_u2f_registrations($object));
               $challenge = $auth_data[0]->challenge;
               $appId = $auth_data[0]->appId;
@@ -980,13 +1103,29 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
             switch ($object) {
               default:
                 $data = dkim('details', $object);
-                  process_get_return($data);
-                  break;
+                process_get_return($data);
+                break;
             }
           break;
-          default:
-            echo '{}';
+          case "presets":
+            switch ($object) {
+              case "rspamd":
+                process_get_return(presets('get', 'rspamd'));
+              break;
+              case "sieve":
+                process_get_return(presets('get', 'sieve'));
+              break;
+            }
           break;
+        break;
+        // return no route found if no case is matched
+        default:
+          http_response_code(404);
+          echo json_encode(array(
+            'type' => 'error',
+            'msg' => 'route not found'
+          ));
+          exit();
         }
       break;
       case "delete":
@@ -1013,9 +1152,24 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
         else {
           $items = (array)json_decode($_POST['items'], true);
         }
+        // only allow POST requests to POST API endpoints
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+          http_response_code(405);
+          echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'only POST method is allowed'
+          ));
+          exit();
+        }
         switch ($category) {
           case "alias":
             process_delete_return(mailbox('delete', 'alias', array('id' => $items)));
+          break;
+          case "oauth2-client":
+            process_delete_return(oauth2('delete', 'client', array('id' => $items)));
+          break;
+          case "app-passwd":
+            process_delete_return(app_passwd('delete', array('id' => $items)));
           break;
           case "relayhost":
             process_delete_return(relayhost('delete', array('id' => $items)));
@@ -1090,6 +1244,14 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           case "rlhash":
             echo ratelimit('delete', null, implode($items));
           break;
+          // return no route found if no case is matched
+          default:
+            http_response_code(404);
+            echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'route not found'
+            ));
+            exit();
         }
       break;
       case "edit":
@@ -1118,6 +1280,15 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           unset($attr['csrf_token']);
           $items = isset($_POST['items']) ? (array)json_decode($_POST['items'], true) : null;
         }
+        // only allow POST requests to POST API endpoints
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+          http_response_code(405);
+          echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'only POST method is allowed'
+          ));
+          exit();
+        }
         switch ($category) {
           case "bcc":
             process_edit_return(bcc('edit', array_merge(array('id' => $items), $attr)));
@@ -1128,11 +1299,17 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
           case "recipient_map":
             process_edit_return(recipient_map('edit', array_merge(array('id' => $items), $attr)));
           break;
+          case "app-passwd":
+            process_edit_return(app_passwd('edit', array_merge(array('id' => $items), $attr)));
+          break;
           case "tls-policy-map":
             process_edit_return(tls_policy_maps('edit', array_merge(array('id' => $items), $attr)));
           break;
           case "alias":
             process_edit_return(mailbox('edit', 'alias', array_merge(array('id' => $items), $attr)));
+          break;
+          case "rspamd-map":
+            process_edit_return(rspamd('edit', array_merge(array('map' => $items), $attr)));
           break;
           case "app_links":
             process_edit_return(customize('edit', 'app_links', $attr));
@@ -1219,15 +1396,36 @@ if (isset($_SESSION['mailcow_cc_role']) || isset($_SESSION['pending_mailcow_cc_u
             process_edit_return(customize('edit', 'ui_texts', $attr));
           break;
           case "self":
-            if ($_SESSION['mailcow_cc_role'] == "domainadmin") {
+            if ($_SESSION['openemail_cc_role'] == "domainadmin") {
               process_edit_return(domain_admin('edit', $attr));
             }
-            elseif ($_SESSION['mailcow_cc_role'] == "user") {
+            elseif ($_SESSION['openemail_cc_role'] == "user") {
               process_edit_return(edit_user_account($attr));
             }
           break;
+          // return no route found if no case is matched
+          default:
+            http_response_code(404);
+            echo json_encode(array(
+              'type' => 'error',
+              'msg' => 'route not found'
+            ));
+            exit();
         }
       break;
+      // return no route found if no case is matched
+      default:
+        http_response_code(404);
+        echo json_encode(array(
+          'type' => 'error',
+          'msg' => 'route not found'
+        ));
+        exit();
+    }
+  }
+  if ($_SESSION['openemail_cc_api'] === true) {
+    if (isset($_SESSION['openemail_cc_api']) && $_SESSION['openemail_cc_api'] === true) {
+      unset($_SESSION['return']);
     }
   }
 }

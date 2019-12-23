@@ -1,6 +1,6 @@
 <?php
 function mailq($_action, $_data = null) {
-  if ($_SESSION['mailcow_cc_role'] != "admin") {
+  if ($_SESSION['openemail_cc_role'] != "admin") {
     $_SESSION['return'][] = array(
       'type' => 'danger',
       'log' => array(__FUNCTION__, $_action, $_data),

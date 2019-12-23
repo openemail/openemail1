@@ -5,7 +5,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
   ini_set('session.gc_maxlifetime', $SESSION_LIFETIME);
 }
 
-if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && 
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
   strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == "https") {
   if (session_status() !== PHP_SESSION_ACTIVE) {
     ini_set("session.cookie_secure", 1);
@@ -21,7 +21,7 @@ elseif (isset($_SERVER['HTTPS'])) {
 else {
   $IS_HTTPS = false;
 }
-// session_set_cookie_params($SESSION_LIFETIME, '/', '', $IS_HTTPS, true);
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
   session_start();
 }
@@ -35,6 +35,13 @@ if (!isset($_SESSION['SESS_REMOTE_UA'])) {
   $_SESSION['SESS_REMOTE_UA'] = $_SERVER['HTTP_USER_AGENT'];
 }
 
+// Keep session active
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $SESSION_LIFETIME)) {
+  session_unset();
+  session_destroy();
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
 // API
 if (!empty($_SERVER['HTTP_X_API_KEY'])) {
   $stmt = $pdo->prepare("SELECT `allow_from` FROM `api` WHERE `api_key` = :api_key AND `active` = '1';");
@@ -46,38 +53,56 @@ if (!empty($_SERVER['HTTP_X_API_KEY'])) {
     $remote = get_remote_ip(false);
     $allow_from = array_map('trim', preg_split( "/( |,|;|\n)/", $api_return['allow_from']));
     if (in_array($remote, $allow_from)) {
-      $_SESSION['mailcow_cc_username'] = 'API';
-      $_SESSION['mailcow_cc_role'] = 'admin';
-      $_SESSION['mailcow_cc_api'] = true;
+      $_SESSION['openemail_cc_username'] = 'API';
+      $_SESSION['openemail_cc_role'] = 'admin';
+      $_SESSION['openemail_cc_api'] = true;
     }
     else {
       $redis->publish("F2B_CHANNEL", "openemail UI: Invalid password for API_USER by " . $_SERVER['REMOTE_ADDR']);
       error_log("openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+      http_response_code(401);
       echo json_encode(array(
         'type' => 'error',
         'msg' => 'api access denied for ip ' . $_SERVER['REMOTE_ADDR']
       ));
       unset($_POST);
-      die();
+      exit();
     }
   }
   else {
     $redis->publish("F2B_CHANNEL", "openemail UI: Invalid password for API_USER by " . $_SERVER['REMOTE_ADDR']);
     error_log("openemail UI: Invalid password for " . $user . " by " . $_SERVER['REMOTE_ADDR']);
+    http_response_code(401);
     echo json_encode(array(
       'type' => 'error',
       'msg' => 'authentication failed'
     ));
     unset($_POST);
-    die();
+    exit();
   }
 }
-// Update session cookie
-// setcookie(session_name() ,session_id(), time() + $SESSION_LIFETIME);
+
+// Handle logouts
+if (isset($_POST["logout"])) {
+  if (isset($_SESSION["dual-login"])) {
+    $_SESSION["openemail_cc_username"] = $_SESSION["dual-login"]["username"];
+    $_SESSION["openemail_cc_role"] = $_SESSION["dual-login"]["role"];
+    unset($_SESSION["dual-login"]);
+    header("Location: /mailbox");
+    exit();
+  }
+  else {
+    session_regenerate_id(true);
+    session_unset();
+    session_destroy();
+    session_write_close();
+    header("Location: /");
+  }
+}
 
 // Check session
 function session_check() {
-  if (isset($_SESSION['mailcow_cc_api']) && $_SESSION['mailcow_cc_api'] === true) {
+  if (isset($_SESSION['openemail_cc_api']) && $_SESSION['openemail_cc_api'] === true) {
     return true;
   }
   if (!isset($_SESSION['SESS_REMOTE_UA']) || ($_SESSION['SESS_REMOTE_UA'] != $_SERVER['HTTP_USER_AGENT'])) {
@@ -102,25 +127,7 @@ function session_check() {
   return true;
 }
 
-if (isset($_SESSION['mailcow_cc_role']) && session_check() === false) {
+if (isset($_SESSION['openemail_cc_role']) && session_check() === false) {
   $_POST = array();
   $_FILES = array();
-}
-
-// Handle logouts
-if (isset($_POST["logout"])) {
-  if (isset($_SESSION["dual-login"])) {
-    $_SESSION["mailcow_cc_username"] = $_SESSION["dual-login"]["username"];
-    $_SESSION["mailcow_cc_role"] = $_SESSION["dual-login"]["role"];
-    unset($_SESSION["dual-login"]);
-    header("Location: /mailbox");
-    exit();
-  }
-  else {
-    session_regenerate_id(true);
-    session_unset();
-    session_destroy();
-    session_write_close();
-    header("Location: /");
-  }
 }

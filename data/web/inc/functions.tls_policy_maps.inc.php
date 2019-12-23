@@ -2,7 +2,7 @@
 function tls_policy_maps($_action, $_data = null, $attr = null) {
 	global $pdo;
 	global $lang;
-  if ($_SESSION['mailcow_cc_role'] != "admin") {
+  if ($_SESSION['openemail_cc_role'] != "admin") {
     return false;
   }
   switch ($_action) {

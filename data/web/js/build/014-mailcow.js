@@ -1,8 +1,8 @@
 $(document).ready(function() {
-  // mailcow alert box generator
-  window.mailcow_alert_box = function(message, type) {
+  // openemail alert box generator
+  window.openemail_alert_box = function(message, type) {
     msg = $('<span/>').text(message).text();
-    if (type == 'danger') {
+    if (type == 'danger' || type == 'info') {
       auto_hide = 0;
       $('#' + localStorage.getItem("add_modal")).modal('show');
       localStorage.removeItem("add_modal");
@@ -12,8 +12,30 @@ $(document).ready(function() {
     $.notify({message: msg},{z_index: 20000, delay: auto_hide, type: type,placement: {from: "bottom",align: "right"},animate: {enter: 'animated fadeInUp',exit: 'animated fadeOutDown'}});
   }
 
+  $(".generate_password").click(function( event ) {
+    event.preventDefault();
+    $('[data-hibp]').trigger('input');
+    if (typeof($(this).closest("form").data('pwgen-length')) == "number") {
+      var random_passwd = GPW.pronounceable($(this).closest("form").data('pwgen-length'))
+    }
+    else {
+      var random_passwd = GPW.pronounceable(8)
+    }
+    $(this).closest("form").find('[data-pwgen-field]').attr('type', 'text');
+    $(this).closest("form").find('[data-pwgen-field]').val(random_passwd);
+  });
+
   // https://stackoverflow.com/questions/4399005/implementing-jquerys-shake-effect-with-animate
-  function shake(div,interval=100,distance=10,times=4) {
+  function shake(div,interval,distance,times) {
+      if(typeof interval === 'undefined') {
+        interval = 100;
+      }
+      if(typeof distance === 'undefined') {
+        distance = 10;
+      }
+      if(typeof times === 'undefined') {
+        times = 4;
+      }
     $(div).css('position','relative');
     for(var iter=0;iter<(times+1);iter++){
       $(div).animate({ left: ((iter%2==0 ? distance : distance*-1))}, interval);
@@ -113,11 +135,17 @@ $(document).ready(function() {
     if ($(this).is("a")) {
       $(this).removeAttr("data-toggle");
       $(this).removeAttr("data-target");
+      $(this).removeAttr("data-action");
+      $(this).click(function(event) {
+        event.preventDefault();
+      });
     }
     if ($(this).hasClass('btn-group')) {
       $(this).find('a').each(function(){
         $(this).removeClass('dropdown-toggle')
           .removeAttr('data-toggle')
+          .removeAttr('data-target')
+          .removeAttr('data-action')
           .removeAttr('id')
           .attr("disabled", true);
         $(this).click(function(event) {
@@ -140,14 +168,18 @@ $(document).ready(function() {
       $(this).find('button').each(function() {
         $(this).attr("disabled", true);
       });
+    } else if ($(this).hasClass('form-group')) {
+      $(this).find('input').each(function() {
+        $(this).attr("disabled", true);
+      });
     } else if ($(this).hasClass('btn')) {
       $(this).attr("disabled", true);
-    } else if ($(this).attr('data-provide', 'slider')) {
+    } else if ($(this).attr('data-provide') == 'slider') {
       $(this).slider("disable");
     }
     $(this).data("toggle", "tooltip");
     $(this).attr("title", lang_acl.prohibited);
-    $(this).tooltip(); 
+    $(this).tooltip();
   });
 
   // disable submit after submitting form (not API driven buttons)
@@ -186,7 +218,7 @@ $(document).ready(function() {
         if ($(htmlResponse).find('span').hasClass('text-success')) {
           $('#triggerRestartContainer').html('<span class="glyphicon glyphicon-ok"></span> ');
           setTimeout(function(){
-            $('#RestartContainer').modal('toggle'); 
+            $('#RestartContainer').modal('toggle');
             window.location = window.location.href.split("#")[0];
           }, 1200);
         } else {

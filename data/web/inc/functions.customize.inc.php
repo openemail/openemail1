@@ -4,7 +4,7 @@ function customize($_action, $_item, $_data = null) {
 	global $lang;
   switch ($_action) {
     case 'add':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_item, $_data),
@@ -72,7 +72,7 @@ function customize($_action, $_item, $_data = null) {
       }
     break;
     case 'edit':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_item, $_data),
@@ -112,11 +112,13 @@ function customize($_action, $_item, $_data = null) {
           $main_name = $_data['main_name'];
           $apps_name = $_data['apps_name'];
           $help_text = $_data['help_text'];
+          $ui_footer = $_data['ui_footer'];
           try {
             $redis->set('TITLE_NAME', htmlspecialchars($title_name));
             $redis->set('MAIN_NAME', htmlspecialchars($main_name));
             $redis->set('APPS_NAME', htmlspecialchars($apps_name));
             $redis->set('HELP_TEXT', $help_text);
+            $redis->set('UI_FOOTER', $ui_footer);
           }
           catch (RedisException $e) {
             $_SESSION['return'][] = array(
@@ -135,7 +137,7 @@ function customize($_action, $_item, $_data = null) {
       }
     break;
     case 'delete':
-      if ($_SESSION['mailcow_cc_role'] != "admin") {
+      if ($_SESSION['openemail_cc_role'] != "admin") {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_item, $_data),
@@ -201,6 +203,11 @@ function customize($_action, $_item, $_data = null) {
             $data['main_name'] = ($main_name = $redis->get('MAIN_NAME')) ? $main_name : 'openemail UI';
             $data['apps_name'] = ($apps_name = $redis->get('APPS_NAME')) ? $apps_name : 'openemail Apps';
             $data['help_text'] = ($help_text = $redis->get('HELP_TEXT')) ? $help_text : false;
+            if (!empty($redis->get('UI_IMPRESS'))) {
+              $redis->set('UI_FOOTER', $redis->get('UI_IMPRESS'));
+              $redis->del('UI_IMPRESS');
+            }
+            $data['ui_footer'] = ($ui_footer = $redis->get('UI_FOOTER')) ? $ui_footer : false;
             return $data;
           }
           catch (RedisException $e) {

@@ -6,6 +6,10 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit873464e4bd965a3168f133248b1b218b
 {
+    public static $files = array (
+        '04c6c5c2f7095ccf6c481d3e53e1776f' => __DIR__ . '/..' . '/mustangostang/spyc/Spyc.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'R' => 
         array (
@@ -57,6 +61,16 @@ class ComposerStaticInit873464e4bd965a3168f133248b1b218b
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'O' => 
+        array (
+            'OAuth2' => 
+            array (
+                0 => __DIR__ . '/..' . '/bshaffer/oauth2-server-php/src',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'EasyPeasyICS' => __DIR__ . '/..' . '/phpmailer/phpmailer/extras/EasyPeasyICS.php',
         'PHPMailer' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmailer.php',
@@ -78,6 +92,7 @@ class ComposerStaticInit873464e4bd965a3168f133248b1b218b
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit873464e4bd965a3168f133248b1b218b::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit873464e4bd965a3168f133248b1b218b::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit873464e4bd965a3168f133248b1b218b::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit873464e4bd965a3168f133248b1b218b::$classMap;
 
         }, null, ClassLoader::class);

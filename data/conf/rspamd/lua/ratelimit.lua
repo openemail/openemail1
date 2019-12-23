@@ -1,6 +1,6 @@
 local custom_keywords = {}
 
-custom_keywords.mailcow = function(task)
+custom_keywords.openemail = function(task)
   local rspamd_logger = require "rspamd_logger"
   local dyn_rl_symbol = task:get_symbol("DYN_RL")
   if dyn_rl_symbol then

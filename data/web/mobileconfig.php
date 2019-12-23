@@ -1,12 +1,15 @@
 <?php
 require_once 'inc/prerequisites.inc.php';
 
-if (empty($mailcow_hostname)) {
+if (empty($openemail_hostname)) {
   exit();
 }
-if (!isset($_SESSION['mailcow_cc_role']) || $_SESSION['mailcow_cc_role'] != 'user') {
-  header("Location: index.php");
-  die("This page is only available to logged-in users, not admins.");
+if (!isset($_SESSION['openemail_cc_role']) || $_SESSION['openemail_cc_role'] != 'user') {
+  session_destroy();
+  // probably better than appending the whole current http query string
+  $append_get = (isset($_GET['only_email'])) ? '&only_email' : '';
+  header('Location: index.php?mobileconfig' . $append_get);
+  die();
 }
 
 error_reporting(0);
@@ -14,15 +17,15 @@ error_reporting(0);
 header('Content-Type: application/x-apple-aspen-config');
 header('Content-Disposition: attachment; filename="'.$UI_TEXTS['main_name'].'.mobileconfig"');
 
-$email = $_SESSION['mailcow_cc_username'];
-$domain = explode('@', $_SESSION['mailcow_cc_username'])[1];
+$email = $_SESSION['openemail_cc_username'];
+$domain = explode('@', $_SESSION['openemail_cc_username'])[1];
 $identifier = implode('.', array_reverse(preg_split( '/(@|\.)/', $email))) . '.appleprofile.'.preg_replace('/[^a-zA-Z0-9]+/', '', $UI_TEXTS['main_name']);
 
 try {
   $stmt = $pdo->prepare("SELECT `name` FROM `mailbox` WHERE `username`= :username");
   $stmt->execute(array(':username' => $email));
   $MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
-  $displayname = empty($MailboxData['name']) ? $email : $MailboxData['name'];
+  $displayname = htmlspecialchars(empty($MailboxData['name']) ? $email : $MailboxData['name'], ENT_NOQUOTES);
 }
 catch(PDOException $e) {
   $displayname = $email;
@@ -30,10 +33,10 @@ catch(PDOException $e) {
 
 if (isset($_GET['only_email'])) {
   $onlyEmailAccount = true;
-  $description = 'IMAP';  
+  $description = 'IMAP';
 } else {
   $onlyEmailAccount = false;
-  $description = 'IMAP, CalDAV, CardDAV'; 
+  $description = 'IMAP, CalDAV, CardDAV';
 }
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";

@@ -1,4 +1,4 @@
-rspamd_config.MAILCOW_AUTH = {
+rspamd_config.OPENEMAIL_AUTH = {
 	callback = function(task)
 		local uname = task:get_user()
 		if uname then
@@ -23,7 +23,7 @@ rspamd_config:register_symbol({
     local redis_params = rspamd_parse_redis_server('keep_spam')
     local ip = task:get_from_ip()
 
-    if not ip:is_valid() then
+    if ip == nil or not ip:is_valid() then
       return false
     end
 
@@ -77,9 +77,9 @@ rspamd_config:register_symbol({
     local rspamd_logger = require "rspamd_logger"
 
     local tagged_rcpt = task:get_symbol("TAGGED_RCPT")
-    local mailcow_domain = task:get_symbol("RCPT_MAILCOW_DOMAIN")
+    local openemail_domain = task:get_symbol("RCPT_OPENEMAIL_DOMAIN")
 
-    if tagged_rcpt and tagged_rcpt[1].options and mailcow_domain then
+    if tagged_rcpt and tagged_rcpt[1].options and openemail_domain then
       local tag = tagged_rcpt[1].options[1]
       rspamd_logger.infox("found tag: %s", tag)
       local action = task:get_metric_action('default')
@@ -174,6 +174,7 @@ rspamd_config:register_symbol({
     end
     return true
   end,
+  flags = 'empty',
   priority = 20
 })
 

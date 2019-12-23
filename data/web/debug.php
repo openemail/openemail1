@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/prerequisites.inc.php';
 
-if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admin") {
+if (isset($_SESSION['openemail_cc_role']) && $_SESSION['openemail_cc_role'] == "admin") {
 require_once $_SERVER['DOCUMENT_ROOT'] . '/inc/header.inc.php';
 $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 if (strtolower(getenv('SKIP_SOLR')) == 'n') {
@@ -76,11 +76,17 @@ else {
                   <?php
                   if ($solr_status !== false):
                   ?>
-                  <p><?=$lang['debug']['solr_uptime'];?>: ~<?=round($solr_status['uptime'] / 1000 / 60 / 60);?>h</p>
-                  <p><?=$lang['debug']['solr_started_at'];?>: <?=$solr_status['startTime'];?></p>
-                  <p><?=$lang['debug']['solr_last_modified'];?>: <?=$solr_status['index']['lastModified'];?></p>
-                  <p><?=$lang['debug']['solr_size'];?>: <?=$solr_status['index']['size'];?></p>
-                  <p><?=$lang['debug']['solr_docs'];?>: <?=$solr_status['index']['numDocs'];?></p>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-info" role="progressbar" style="width:<?=round($solr_status['jvm']['memory']['raw']['used%']);?>%"></div>
+                  </div>
+                  <p><?=$lang['debug']['jvm_memory_solr'];?>: <?=$solr_status['jvm']['memory']['total'] - $solr_status['jvm']['memory']['free'];?> / <?=$solr_status['jvm']['memory']['total'];?>
+                    (<?=round($solr_status['jvm']['memory']['raw']['used%']);?>%)</p>
+                  <hr>
+                  <p><?=$lang['debug']['solr_uptime'];?>: ~<?=round($solr_status['status']['dovecot-fts']['uptime'] / 1000 / 60 / 60);?>h</p>
+                  <p><?=$lang['debug']['solr_started_at'];?>: <?=$solr_status['status']['dovecot-fts']['startTime'];?></p>
+                  <p><?=$lang['debug']['solr_last_modified'];?>: <?=$solr_status['status']['dovecot-fts']['index']['lastModified'];?></p>
+                  <p><?=$lang['debug']['solr_size'];?>: <?=$solr_status['status']['dovecot-fts']['index']['size'];?></p>
+                  <p><?=$lang['debug']['solr_docs'];?>: <?=$solr_status['status']['dovecot-fts']['index']['numDocs'];?></p>
                   <?php
                   else:
                   ?>
@@ -124,9 +130,9 @@ else {
                 $started = '?';
               }
               ?>
-              <small>(Started on <?=$started;?>),
+              <small>(<?=$lang['debug']['started_on'];?> <?=$started;?>),
               <a href data-toggle="modal" data-container="<?=$container;?>" data-target="#RestartContainer"><?=$lang['debug']['restart_container'];?></a></small>
-              <span class="pull-right label label-<?=($container_info['State'] !== false && !empty($container_info['State'])) ? (($container_info['State']['Running'] == 1) ? 'success' : 'danger') : 'default'; ?>">&nbsp;&nbsp;&nbsp;</span>
+              <span class="pull-right container-indicator label label-<?=($container_info['State'] !== false && !empty($container_info['State'])) ? (($container_info['State']['Running'] == 1) ? 'success' : 'danger') : 'default'; ?>">&nbsp;</span>
               </li>
               <?php
               }
@@ -155,10 +161,10 @@ else {
 
         <div role="tabpanel" class="tab-pane" id="tab-ui">
           <div class="panel panel-default">
-            <div class="panel-heading">mailcow UI <span class="badge badge-info table-lines"></span>
+            <div class="panel-heading">openemail UI <span class="badge badge-info table-lines"></span>
               <div class="btn-group pull-right">
-                <button class="btn btn-xs btn-default add_log_lines" data-post-process="mailcow_ui" data-table="ui_logs" data-log-url="ui" data-nrows="1000">+ 1000</button>
-                <button class="btn btn-xs btn-default add_log_lines" data-post-process="mailcow_ui" data-table="ui_logs" data-log-url="ui" data-nrows="10000">+ 10000</button>
+                <button class="btn btn-xs btn-default add_log_lines" data-post-process="openemail_ui" data-table="ui_logs" data-log-url="ui" data-nrows="1000">+ 1000</button>
+                <button class="btn btn-xs btn-default add_log_lines" data-post-process="openemail_ui" data-table="ui_logs" data-log-url="ui" data-nrows="10000">+ 10000</button>
                 <button class="btn btn-xs btn-default refresh_table" data-draw="draw_ui_logs" data-table="ui_logs"><?=$lang['admin']['refresh'];?></button>
               </div>
             </div>
@@ -231,7 +237,9 @@ else {
               </div>
             </div>
             <div class="panel-body">
-              <div id="rspamd_donut" style="height: 300px;"></div>
+              <div id="chart-container">
+                <canvas id="rspamd_donut" style="width:100%;height:400px"></canvas>
+              </div>
               <div class="table-responsive">
                 <table class="table table-striped table-condensed log-table" id="rspamd_history"></table>
               </div>

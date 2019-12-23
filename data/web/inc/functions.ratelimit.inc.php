@@ -33,7 +33,7 @@ function ratelimit($_action, $_scope, $_data = null) {
               );
               continue;
             }
-            if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $object)) {
+            if (!hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $object)) {
               $_SESSION['return'][] = array(
                 'type' => 'danger',
                 'log' => array(__FUNCTION__, $_action, $_scope, $_data_log),
@@ -93,8 +93,8 @@ function ratelimit($_action, $_scope, $_data = null) {
               );
               continue;
             }
-            if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $object)
-              || ($_SESSION['mailcow_cc_role'] != 'admin' && $_SESSION['mailcow_cc_role'] != 'domainadmin')) {
+            if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $object)
+              || ($_SESSION['openemail_cc_role'] != 'admin' && $_SESSION['openemail_cc_role'] != 'domainadmin')) {
               $_SESSION['return'][] = array(
                 'type' => 'danger',
                 'log' => array(__FUNCTION__, $_action, $_scope, $_data_log),
@@ -140,7 +140,7 @@ function ratelimit($_action, $_scope, $_data = null) {
     case 'get':
       switch ($_scope) {
         case 'domain':
-          if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $_data)) {
+          if (!hasDomainAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $_data)) {
             return false;
           }
           try {
@@ -165,8 +165,8 @@ function ratelimit($_action, $_scope, $_data = null) {
           return false;
         break;
         case 'mailbox':
-          if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $_data)
-            || ($_SESSION['mailcow_cc_role'] != 'admin' && $_SESSION['mailcow_cc_role'] != 'domainadmin')) {
+          if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $_data)
+            || ($_SESSION['openemail_cc_role'] != 'admin' && $_SESSION['openemail_cc_role'] != 'domainadmin')) {
             return false;
           }
           try {
@@ -194,7 +194,7 @@ function ratelimit($_action, $_scope, $_data = null) {
     break;
     case 'delete':
       $data['hash'] = $_data;
-      if ($_SESSION['mailcow_cc_role'] != 'admin' || !preg_match('/^RL[0-9A-Za-z=]+$/i', trim($data['hash']))) {
+      if ($_SESSION['openemail_cc_role'] != 'admin' || !preg_match('/^RL[0-9A-Za-z=]+$/i', trim($data['hash']))) {
         $_SESSION['return'][] = array(
           'type' => 'danger',
           'log' => array(__FUNCTION__, $_action, $_type, $_data_log, $_attr),

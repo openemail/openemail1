@@ -23,8 +23,8 @@ function acl($_action, $_scope = null, $_data = null) {
               $acl_post[$acl_val] = 1;
             }
             // Users cannot change their own ACL
-            if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $username)
-              || ($_SESSION['mailcow_cc_role'] != 'admin' && $_SESSION['mailcow_cc_role'] != 'domainadmin')) {
+            if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $username)
+              || ($_SESSION['openemail_cc_role'] != 'admin' && $_SESSION['openemail_cc_role'] != 'domainadmin')) {
               $_SESSION['return'][] = array(
                 'type' => 'danger',
                 'log' => array(__FUNCTION__, $_action, $_scope, $_data_log),
@@ -63,7 +63,7 @@ function acl($_action, $_scope = null, $_data = null) {
           }
         break;
         case 'domainadmin':
-          if ($_SESSION['mailcow_cc_role'] != 'admin') {
+          if ($_SESSION['openemail_cc_role'] != 'admin') {
             $_SESSION['return'][] = array(
               'type' => 'danger',
               'log' => array(__FUNCTION__, $_action, $_scope, $_data_log),
@@ -87,7 +87,7 @@ function acl($_action, $_scope = null, $_data = null) {
               $acl_post[$acl_val] = 1;
             }
             // Users cannot change their own ACL
-            if ($_SESSION['mailcow_cc_role'] != 'admin') {
+            if ($_SESSION['openemail_cc_role'] != 'admin') {
               $_SESSION['return'][] = array(
                 'type' => 'danger',
                 'log' => array(__FUNCTION__, $_action, $_scope, $_data_log),
@@ -130,7 +130,7 @@ function acl($_action, $_scope = null, $_data = null) {
     case 'get':
       switch ($_scope) {
         case 'user':
-          if (!hasMailboxObjectAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $_data)) {
+          if (!hasMailboxObjectAccess($_SESSION['openemail_cc_username'], $_SESSION['openemail_cc_role'], $_data)) {
             return false;
           }
           $stmt = $pdo->prepare("SELECT * FROM `user_acl` WHERE `username` = :username");
@@ -145,10 +145,10 @@ function acl($_action, $_scope = null, $_data = null) {
           }
         break;
         case 'domainadmin':
-          if ($_SESSION['mailcow_cc_role'] != 'admin' && $_SESSION['mailcow_cc_role'] != 'domainadmin') {
+          if ($_SESSION['openemail_cc_role'] != 'admin' && $_SESSION['openemail_cc_role'] != 'domainadmin') {
             return false;
           }
-          if ($_SESSION['mailcow_cc_role'] == 'domainadmin' && $_SESSION['mailcow_cc_username'] != $_data) {
+          if ($_SESSION['openemail_cc_role'] == 'domainadmin' && $_SESSION['openemail_cc_username'] != $_data) {
             return false;
           }
           $stmt = $pdo->prepare("SELECT * FROM `da_acl` WHERE `username` = :username");
@@ -165,13 +165,13 @@ function acl($_action, $_scope = null, $_data = null) {
       }
     break;
     case 'to_session':
-      if (!isset($_SESSION['mailcow_cc_role'])) {
+      if (!isset($_SESSION['openemail_cc_role'])) {
         return false;
       }
       unset($_SESSION['acl']);
-      $username = strtolower(trim($_SESSION['mailcow_cc_username']));
+      $username = strtolower(trim($_SESSION['openemail_cc_username']));
       // Admins get access to all modules
-      if ($_SESSION['mailcow_cc_role'] == 'admin' ||
+      if ($_SESSION['openemail_cc_role'] == 'admin' ||
         (isset($_SESSION["dual-login"]["role"]) && $_SESSION["dual-login"]["role"] == 'admin')) {
         $stmt = $pdo->query("SHOW COLUMNS FROM `user_acl` WHERE `Field` != 'username';");
         $acl_all = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -184,7 +184,7 @@ function acl($_action, $_scope = null, $_data = null) {
           $acl['acl'][$row['Field']] = 1;
         }
       }
-      elseif ($_SESSION['mailcow_cc_role'] == 'domainadmin' ||
+      elseif ($_SESSION['openemail_cc_role'] == 'domainadmin' ||
         (isset($_SESSION["dual-login"]["role"]) && $_SESSION["dual-login"]["role"] == 'domainadmin')) {
         // Read all exting user_acl modules and set to 1
         $stmt = $pdo->query("SHOW COLUMNS FROM `user_acl` WHERE `Field` != 'username';");
@@ -202,7 +202,7 @@ function acl($_action, $_scope = null, $_data = null) {
         }
         unset($acl['acl']['username']);
       }
-      elseif ($_SESSION['mailcow_cc_role'] == 'user') {
+      elseif ($_SESSION['openemail_cc_role'] == 'user') {
         $stmt = $pdo->prepare("SELECT * FROM `user_acl` WHERE `username` = :username");
         $stmt->execute(array(':username' => $username));
         $acl['acl'] = $stmt->fetch(PDO::FETCH_ASSOC);

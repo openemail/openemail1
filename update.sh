@@ -1,16 +1,32 @@
 #!/usr/bin/env bash
 
-# openemail.conf
-# Thanks to: https://github.com/mailcow/mailcow-dockerized
-
 # Check permissions
 if [ "$(id -u)" -ne "0" ]; then
   echo "You need to be root"
   exit 1
 fi
 
+if [[ "$(uname -r)" =~ ^4\.15\.0-60 ]]; then
+  echo "DO NOT RUN openemail ON THIS UBUNTU KERNEL!";
+  echo "Please update to 5.x or use another distribution."
+  exit 1
+fi
+
+if [[ "$(uname -r)" =~ ^4\.4\. ]]; then
+  if grep -q Ubuntu <<< $(uname -a); then
+    echo "DO NOT RUN openemail ON THIS UBUNTU KERNEL!"
+    echo "Please update to linux-generic-hwe-16.04 by running \"apt-get install --install-recommends linux-generic-hwe-16.04\""
+    exit 1
+  fi
+  echo "openemail on a 4.4.x kernel is not supported. It may or may not work, please upgrade your kernel or continue at your own risk."
+  read -p "Press any key to continue..." < /dev/tty
+fi
+
 # Exit on error and pipefail
 set -o pipefail
+
+# Setting high dc timeout
+export COMPOSE_HTTP_TIMEOUT=600
 
 # Add /opt/bin to PATH
 PATH=$PATH:/opt/bin
@@ -24,6 +40,20 @@ done
 export LC_ALL=C
 DATE=$(date +%Y-%m-%d_%H_%M_%S)
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+function prefetch_images() {
+  [[ -z ${BRANCH} ]] && { echo -e "\e[33m\nUnknown branch...\e[0m"; exit 1; }
+  git fetch origin #${BRANCH}
+  while read image; do
+    RET_C=0
+    until docker pull ${image}; do
+      RET_C=$((RET_C + 1))
+      echo -e "\e[33m\nError pulling $image, retrying...\e[0m"
+      [ ${RET_C} -gt 3 ] && { echo -e "\e[31m\nToo many failed retries, exiting\e[0m"; exit 1; }
+      sleep 1
+    done
+  done < <(git show origin/${BRANCH}:docker-compose.yml | grep "image:" | awk '{ gsub("image:","", $3); print $2 }')
+}
 
 docker_garbage() {
   IMGS_TO_DELETE=()
@@ -74,8 +104,12 @@ while (($#)); do
   case "${1}" in
     --check|-c)
       echo "Checking remote code for updates..."
-      git fetch origin #${BRANCH}
-      if [[ -z $(git log HEAD --pretty=format:"%H" | grep $(git rev-parse origin/${BRANCH})) ]]; then
+      LATEST_REV=$(git ls-remote --exit-code --refs --quiet https://github.com/openemail/openemail ${BRANCH} | cut -f1)
+      if [ $? -ne 0 ]; then
+        echo "A problem occurred while trying to fetch the latest revision from github."
+        exit 99
+      fi
+      if [[ -z $(git log HEAD --pretty=format:"%H" | grep "${LATEST_REV}") ]]; then
         echo "Updated code is available."
         exit 0
       else
@@ -91,6 +125,11 @@ while (($#)); do
       docker_garbage
       exit 0
     ;;
+    --prefetch)
+      echo -e "\e[32mPrefetching images...\e[0m"
+      prefetch_images
+      exit 0
+    ;;
     --help|-h)
     echo './update.sh [-c|--check, --ours, --gc, -h|--help]
 
@@ -104,6 +143,7 @@ while (($#)); do
 done
 
 [[ ! -f openemail.conf ]] && { echo "openemail.conf is missing"; exit 1;}
+chmod 600 openemail.conf
 source openemail.conf
 DOTS=${OPENEMAIL_HOSTNAME//[^.]};
 if [ ${#DOTS} -lt 2 ]; then
@@ -119,6 +159,7 @@ CONFIG_ARRAY=(
   "SKIP_LETS_ENCRYPT"
   "USE_WATCHDOG"
   "WATCHDOG_NOTIFY_EMAIL"
+  "WATCHDOG_NOTIFY_BAN"
   "SKIP_CLAMD"
   "SKIP_IP_CHECK"
   "ADDITIONAL_SAN"
@@ -133,9 +174,14 @@ CONFIG_ARRAY=(
   "API_KEY"
   "API_ALLOW_FROM"
   "MAILDIR_GC_TIME"
+  "MAILDIR_SUB"
   "ACL_ANYONE"
   "SOLR_HEAP"
   "SKIP_SOLR"
+  "ENABLE_SSL_SNI"
+  "ALLOW_ADMIN_EMAIL_LOGIN"
+  "SKIP_HTTP_VERIFICATION"
+  "SOGO_EXPIRE_SESSION"
 )
 
 sed -i '$a\' openemail.conf
@@ -148,7 +194,7 @@ for option in ${CONFIG_ARRAY[@]}; do
   elif [[ ${option} == "COMPOSE_PROJECT_NAME" ]]; then
     if ! grep -q ${option} openemail.conf; then
       echo "Adding new option \"${option}\" to openemail.conf"
-      echo "COMPOSE_PROJECT_NAME=openemail" >> openemail.conf
+      echo "COMPOSE_PROJECT_NAME=openemaildockerized" >> openemail.conf
     fi
   elif [[ ${option} == "DOVEADM_PORT" ]]; then
     if ! grep -q ${option} openemail.conf; then
@@ -237,9 +283,36 @@ for option in ${CONFIG_ARRAY[@]}; do
   elif [[ ${option} == "SKIP_SOLR" ]]; then
     if ! grep -q ${option} openemail.conf; then
       echo "Adding new option \"${option}\" to openemail.conf"
-      echo '# Solr is disabled by default after upgrading from non-Solr to Solr-enabled Openemail.' >> openemail.conf
+      echo '# Solr is disabled by default after upgrading from non-Solr to Solr-enabled openemails.' >> openemail.conf
       echo '# Disable Solr or if you do not want to store a readable index of your mails in solr-vol-1.' >> openemail.conf
       echo "SKIP_SOLR=y" >> openemail.conf
+    fi
+  elif [[ ${option} == "ENABLE_SSL_SNI" ]]; then
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Create seperate certificates for all domains - y/n' >> openemail.conf
+      echo '# this will allow adding more than 100 domains, but some email clients will not be able to connect with alternative hostnames' >> openemail.conf
+      echo '# see https://wiki.dovecot.org/SSL/SNIClientSupport' >> openemail.conf
+      echo "ENABLE_SSL_SNI=n" >> openemail.conf
+    fi
+  elif [[ ${option} == "MAILDIR_SUB" ]]; then
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# MAILDIR_SUB defines a path in a users virtual home to keep the maildir in. Leave empty for updated setups.' >> openemail.conf
+      echo "#MAILDIR_SUB=Maildir" >> openemail.conf
+      echo "MAILDIR_SUB=" >> openemail.conf
+  fi
+  elif [[ ${option} == "WATCHDOG_NOTIFY_BAN" ]]; then
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# Notify about banned IP. Includes whois lookup.' >> openemail.conf
+      echo "WATCHDOG_NOTIFY_BAN=y" >> openemail.conf
+  fi
+  elif [[ ${option} == "SOGO_EXPIRE_SESSION" ]]; then
+    if ! grep -q ${option} openemail.conf; then
+      echo "Adding new option \"${option}\" to openemail.conf"
+      echo '# SOGo session timeout in minutes' >> openemail.conf
+      echo "SOGO_EXPIRE_SESSION=480" >> openemail.conf
   fi
   elif ! grep -q ${option} openemail.conf; then
     echo "Adding new option \"${option}\" to openemail.conf"
@@ -248,7 +321,7 @@ for option in ${CONFIG_ARRAY[@]}; do
 done
 
 echo -en "Checking internet connection... "
-curl -o /dev/null 1.1.1.1 -sm3
+timeout 3 ping -c 1 9.9.9.9 > /dev/null
 if [[ $? != 0 ]]; then
   echo -e "\e[31mfailed\e[0m"
   exit 1
@@ -270,26 +343,37 @@ fi
 if [[ -f openemail.conf ]]; then
   source openemail.conf
 else
-  echo -e "\e[31mNo openemail.conf - is Openmail installed?\e[0m"
+  echo -e "\e[31mNo openemail.conf - is openemail installed?\e[0m"
   exit 1
 fi
 
-read -r -p "Are you sure you want to update Openemail: All containers will be stopped. [y/N] " response
+read -r -p "Are you sure you want to update openemail: dockerized? All containers will be stopped. [y/N] " response
 if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
   echo "OK, exiting."
   exit 0
 fi
 
-echo -e "Stopping Openemail... "
+DIFF_DIRECTORY=update_diffs
+DIFF_FILE=${DIFF_DIRECTORY}/diff_before_update_$(date +"%Y-%m-%d-%H-%M-%S")
+echo -e "\e[32mSaving diff to ${DIFF_FILE}...\e[0m"
+mkdir -p ${DIFF_DIRECTORY}
+mv diff_before_update* ${DIFF_DIRECTORY}/ 2> /dev/null
+git diff --stat > ${DIFF_FILE}
+git diff >> ${DIFF_FILE}
+
+echo -e "\e[32mPrefetching images...\e[0m"
+prefetch_images
+
+echo -e "Stopping openemail... "
 sleep 2
 docker-compose down
 
-# Silently fixing remote url from openemail
+# Silently fixing remote url from andryyy to openemail
 git remote set-url origin https://github.com/openemail/openemail
 echo -e "\e[32mCommitting current status...\e[0m"
 [[ -z "$(git config user.name)" ]] && git config user.name moo
 [[ -z "$(git config user.email)" ]] && git config user.email moo@cow.moo
-git update-index --assume-unchanged data/conf/rspamd/override.d/worker-controller-password.inc
+[[ ! -z $(git ls-files data/conf/rspamd/override.d/worker-controller-password.inc) ]] && git rm data/conf/rspamd/override.d/worker-controller-password.inc
 git add -u
 git commit -am "Before update on ${DATE}" > /dev/null
 echo -e "\e[32mFetching updated code from remote...\e[0m"
@@ -342,14 +426,14 @@ docker-compose pull
 
 # Fix missing SSL, does not overwrite existing files
 [[ ! -d data/assets/ssl ]] && mkdir -p data/assets/ssl
-cp -n data/assets/ssl-example/*.pem data/assets/ssl/
+cp -n -d data/assets/ssl-example/*.pem data/assets/ssl/
 
 echo -e "Checking IPv6 settings... "
 if grep -q 'SYSCTL_IPV6_DISABLED=1' openemail.conf; then
   echo
   echo '!! IMPORTANT !!'
   echo
-  echo 'SYSCTL_IPV6_DISABLED was removed due to complications. IPv6 can be disabled by editing "docker-compose.yml" and setting "enabled_ipv6: true" to "enabled_ipv6: false".'
+  echo 'SYSCTL_IPV6_DISABLED was removed due to complications. IPv6 can be disabled by editing "docker-compose.yml" and setting "enable_ipv6: true" to "enable_ipv6: false".'
   echo 'This setting will only be active after a complete shutdown of openemail by running "docker-compose down" followed by "docker-compose up -d".'
   echo
   echo '!! IMPORTANT !!'
@@ -357,15 +441,8 @@ if grep -q 'SYSCTL_IPV6_DISABLED=1' openemail.conf; then
   read -p "Press any key to continue..." < /dev/tty
 fi
 
-echo -e "Fixing project name... "
+# Checking for old project name bug
 sed -i 's#COMPOSEPROJECT_NAME#COMPOSE_PROJECT_NAME#g' openemail.conf
-sed -i '/COMPOSE_PROJECT_NAME=/s/-//g' openemail.conf
-
-echo -e "Fixing PHP-FPM worker ports for Nginx sites..."
-sed -i 's#phpfpm:9000#phpfpm:9002#g' data/conf/nginx/*.conf
-if ls data/conf/nginx/*.custom 1> /dev/null 2>&1; then
-  sed -i 's#phpfpm:9000#phpfpm:9002#g' data/conf/nginx/*.custom
-fi
 
 # Fix Rspamd maps
 if [ -f data/conf/rspamd/custom/global_from_blacklist.map ]; then
@@ -378,11 +455,6 @@ fi
 echo -e "\e[32mStarting openemail...\e[0m"
 sleep 2
 docker-compose up -d --remove-orphans
-
-if [[ -f "data/web/nextcloud/occ" ]]; then
-  echo "Setting Nextcloud Redis timeout to 0.0..."
-  docker exec -it -u www-data $(docker ps -f name=php-fpm-openemail -q) bash -c "/web/nextcloud/occ config:system:set redis timeout --value=0.0 --type=integer"
-fi
 
 echo -e "\e[32mCollecting garbage...\e[0m"
 docker_garbage
