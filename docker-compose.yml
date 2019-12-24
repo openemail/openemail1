@@ -96,7 +96,7 @@ services:
             - rspamd
 
     php-fpm-openemail:
-      image: openemail/phpfpm:${OPENEMAIL_VERSION}
+      image: openemail/php-fpm:${OPENEMAIL_VERSION}
       command: "php-fpm -d date.timezone=${TZ} -d expose_php=0"
       depends_on:
         - redis-openemail
