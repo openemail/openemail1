@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data/letsencrypt/config:/config
     env_file: 
-      - ./.letsencrypt.env
+      - ./.proxy.env
     networks:
       openemail-network:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.252
@@ -140,7 +140,7 @@ services:
         - DBNAME=${DBNAME}
         - DBUSER=${DBUSER}
         - DBPASS=${DBPASS}
-        - OPENEMAIL_HOSTNAME=OPENEMAIL_HOSTNAME
+        - OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
         - IMAP_PORT=${IMAP_PORT:-143}
         - IMAPS_PORT=${IMAPS_PORT:-993}
         - POP_PORT=${POP_PORT:-110}
@@ -189,7 +189,7 @@ services:
             - sogo
 
     dovecot-openemail:
-      image: openemail/dovecot:OPENEMAIL_VERSION
+      image: openemail/dovecot:${OPENEMAIL_VERSION}
       depends_on:
         - mysql-openemail
       dns:
