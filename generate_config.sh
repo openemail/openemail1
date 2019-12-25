@@ -114,12 +114,6 @@ fi
 
 OPENEMAIL_DOMAIN=$(echo ${OPENEMAIL_HOSTNAME} | cut -f 1 -d . --complement)
 
-# Generate Proxy Envioronment 
-
-cat enviorenment/proxy.env >> ./.proxy.env
-sed -i -e "s/CH_OPENEMAIL_DOMAIN/$OPENEMAIL_DOMAIN/g"
-
-
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
 cat << EOF > openemail.conf
@@ -310,3 +304,15 @@ cp -n -d data/assets/ssl-example/*.pem data/assets/ssl/
 # Hardlink config file to .env
 
 ln ./openemail.conf ./.env
+
+# Generate docker-compose.yml
+
+cat ./docker-compose.yml.tmpl > ./docker-compose.yml
+sed -i -e "s/OPENEMAIL_VERSION/$OPENEMAIL_VERSION/g" ./docker-compose.yml
+
+# Generate Proxy Envioronment 
+
+cat enviorenment/proxy.env >> ./.proxy.env
+sed -i -e "s/CH_OPENEMAIL_DOMAIN/$OPENEMAIL_DOMAIN/g" ./.proxy.env
+
+
