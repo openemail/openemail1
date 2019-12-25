@@ -1,19 +1,19 @@
 version: '2.1'
 services:
-  proxy-openemail:
-    image: cybergatelabs/letsencrypt
-    restart: always
-    ports:
-      - 80:80
-      - 443:443
-    cap_add:
-      - NET_ADMIN
-    volumes:
-      - ./data/letsencrypt/config:/config
-    env_file: 
-      - ./.proxy.env
-    networks:
-      openemail-network:
+    proxy-openemail:
+      image: cybergatelabs/letsencrypt
+      restart: always
+      ports:
+        - 80:80
+        - 443:443
+      cap_add:
+        - NET_ADMIN
+      volumes:
+        - ./data/letsencrypt/config:/config
+      env_file: 
+        - ./.proxy.env
+      networks:
+        openemail-network:
           ipv4_address: ${IPV4_NETWORK:-172.22.1}.252
           aliases:
             - proxy
