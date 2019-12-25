@@ -1,8 +1,25 @@
 version: '2.1'
 services:
-
+    proxy-openemail:
+    image: cybergatelabs/letsencrypt
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./data/letsencrypt/config:/config
+    env_file: 
+      - ./.letsencrypt.env
+    networks:
+      openemail-network:
+          ipv4_address: ${IPV4_NETWORK:-172.22.1}.252
+          aliases:
+            - proxy
+            
     unbound-openemail:
-      image: openemail/unbound:${OPENEMAIL_VERSION}
+      image: openemail/unbound:OPENEMAIL_VERSION
       environment:
         - TZ=${TZ}
       volumes:
@@ -54,7 +71,7 @@ services:
             - redis
 
     clamd-openemail:
-      image: openemail/clamd:${OPENEMAIL_VERSION}
+      image: openemail/clamd:OPENEMAIL_VERSION
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
@@ -69,7 +86,7 @@ services:
             - clamd
 
     rspamd-openemail:
-      image: openemail/rspamd:${OPENEMAIL_VERSION}
+      image: openemail/rspamd:OPENEMAIL_VERSION
       stop_grace_period: 30s
       depends_on:
         - nginx-openemail
@@ -96,7 +113,7 @@ services:
             - rspamd
 
     php-fpm-openemail:
-      image: openemail/php-fpm:${OPENEMAIL_VERSION}
+      image: openemail/php-fpm:OPENEMAIL_VERSION
       command: "php-fpm -d date.timezone=${TZ} -d expose_php=0"
       depends_on:
         - redis-openemail
@@ -123,7 +140,7 @@ services:
         - DBNAME=${DBNAME}
         - DBUSER=${DBUSER}
         - DBPASS=${DBPASS}
-        - OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
+        - OPENEMAIL_HOSTNAME=OPENEMAIL_HOSTNAME
         - IMAP_PORT=${IMAP_PORT:-143}
         - IMAPS_PORT=${IMAPS_PORT:-993}
         - POP_PORT=${POP_PORT:-110}
@@ -144,7 +161,7 @@ services:
             - phpfpm
 
     sogo-openemail:
-      image: openemail/sogo:${OPENEMAIL_VERSION}
+      image: openemail/sogo:OPENEMAIL_VERSION
       environment:
         - DBNAME=${DBNAME}
         - DBUSER=${DBUSER}
@@ -172,7 +189,7 @@ services:
             - sogo
 
     dovecot-openemail:
-      image: openemail/dovecot:${OPENEMAIL_VERSION}
+      image: openemail/dovecot:OPENEMAIL_VERSION
       depends_on:
         - mysql-openemail
       dns:
@@ -227,7 +244,7 @@ services:
             - dovecot
 
     postfix-openemail:
-      image: openemail/postfix:${OPENEMAIL_VERSION}
+      image: openemail/postfix:OPENEMAIL_VERSION
       depends_on:
         - mysql-openemail
       volumes:
@@ -315,7 +332,7 @@ services:
     acme-openemail:
       depends_on:
         - nginx-openemail
-      image: openemail/acme:${OPENEMAIL_VERSION}
+      image: openemail/acme:OPENEMAIL_VERSION
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       environment:
@@ -344,7 +361,7 @@ services:
             - acme
 
     netfilter-openemail:
-      image: openemail/netfilter:${OPENEMAIL_VERSION}
+      image: openemail/netfilter:OPENEMAIL_VERSION
       stop_grace_period: 30s
       depends_on:
         - dovecot-openemail
@@ -365,7 +382,7 @@ services:
         - /lib/modules:/lib/modules:ro
 
     watchdog-openemail:
-      image: openemail/watchdog:${OPENEMAIL_VERSION}
+      image: openemail/watchdog:OPENEMAIL_VERSION
       # Debug
       #command: /watchdog.sh
       dns:
@@ -398,7 +415,7 @@ services:
             - watchdog
 
     dockerapi-openemail:
-      image: openemail/dockerapi:${OPENEMAIL_VERSION}
+      image: openemail/dockerapi:OPENEMAIL_VERSION
       restart: always
       oom_kill_disable: true
       dns:
@@ -414,7 +431,7 @@ services:
             - dockerapi
 
     solr-openemail:
-      image: openemail/solr:${OPENEMAIL_VERSION}
+      image: openemail/solr:OPENEMAIL_VERSION
       restart: always
       volumes:
         - solr-vol-1:/opt/solr/server/solr/dovecot-fts/data
@@ -430,7 +447,7 @@ services:
             - solr
 
     olefy-openemail:
-      image: openemail/olefy:${OPENEMAIL_VERSION}
+      image: openemail/olefy:OPENEMAIL_VERSION
       restart: always
       environment:
         - TZ=${TZ}
