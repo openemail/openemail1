@@ -189,7 +189,7 @@ services:
             - sogo
 
     dovecot-openemail:
-      image: openemail/dovecot:${OPENEMAIL_VERSION}
+      image: openemail/dovecot:OPENEMAIL_VERSION
       depends_on:
         - mysql-openemail
       dns:
