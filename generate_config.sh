@@ -303,6 +303,7 @@ cp -n -d data/assets/ssl-example/*.pem data/assets/ssl/
 
 # Hardlink config file to .env
 
+rm -rf ./.env
 ln ./openemail.conf ./.env
 
 # Generate docker-compose.yml
