@@ -114,6 +114,11 @@ fi
 
 OPENEMAIL_DOMAIN=$(echo ${OPENEMAIL_HOSTNAME} | cut -f 1 -d . --complement)
 
+# Generate Proxy Envioronment 
+
+cat enviorenment/proxy.env >> ./.proxy.env
+sed -i -e "s/CH_OPENEMAIL_DOMAIN/$OPENEMAIL_DOMAIN/g"
+
 
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
@@ -128,7 +133,6 @@ cat << EOF > openemail.conf
 OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
 OPENEMAIL_VERSION=${OPENEMAIL_VERSION}
 OPENEMAIL_DOMAIN=${OPENEMAIL_DOMAIN}
-
 
 # ------------------------------
 # SQL database configuration
@@ -150,11 +154,11 @@ DBROOT=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 # Might be important: This will also change the binding within the container.
 # If you use a proxy within Docker, point it to the ports you set below.
 
-HTTP_PORT=80
-HTTP_BIND=0.0.0.0
+HTTP_PORT=8080
+HTTP_BIND=127.0.0.1
 
-HTTPS_PORT=443
-HTTPS_BIND=0.0.0.0
+HTTPS_PORT=8443
+HTTPS_BIND=127.0.0.1
 
 # ------------------------------
 # Other bindings
@@ -181,7 +185,7 @@ TZ=${OPENEMAIL_TZ}
 
 # Fixed project name
 
-COMPOSE_PROJECT_NAME=openemaildockerized
+COMPOSE_PROJECT_NAME=
 
 # Set this to "allow" to enable the anyone pseudo user. Disabled by default.
 # When enabled, ACL can be created, that apply to "All authenticated users"
