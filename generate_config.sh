@@ -148,11 +148,11 @@ DBROOT=$(LC_ALL=C </dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 # Might be important: This will also change the binding within the container.
 # If you use a proxy within Docker, point it to the ports you set below.
 
-HTTP_PORT=8080
-HTTP_BIND=127.0.0.1
+HTTP_PORT=80
+HTTP_BIND=0.0.0.0
 
-HTTPS_PORT=8443
-HTTPS_BIND=127.0.0.1
+HTTPS_PORT=443
+HTTPS_BIND=0.0.0.0
 
 # ------------------------------
 # Other bindings
