@@ -75,7 +75,7 @@ services:
         - COMPRESSION=XZ
         - SPLIT_DB=TRUE
       restart: always
-        networks:
+      networks:
         openemail-network:
           aliases:
             - db-backup
