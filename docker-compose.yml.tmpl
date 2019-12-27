@@ -307,8 +307,8 @@ services:
         until ping rspamd -c1 > /dev/null; do sleep 1; done &&
         exec nginx -g 'daemon off;'"
       environment:
-        - HTTPS_PORT=${HTTPS_PORT:-443}
-        - HTTP_PORT=${HTTP_PORT:-80}
+       # - HTTPS_PORT=${HTTPS_PORT:-443}
+       # - HTTP_PORT=${HTTP_PORT:-80}
         - OPENEMAIL_HOSTNAME=${OPENEMAIL_HOSTNAME}
         - IPV4_NETWORK=${IPV4_NETWORK:-172.22.1}
         - TZ=${TZ}
