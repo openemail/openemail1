@@ -54,8 +54,8 @@ services:
          - ${IPV4_NETWORK:-172.22.1}.254
       networks:
         openemail-network:
-        aliases:
-           - phpmyadmin
+          aliases:
+            - pma
     
     db-backup-openemail:
       container_name: db-backup-openemail
