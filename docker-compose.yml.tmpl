@@ -1,23 +1,6 @@
 version: '2.1'
 services:
-    proxy-openemail:
-      image: cybergatelabs/letsencrypt
-      restart: always
-      ports:
-        - 80:80
-        - 443:443
-      cap_add:
-        - NET_ADMIN
-      volumes:
-        - ./data/letsencrypt/config:/config
-      env_file: 
-        - ./.proxy.env
-      networks:
-        openemail-network:
-          ipv4_address: ${IPV4_NETWORK:-172.22.1}.252
-          aliases:
-            - proxy
-            
+                
     unbound-openemail:
       image: openemail/unbound:OPENEMAIL_VERSION
       environment:
@@ -56,7 +39,47 @@ services:
         openemail-network:
           aliases:
             - mysql
-
+    
+    pma-openemail:
+       image: openemail/phpmyadmin
+       container_name: pma
+       hostname: pma.${OPENEMAIL_DOMAIN}
+       restart: always
+       environment:
+         - TZ=${TZ}
+         - PMA_HOST=mysql
+         - PMA_ARBITRARY=1
+         - PMA_ABSOLUTE_URI=https://${OPENEMAIL_HOSTNAME}/phpmyadmin/
+       dns:
+         - ${IPV4_NETWORK:-172.22.1}.254
+       networks:
+         openemail-network:
+         aliases:
+           - phpmyadmin
+    
+    db-backup-openemail:
+      container_name: db-backup-openemail
+      image: openemail/mariadb-backup
+        links:
+          - mysql-openemail
+        volumes:
+          - /opt/backups/mariadb:/backups
+        environment:
+          - DB_SERVER=mysql
+          - DB_USER=root
+          - DB_PASSWORD=${DBROOT}
+          - DB_DUMP_FREQ=1440
+          - DB_DUMP_BEGIN=0000
+          - DB_CLEANUP_TIME=8640
+          - MD5=TRUE
+          - COMPRESSION=XZ
+          - SPLIT_DB=TRUE
+        restart: always
+        networks:
+        openemail-network:
+          aliases:
+            - db-backup
+          
     redis-openemail:
       image: redis:5-alpine
       volumes:
