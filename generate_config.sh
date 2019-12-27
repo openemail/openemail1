@@ -1,4 +1,4 @@
-`#!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -o pipefail
 
@@ -315,5 +315,3 @@ sed -i -e "s/OPENEMAIL_VERSION/$OPENEMAIL_VERSION/g" ./docker-compose.yml
 
 cat enviorenment/proxy.env >> ./.proxy.env
 sed -i -e "s/CH_OPENEMAIL_DOMAIN/$OPENEMAIL_DOMAIN/g" ./.proxy.env
-
-
