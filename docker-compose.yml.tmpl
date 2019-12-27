@@ -41,40 +41,40 @@ services:
             - mysql
     
     pma-openemail:
-       image: openemail/phpmyadmin
-       container_name: pma
-       hostname: pma.${OPENEMAIL_DOMAIN}
-       restart: always
-       environment:
-         - TZ=${TZ}
-         - PMA_HOST=mysql
-         - PMA_ARBITRARY=1
-         - PMA_ABSOLUTE_URI=https://${OPENEMAIL_HOSTNAME}/phpmyadmin/
-       dns:
+      image: openemail/phpmyadmin
+      container_name: pma-openemail
+      hostname: pma.${OPENEMAIL_DOMAIN}
+      restart: always
+      environment:
+        - TZ=${TZ}
+        - PMA_HOST=mysql
+        - PMA_ARBITRARY=1
+        - PMA_ABSOLUTE_URI=https://${OPENEMAIL_HOSTNAME}/phpmyadmin/
+      dns:
          - ${IPV4_NETWORK:-172.22.1}.254
-       networks:
-         openemail-network:
-         aliases:
+      networks:
+        openemail-network:
+        aliases:
            - phpmyadmin
     
     db-backup-openemail:
       container_name: db-backup-openemail
       image: openemail/mariadb-backup
-        links:
-          - mysql-openemail
-        volumes:
-          - /opt/backups/mariadb:/backups
-        environment:
-          - DB_SERVER=mysql
-          - DB_USER=root
-          - DB_PASSWORD=${DBROOT}
-          - DB_DUMP_FREQ=1440
-          - DB_DUMP_BEGIN=0000
-          - DB_CLEANUP_TIME=8640
-          - MD5=TRUE
-          - COMPRESSION=XZ
-          - SPLIT_DB=TRUE
-        restart: always
+      links:
+        - mysql-openemail
+      volumes:
+        - /opt/backups/mariadb:/backups
+      environment:
+        - DB_SERVER=mysql
+        - DB_USER=root
+        - DB_PASSWORD=${DBROOT}
+        - DB_DUMP_FREQ=1440
+        - DB_DUMP_BEGIN=0000
+        - DB_CLEANUP_TIME=8640
+        - MD5=TRUE
+        - COMPRESSION=XZ
+        - SPLIT_DB=TRUE
+      restart: always
         networks:
         openemail-network:
           aliases:
